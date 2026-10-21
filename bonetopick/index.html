@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#171329">
+  <title>BONE TO PICK</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#171329;color:#fff7df;font-family:Nunito,sans-serif}.mono{font-family:'DM Mono',monospace}main{position:relative;width:100%;height:100dvh;background:#354d3c}canvas{display:block;width:100%;height:100%;touch-action:none;image-rendering:auto}.panel{background:#26203bef;border:2px solid #bba7ff;box-shadow:0 8px 0 #100d1e,0 16px 50px #08071388}.btn{border:2px solid #342947;box-shadow:0 3px 0 #171329;transition:transform .12s ease}.btn:hover{transform:translateY(-2px)}.btn:active{transform:translateY(2px)}.rank-pop{animation:pop .65s cubic-bezier(.2,1.8,.4,1) both}@keyframes pop{from{opacity:0;transform:scale(.4) rotate(-10deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+  </style>
+</head>
+<body>
+  <main>
+    <canvas id="game" width="960" height="540" aria-label="BONE TO PICK cemetery game"></canvas>
+    <div id="timerHud" class="mono absolute left-1/2 top-3 flex -translate-x-1/2 items-center gap-4 rounded-xl border-2 border-[#30253e] bg-[#171329dd] px-4 py-2 text-lg font-bold shadow-lg sm:gap-6 sm:px-5"><span id="timerText" class="text-xl text-[#ffcf8e] sm:text-2xl">01:00</span><span id="goalHud" class="text-xs text-[#a5f3c5] sm:text-sm">0 / 10 BONES</span><span id="livesHud" class="text-lg tracking-widest text-[#ff79a8]" aria-label="2 lives">♥ ♥</span></div>
+        <div class="pointer-events-none absolute right-3 top-20 rounded-xl border border-white/20 bg-[#171329bb] px-3 py-2 text-center text-[10px] font-black tracking-widest text-white/70">ARROW TO NEAREST BONE</div>
+    <button id="restartBtn" class="btn absolute right-3 top-3 rounded-xl bg-[#f4e8c1] px-4 py-2 font-black text-[#292044]">↻ RESTART</button>
+    <div id="overlay" class="absolute inset-0 z-10 flex items-center justify-center bg-[#171329bb] p-4 ">
+      <section class="panel max-h-full w-full max-w-xl overflow-y-auto rounded-3xl p-6 text-center sm:p-8">
+        <div class="mb-1 text-5xl">💀</div><p class="mono text-[10px] tracking-[.2em] text-[#bba7ff]">A GRAVEYARD SPEEDRUN</p>
+        <h1 id="overlayTitle" class="mt-1 text-4xl font-black text-[#ff9f43] sm:text-5xl">BONE TO PICK</h1>
+        <p id="overlayText" class="mx-auto mb-4 mt-2 max-w-md text-sm leading-6 text-white/75">Grab 10 bones in 1 minute. Dodge the zombies and keep your bones!</p>
+        <div id="victoryPanel" class="mb-4 hidden rounded-2xl border-2 border-[#ff9f43] bg-[#ff9f43]/10 p-4"><div id="rankBadge" class="rank-pop text-3xl font-black text-[#ffcf8e]">10 BONES COLLECTED!</div><div id="finishTime" class="mono mt-1 text-sm text-white/80">FINISHED IN 00:00</div><div class="mt-3 rounded-xl bg-black/20 p-3 text-sm"><span class="mono text-[10px] tracking-widest text-white/60">YOUR CANDY</span><br><b id="runReward" class="text-xl text-[#ffcf8e]">🍬 × 10</b></div></div>
+        <p id="menuGuide" class="mb-5 rounded-xl bg-white/5 p-3 text-sm text-white/70"><b class="text-[#a5f3c5]">WASD or arrow keys</b> to move · grab bones · dodge zombies · get all 10 to win!</p>
+        <button id="mainBtn" class="btn rounded-2xl bg-[#ff9f43] px-8 py-3 text-lg font-black text-[#271a32]">PLAY</button>
+      </section>
+    </div>
+    <div id="toast" class="pointer-events-none absolute bottom-5 left-1/2 z-[5] hidden -translate-x-1/2 rounded-xl border-2 border-[#332947] bg-[#f4e8c1] px-4 py-2 text-center text-sm font-black text-[#292044] shadow-lg"></div>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>
