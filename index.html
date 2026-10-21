@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171321">
+  <title>Graveyard Arcade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500;600&family=Nunito:wght@500;600;700;800;900;1000&display=swap" rel="stylesheet">
+  <style>
+    :root{color-scheme:dark;--night:#171321;--panel:#211c2c;--bone:#fff0d1;--muted:#b9b1c4;--orange:#ff9f43;--lilac:#bba7ff;--mint:#a5f3c5}
+    *{box-sizing:border-box}html{min-height:100%;background:var(--night)}body{margin:0;min-height:100vh;color:var(--bone);font-family:Nunito,system-ui,sans-serif;background:radial-gradient(ellipse at 50% -12%,#41334e 0,#252036 35%,var(--night) 75%);overflow-x:hidden}
+    .wrap{width:min(1120px,calc(100% - 40px));margin:auto}.top{display:flex;align-items:center;justify-content:space-between;padding:25px 0;border-bottom:1px solid #ffffff19}.brand{display:flex;align-items:center;gap:11px;font-weight:1000;letter-spacing:.08em}.brand-mark{display:grid;place-items:center;width:42px;height:42px;border:1px solid #bba7ff77;border-radius:14px;background:#bba7ff16;font-size:22px}.mono{font:600 11px 'DM Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#bba7ff}.top-note{font:500 11px 'DM Mono',monospace;letter-spacing:.12em;color:#b8adbd}
+    .hero{position:relative;padding:70px 0 43px;text-align:center}.moon{position:absolute;right:8%;top:44px;width:68px;height:68px;border-radius:50%;background:#ffcf8e;box-shadow:0 0 0 10px #ffcf8e12}.eyebrow{display:inline-flex;gap:8px;align-items:center;padding:8px 13px;border:1px solid #bba7ff55;border-radius:99px;background:#211c2c;color:#d4c7ff;font:600 10px 'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase}.hero h1{position:relative;margin:17px 0 8px;font-size:clamp(42px,8vw,82px);line-height:.98;font-weight:1000;letter-spacing:-.055em}.hero h1 span{color:var(--orange)}.hero p{max-width:540px;margin:16px auto 0;color:#c6bdcd;font-size:16px;line-height:1.7}.yard{position:absolute;left:50%;bottom:0;z-index:-1;width:100vw;height:90px;transform:translateX(-50%);background:linear-gradient(transparent,#171321 85%)}
+    .section-head{display:flex;align-items:end;justify-content:space-between;margin:10px 0 17px}.section-head h2{margin:0;font-size:21px;font-weight:900}.section-head p{margin:0;color:#aaa1b4;font:500 10px 'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase}
+    .games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;padding-bottom:34px}.card{--accent:var(--orange);position:relative;display:flex;min-height:210px;flex-direction:column;overflow:hidden;border:1px solid #ffffff20;border-radius:22px;background:linear-gradient(145deg,#282235,#1e1a29 72%);color:inherit;text-decoration:none;transition:transform .18s,border-color .18s,background .18s}.card:hover,.card:focus-visible{transform:translateY(-4px);border-color:var(--accent);background:linear-gradient(145deg,#30283d,#211c2c 75%);outline:none}.card-top{display:flex;align-items:flex-start;justify-content:space-between;padding:20px 21px 2px}.icon{display:grid;place-items:center;width:58px;height:58px;border:1px solid color-mix(in srgb,var(--accent),transparent 60%);border-radius:18px;background:color-mix(in srgb,var(--accent),transparent 89%);font-size:31px}.play{display:grid;place-items:center;width:36px;height:36px;border:1px solid #ffffff24;border-radius:50%;color:var(--accent);font-size:19px;transition:transform .18s}.card:hover .play{transform:translateX(3px)}.card-body{padding:12px 21px 20px}.card h3{margin:0 0 6px;font-size:22px;line-height:1.2;font-weight:1000}.card p{max-width:440px;margin:0;color:#bdb4c6;font-size:14px;line-height:1.5}.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:15px}.tag{padding:5px 9px;border-radius:99px;background:#ffffff0c;color:#d4ccda;font:500 9px 'DM Mono',monospace;letter-spacing:.08em;text-transform:uppercase}.card.bones{--accent:#a5f3c5}.card.whack{--accent:#ff9f43}.card.treat{--accent:#ff79a8}.card.match{--accent:#bba7ff}
+    .bottom{display:flex;justify-content:space-between;gap:15px;padding:17px 0 25px;border-top:1px solid #ffffff19;color:#968da0;font:500 10px 'DM Mono',monospace;letter-spacing:.08em}.bottom b{color:#d2c7dc;font-weight:600}.star{color:var(--orange)}
+    @media(max-width:650px){.wrap{width:min(100% - 28px,500px)}.top{padding:17px 0}.top-note{font-size:9px}.hero{padding:54px 0 35px}.moon{right:4%;top:33px;width:42px;height:42px}.hero p{font-size:14px}.section-head p{max-width:120px;text-align:right;line-height:1.5}.games{grid-template-columns:1fr;gap:12px}.card{min-height:184px}.card-top{padding:16px 17px 0}.card-body{padding:10px 17px 17px}.bottom{font-size:9px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <header class="wrap top">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">⚰</span><span>GRAVEYARD<br>ARCADE</span></div>
+    <div class="top-note">A little spooky · a lot of silly</div>
+  </header>
+  <main class="wrap">
+    <section class="hero" aria-labelledby="welcome">
+      <div class="moon" aria-hidden="true"></div>
+      <div class="eyebrow"><span class="star">✦</span> THE GATES ARE OPEN <span class="star">✦</span></div>
+      <h1 id="welcome">Pick your <span>poison.</span></h1>
+      <p>Four quick Halloween games are waiting in the graveyard. Choose a game, round up your friends, and let the spooky silliness begin.</p>
+      <div class="yard" aria-hidden="true"></div>
+    </section>
+    <section aria-labelledby="games-title">
+      <div class="section-head"><h2 id="games-title">Choose a game</h2><p>Pick a tomb. Start a game.</p></div>
+      <div class="games">
+        <a class="card bones" href="./bonetopick/">
+          <div class="card-top"><div class="icon" aria-hidden="true">🦴</div><span class="play" aria-hidden="true">↗</span></div>
+          <div class="card-body"><h3>BONE TO PICK</h3><p>Waddle through the cemetery, scoop up 10 bones, and dodge the goofy zombies.</p><div class="tags"><span class="tag">Action</span><span class="tag">2 lives</span><span class="tag">1 minute</span></div></div>
+        </a>
+        <a class="card whack" href="./wack-a-mole/">
+          <div class="card-top"><div class="icon" aria-hidden="true">🔨</div><span class="play" aria-hidden="true">↗</span></div>
+          <div class="card-body"><h3>GRAVEYARD WHACK</h3><p>Keep your eyes peeled and bonk the little monsters before they disappear.</p><div class="tags"><span class="tag">Arcade</span><span class="tag">Quick reflexes</span></div></div>
+        </a>
+        <a class="card treat" href="./trickyhouse/">
+          <div class="card-top"><div class="icon" aria-hidden="true">🍬</div><span class="play" aria-hidden="true">↗</span></div>
+          <div class="card-body"><h3>TRICK OR TREAT!</h3><p>Knock on spooky doors and see what kind of Halloween surprise is waiting.</p><div class="tags"><span class="tag">Adventure</span><span class="tag">Surprises</span></div></div>
+        </a>
+        <a class="card match" href="./zombiematching/">
+          <div class="card-top"><div class="icon" aria-hidden="true">🧟</div><span class="play" aria-hidden="true">↗</span></div>
+          <div class="card-body"><h3>ZOMBIE MATCHING</h3><p>Flip the cards, remember what you saw, and find every creepy-cute pair.</p><div class="tags"><span class="tag">Memory</span><span class="tag">Brain game</span></div></div>
+        </a>
+      </div>
+    </section>
+  </main>
+  <footer class="wrap bottom"><span>MADE FOR <b>MONSTER-SIZED FUN</b></span><span>WATCH YOUR STEP <span class="star">✦</span></span></footer>
+</body>
+</html>
