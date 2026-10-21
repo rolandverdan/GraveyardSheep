@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zombie Matching</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Trebuchet MS", Arial, sans-serif;
+    background: radial-gradient(ellipse at top, #1d2b1a 0%, #0a0f09 70%);
+    color: #d8f5c8;
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 20px;
+  }
+  h1 {
+    font-size: 2.6rem; letter-spacing: 3px; color: #8bff5a;
+    text-shadow: 0 0 12px #3cff00, 0 4px 0 #1a3a10;
+    margin-bottom: 10px;
+  }
+  .hud {
+    display: flex; gap: 30px; font-size: 1.2rem; margin-bottom: 14px;
+    background: rgba(0,0,0,.45); padding: 10px 24px; border-radius: 12px;
+    border: 1px solid #3a5a2a;
+  }
+  .hud b { color: #fff; }
+
+  /* ---------- Coffin (the flash screen) ---------- */
+  .coffin-wrap {
+    --w: 220px; --h: 320px;
+    width: var(--w); height: var(--h); position: relative;
+    filter: drop-shadow(0 0 18px rgba(80,255,40,.25)) drop-shadow(0 10px 12px rgba(0,0,0,.8));
+  }
+  .coffin, .coffin-inner, .lid {
+    position: absolute;
+    clip-path: polygon(28% 0, 72% 0, 100% 20%, 80% 100%, 20% 100%, 0 20%);
+  }
+  .coffin { inset: 0; background: linear-gradient(90deg, #3b2210, #6b3f1d 50%, #3b2210); }
+  .coffin-inner {
+    inset: 9px;
+    background: radial-gradient(ellipse at center, #3a0d12, #12040a 75%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .coffin-inner img { width: 100%; height: 100%; object-fit: cover; }
+  .lid {
+    inset: 0; z-index: 2;
+    background:
+      repeating-linear-gradient(90deg, rgba(0,0,0,.12) 0 2px, transparent 2px 18px),
+      linear-gradient(90deg, #4a2a12, #8a5428 50%, #4a2a12);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform .45s ease-in-out;
+  }
+  .lid::before, .lid::after { content: ""; position: absolute; background: #d4a64a; box-shadow: 0 0 6px #000; }
+  .lid::before { width: 12%; height: 46%; top: 18%; }   /* cross vertical */
+  .lid::after  { width: 40%; height: 6%;  top: 30%; }   /* cross horizontal */
+  .coffin-wrap.open .lid { transform: translateX(-115%) rotate(-12deg); }
+
+  #coffin { margin-bottom: 8px; }
+  #coffin .coffin-inner img { display: none; }
+  #coffin .coffin-inner img.show { display: block; animation: flash .3s ease-out; }
+  @keyframes flash {
+    0% { filter: brightness(4); transform: scale(1.1); }
+    100% { filter: brightness(1); transform: scale(1); }
+  }
+  #screenText { font-size: 1.3rem; color: #9cff7a; height: 1.6em; margin-bottom: 6px; }
+
+  .timer-wrap {
+    width: 600px; max-width: 95vw; height: 16px; background: #1a2414;
+    border-radius: 8px; overflow: hidden; border: 1px solid #3a5a2a; margin-bottom: 6px;
+  }
+  #timerBar { height: 100%; width: 100%; background: linear-gradient(90deg, #ff3b3b, #ffd23b, #6aff3b); transition: width .1s linear; }
+  #timerText { font-size: 1.1rem; margin-bottom: 6px; height: 1.4em; }
+  #message { height: 1.6em; font-size: 1.3rem; font-weight: bold; margin-bottom: 8px; }
+
+  /* ---------- Selection grid ---------- */
+  #grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    width: 720px; max-width: 95vw;
+  }
+  .card {
+    aspect-ratio: 1; border-radius: 12px; overflow: hidden; cursor: pointer;
+    border: 3px solid #2f4a22; background: #000; position: relative;
+    transition: transform .15s, border-color .15s, box-shadow .15s;
+  }
+  .card img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+  .card:hover:not(.disabled) { transform: translateY(-4px) scale(1.03); border-color: #8bff5a; box-shadow: 0 0 16px #3cff00; }
+  .card.disabled { cursor: not-allowed; filter: grayscale(.6) brightness(.6); }
+  .card.correct { border-color: #3cff00; box-shadow: 0 0 22px #3cff00; filter: none; }
+  .card.wrong { border-color: #ff2a2a; box-shadow: 0 0 22px #ff2a2a; filter: none; animation: shake .4s; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); }
+  }
+
+  button {
+    font-size: 1.3rem; padding: 12px 34px; border-radius: 10px; border: none; cursor: pointer;
+    background: #4caf2a; color: #fff; font-weight: bold; letter-spacing: 1px;
+    box-shadow: 0 5px 0 #2a6a14; margin: 10px;
+  }
+  button:active { transform: translateY(3px); box-shadow: 0 2px 0 #2a6a14; }
+  .hidden { display: none !important; }
+
+  /* ---------- Pop-ups ---------- */
+  #overlay, #landing {
+    position: fixed; inset: 0; z-index: 10; padding: 20px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #overlay { background: rgba(0,0,0,.8); }
+  #landing { z-index: 20; background: radial-gradient(ellipse at top, #1d2b1a 0%, #050805 80%); overflow-y: auto; }
+  .popup {
+    background: linear-gradient(#1f3318, #0d160a);
+    border: 3px solid #4c7a36; border-radius: 18px;
+    padding: 24px 32px; text-align: center; max-width: 95vw;
+    box-shadow: 0 0 40px rgba(80,255,40,.3);
+    animation: pop .3s ease-out;
+  }
+  @keyframes pop { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .popup h2 { font-size: 2.2rem; color: #8bff5a; margin-bottom: 12px; text-shadow: 0 0 10px #3cff00; }
+  .popup p { font-size: 1.15rem; margin-bottom: 8px; line-height: 1.5; }
+
+  #candyReward { margin: 6px 0 10px; }
+  #candyReward .big {
+    font-size: 7rem; font-weight: 900; line-height: 1; color: #ffd23b;
+    text-shadow: 0 0 25px #ff9d00, 0 6px 0 #8a4b00;
+    animation: bigPop .6s cubic-bezier(.2,1.6,.4,1);
+  }
+  #candyReward .label { font-size: 1.6rem; color: #ffe9a8; font-weight: bold; }
+  @keyframes bigPop { from { transform: scale(0); } to { transform: scale(1); } }
+
+  /* ---------- One-page picture tutorial ---------- */
+  .guide { width: 980px; }
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 6px 0 4px; }
+  @media (max-width: 860px) { .steps { grid-template-columns: repeat(2, 1fr); } }
+  .step {
+    background: rgba(0,0,0,.35); border: 2px solid #2f4a22; border-radius: 14px;
+    padding: 12px 8px; display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  }
+  .step h3 { font-size: 1.15rem; color: #fff; margin-top: 10px; letter-spacing: 1px; }
+  .visual { display: flex; align-items: center; justify-content: center; gap: 8px; height: 170px; position: relative; }
+  .visual.col { flex-direction: column; gap: 6px; }
+  .coffin-wrap.mini { --w: 100px; --h: 150px; }
+  .coffin-wrap.mini .lid::before { width: 12%; }
+  .q { position: absolute; z-index: 3; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2.6rem; padding-top: 30px; }
+  .blink { animation: blink 1.6s infinite; }
+  @keyframes blink { 0%,15% { opacity: 0; } 25%,70% { opacity: 1; filter: brightness(1.6); } 80%,100% { opacity: 0; } }
+  .arrow { font-size: 1.8rem; color: #ffd23b; }
+  .mini-grid { display: grid; grid-template-columns: repeat(4, 40px); gap: 4px; }
+  .mini-grid img { width: 40px; height: 40px; object-fit: cover; border-radius: 5px; border: 2px solid #2f4a22; filter: brightness(.55); }
+  .mini-grid img.pick { border-color: #3cff00; box-shadow: 0 0 10px #3cff00; filter: none; animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { transform: scale(1.15); } }
+  .hand { position: absolute; font-size: 1.8rem; left: 52%; top: 62%; animation: tap 1s infinite; }
+  @keyframes tap { 50% { transform: translateY(-6px); } }
+  .badge { background: #ffd23b; color: #3a2a00; font-weight: 900; padding: 3px 12px; border-radius: 20px; font-size: 1rem; }
+  .result-box { width: 92px; padding: 10px 4px; border-radius: 12px; font-size: 1.5rem; border: 3px solid; }
+  .result-box .num { font-size: 2rem; font-weight: 900; line-height: 1.1; }
+  .result-box.good { border-color: #3cff00; color: #ffd23b; box-shadow: 0 0 14px rgba(60,255,0,.4); }
+  .result-box.bad { border-color: #ff2a2a; color: #ff8080; opacity: .85; }
+</style>
+</head>
+<body>
+  <h1>🧟 ZOMBIE MATCHING 🧟</h1>
+
+  <div class="hud">
+    <div>Total Candy: <b id="totalCandy">0</b> 🍬</div>
+  </div>
+
+  <!-- Coffin flash screen -->
+  <div id="coffin" class="coffin-wrap">
+    <div class="coffin"></div>
+    <div class="coffin-inner"><img id="flashImg" alt="Zombie to match"></div>
+    <div class="lid"></div>
+  </div>
+  <div id="screenText"></div>
+
+  <div class="timer-wrap"><div id="timerBar"></div></div>
+  <div id="timerText"></div>
+  <div id="message"></div>
+
+  <div id="grid"></div>
+
+  <!-- One-page picture tutorial -->
+  <div id="landing">
+    <div class="popup guide">
+      <h2>🧟 How to Play 🧟</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="visual">
+            <div class="coffin-wrap mini">
+              <div class="coffin"></div>
+              <div class="coffin-inner"><img data-z="3" class="blink" alt=""></div>
+            </div>
+          </div>
+          <h3>1 · WATCH 👀</h3>
+        </div>
+        <div class="step">
+          <div class="visual">
+            <div class="coffin-wrap mini">
+              <div class="coffin"></div>
+              <div class="lid"></div>
+              <div class="q">❓</div>
+            </div>
+          </div>
+          <h3>2 · REMEMBER 🧠</h3>
+        </div>
+        <div class="step">
+          <div class="visual col">
+            <div class="badge">⏱ 15s</div>
+            <div class="mini-grid">
+              <img data-z="1" alt=""><img data-z="5" alt=""><img data-z="3" class="pick" alt=""><img data-z="7" alt="">
+              <img data-z="2" alt=""><img data-z="8" alt=""><img data-z="4" alt=""><img data-z="6" alt="">
+            </div>
+            <div class="hand">👆</div>
+          </div>
+          <h3>3 · CLICK THE MATCH</h3>
+        </div>
+        <div class="step">
+          <div class="visual">
+            <div class="result-box good"><div>✅</div><div class="num">2–10</div><div>🍬</div></div>
+            <div class="result-box bad"><div>❌</div><div class="num">0</div><div>🍬</div></div>
+          </div>
+          <h3>4 · WIN CANDY</h3>
+        </div>
+      </div>
+      <button id="startBtn">START GAME</button>
+    </div>
+  </div>
+
+  <!-- Result pop-up -->
+  <div id="overlay" class="hidden">
+    <div class="popup">
+      <h2 id="ovTitle"></h2>
+      <div id="candyReward"></div>
+      <p id="ovText"></p>
+      <button id="newGameBtn">START GAME</button>
+    </div>
+  </div>
+
+<script>
+  // Only uses the 8 photos in the "zombie pics" folder
+  const ZOMBIES = Array.from({ length: 8 }, (_, i) =>
+    encodeURI(`zombie pics/Gemini_Generated_Image_s0lhizs0lhizs0lh (${i + 1}).jpg`)
+  );
+  const TIME_LIMIT = 15;  // seconds to choose
+  const FLASH_MS = 1500;  // how long the coffin stays open
+
+  const grid = document.getElementById('grid');
+  const coffin = document.getElementById('coffin');
+  const flashImg = document.getElementById('flashImg');
+  const screenText = document.getElementById('screenText');
+  const timerBar = document.getElementById('timerBar');
+  const timerText = document.getElementById('timerText');
+  const message = document.getElementById('message');
+  const overlay = document.getElementById('overlay');
+  const ovTitle = document.getElementById('ovTitle');
+  const ovText = document.getElementById('ovText');
+  const candyReward = document.getElementById('candyReward');
+
+  let target = -1, accepting = false, timerId = null, deadline = 0;
+  let totalCandy = 0;
+  localStorage.removeItem('zombieMatchCandy'); // clear any old saved total
+
+  // Preload images
+  ZOMBIES.forEach(src => { const im = new Image(); im.src = src; });
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function buildGrid() {
+    grid.innerHTML = '';
+    shuffle([...ZOMBIES.keys()]).forEach(idx => {
+      const card = document.createElement('div');
+      card.className = 'card disabled';
+      card.dataset.idx = idx;
+      card.innerHTML = `<img src="${ZOMBIES[idx]}" alt="Zombie ${idx + 1}">`;
+      card.addEventListener('click', () => pick(card));
+      grid.appendChild(card);
+    });
+  }
+
+  function setCardsEnabled(on) {
+    grid.querySelectorAll('.card').forEach(c => c.classList.toggle('disabled', !on));
+  }
+
+  function openCoffin(src) {
+    flashImg.src = src;
+    flashImg.classList.add('show');
+    coffin.classList.add('open');
+  }
+
+  function closeCoffin() {
+    coffin.classList.remove('open');
+    setTimeout(() => flashImg.classList.remove('show'), 450); // hide after lid closes
+  }
+
+  // One game = one zombie to match
+  function startGame() {
+    overlay.classList.add('hidden');
+    totalCandy = 0; // fresh start every game
+    document.getElementById('totalCandy').textContent = totalCandy;
+    message.textContent = '';
+    timerText.textContent = '';
+    timerBar.style.width = '100%';
+    buildGrid();
+
+    target = Math.floor(Math.random() * ZOMBIES.length);
+    coffin.classList.remove('open');
+    flashImg.classList.remove('show');
+    screenText.textContent = 'Watch the coffin...';
+
+    setTimeout(() => {
+      openCoffin(ZOMBIES[target]);
+      setTimeout(() => {
+        closeCoffin();
+        screenText.textContent = '❓ Which zombie was it?';
+        startTimer();
+      }, FLASH_MS);
+    }, 1000);
+  }
+
+  function startTimer() {
+    accepting = true;
+    setCardsEnabled(true);
+    deadline = performance.now() + TIME_LIMIT * 1000;
+    timerId = setInterval(() => {
+      const left = Math.max(0, deadline - performance.now());
+      timerBar.style.width = (left / (TIME_LIMIT * 1000) * 100) + '%';
+      timerText.textContent = `⏱ ${(left / 1000).toFixed(1)}s`;
+      if (left <= 0) endGame('timeout');
+    }, 50);
+  }
+
+  function revealAnswer() {
+    openCoffin(ZOMBIES[target]);
+    screenText.textContent = '';
+    grid.querySelector(`.card[data-idx="${target}"]`).classList.add('correct');
+  }
+
+  function pick(card) {
+    if (!accepting) return;
+    if (+card.dataset.idx === target) {
+      endGame('correct');
+    } else {
+      card.classList.add('wrong');
+      endGame('wrong');
+    }
+  }
+
+  function endGame(result) {
+    clearInterval(timerId);
+    accepting = false;
+    setCardsEnabled(false);
+    revealAnswer();
+
+    let candy = 0;
+    if (result === 'correct') {
+      candy = Math.floor(Math.random() * 9) + 2; // random 2–10
+      totalCandy += candy;
+      document.getElementById('totalCandy').textContent = totalCandy;
+      message.style.color = '#6aff3b';
+      message.textContent = '✅ Correct!';
+    } else if (result === 'wrong') {
+      message.style.color = '#ff4d4d';
+      message.textContent = '❌ Wrong zombie!';
+    } else {
+      message.style.color = '#ffb03b';
+      message.textContent = "⌛ Time's up!";
+    }
+
+    // Show the pop-up after a short pause so the answer can be seen
+    setTimeout(() => showResultPopup(result, candy), 1400);
+  }
+
+  function showResultPopup(result, candy) {
+    candyReward.innerHTML = '';
+    if (result === 'correct') {
+      ovTitle.textContent = '🎉 You Got It! 🎉';
+      candyReward.innerHTML = `<div class="big">${candy}</div><div class="label">🍬 CANDY 🍬</div>`;
+      ovText.innerHTML = 'Great memory!';
+    } else {
+      ovTitle.textContent = result === 'wrong' ? '💀 Wrong Zombie! 💀' : "⌛ Time's Up! ⌛";
+      ovText.innerHTML = 'No candy this time... try again!';
+    }
+    overlay.classList.remove('hidden');
+  }
+
+  document.getElementById('startBtn').addEventListener('click', () => {
+    document.getElementById('landing').classList.add('hidden');
+    startGame();
+  });
+  document.getElementById('newGameBtn').addEventListener('click', startGame);
+
+  // Fill tutorial pictures with zombies from the folder
+  document.querySelectorAll('img[data-z]').forEach(im => { im.src = ZOMBIES[im.dataset.z - 1]; });
+
+  buildGrid();
+</script>
+</body>
+</html>
