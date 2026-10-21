@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trick or Treat!</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { night: "#0c1020", pumpkin: "#ffb34d", lilac: "#c4b8d8" } } }
+    };
+  </script>
+  <style>
+    @keyframes scare-pop {
+      0% { transform: scale(.08) rotate(-12deg); opacity: 0; }
+      18% { transform: scale(1.12) rotate(5deg); opacity: 1; }
+      28%, 42%, 56% { transform: translateX(-9px) scale(1.04); }
+      35%, 49%, 63% { transform: translateX(9px) scale(1.04); }
+      100% { transform: scale(.96); opacity: 1; }
+    }
+    .scare-pop { animation: scare-pop 850ms cubic-bezier(.2,.8,.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .scare-pop { animation: none; } }
+  </style>
+</head>
+<body class="min-h-screen bg-[radial-gradient(ellipse_at_50%_0%,#473064_0%,#1a1630_42%,#090d19_100%)] px-3 pb-12 pt-5 font-sans text-[#fff7e6] sm:px-6 sm:pt-9">
+  <main class="mx-auto w-full max-w-6xl">
+    <header class="relative mb-7 overflow-hidden rounded-3xl border border-white/10 bg-[#171326]/80 px-5 py-7 text-center shadow-2xl shadow-black/30 sm:py-9">
+      <div class="absolute left-6 top-5 text-3xl opacity-70 sm:left-12 sm:top-8 sm:text-5xl">&#127769;</div>
+      <div class="absolute right-6 top-5 text-3xl opacity-70 sm:right-12 sm:top-8 sm:text-5xl">&#129414;</div>
+      <div class="text-xs font-extrabold uppercase tracking-[0.24em] text-pumpkin">Halloween night / Neighborhood adventure</div>
+      <h1 class="my-2 text-5xl font-black tracking-tight drop-shadow-[0_5px_0_#572e79] sm:text-7xl">Trick or Treat!</h1>
+      <p class="mx-auto max-w-xl text-sm text-lilac sm:text-base">Explore the moonlit street, knock on every door, and fill your candy bag.</p>
+    </header>
+
+    <section class="mb-5 grid grid-cols-2 gap-3 sm:mb-6 sm:gap-4" aria-label="Game score">
+      <div class="flex items-center gap-3 rounded-2xl border border-orange-200/15 bg-gradient-to-br from-[#33243e] to-[#211b35] p-3 shadow-lg shadow-black/20 sm:gap-4 sm:p-4">
+        <span class="grid h-12 w-12 place-items-center rounded-xl bg-pumpkin/15 text-3xl sm:h-14 sm:w-14">&#127853;</span>
+        <div><span class="block text-[.65rem] font-bold uppercase tracking-[.16em] text-lilac sm:text-xs">Candy bag</span>
+        <strong id="candy-count" class="block text-2xl leading-tight text-pumpkin sm:text-3xl">0</strong></div>
+      </div>
+      <div class="flex items-center gap-3 rounded-2xl border border-purple-200/15 bg-gradient-to-br from-[#2d2645] to-[#211b35] p-3 shadow-lg shadow-black/20 sm:gap-4 sm:p-4">
+        <span class="grid h-12 w-12 place-items-center rounded-xl bg-purple-300/10 text-3xl sm:h-14 sm:w-14">&#127968;</span>
+        <div class="min-w-0 flex-1"><div class="flex items-baseline justify-between gap-2"><span class="text-[.65rem] font-bold uppercase tracking-[.16em] text-lilac sm:text-xs">Doors knocked</span>
+        <strong id="house-count" class="text-xl text-white sm:text-2xl">0 / 8</strong></div>
+        <div class="mt-2 h-2 overflow-hidden rounded-full bg-black/40"><div id="progress" class="h-full w-0 rounded-full bg-gradient-to-r from-purple-400 to-pumpkin transition-all duration-500"></div></div></div>
+      </div>
+    </section>
+
+    <section class="overflow-hidden rounded-2xl border border-white/10 bg-[#101526] shadow-2xl shadow-black/40 ring-1 ring-black/30" aria-label="Trick or treat game">
+      <div class="flex items-center justify-between border-b border-white/10 bg-[#181528] px-4 py-3">
+        <div class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]"></span><span class="text-xs font-bold uppercase tracking-[.16em] text-lilac">The old hollow</span></div>
+        <span class="text-xs text-lilac/70">October 31 / 8:00 PM</span>
+      </div>
+      <canvas id="game" class="block w-full touch-none" width="900" height="500" aria-label="Use arrow keys or WASD to move, then Space to knock on a nearby house."></canvas>
+    </section>
+    <div class="mt-3 hidden flex-wrap items-center justify-center gap-2 text-sm text-lilac sm:flex">
+      <span class="rounded-lg border border-white/10 bg-[#211b35] px-3 py-2"><kbd class="mr-1 rounded bg-white/10 px-1.5 py-0.5 font-bold text-white">W A S D</kbd> or arrows to move</span>
+      <span class="rounded-lg border border-white/10 bg-[#211b35] px-3 py-2"><kbd class="mr-1 rounded bg-white/10 px-1.5 py-0.5 font-bold text-white">SPACE</kbd> knock on the door</span>
+    </div>
+    <div class="mt-3 flex justify-center gap-2 sm:hidden" aria-label="Touch movement controls">
+      <button class="move rounded-xl border border-white/10 bg-[#29213d] px-4 py-3 text-xl shadow-lg" data-key="ArrowLeft" aria-label="Move left">&#8592;</button>
+      <button class="move rounded-xl border border-white/10 bg-[#29213d] px-4 py-3 text-xl shadow-lg" data-key="ArrowUp" aria-label="Move up">&#8593;</button>
+      <button class="move rounded-xl border border-white/10 bg-[#29213d] px-4 py-3 text-xl shadow-lg" data-key="ArrowDown" aria-label="Move down">&#8595;</button>
+      <button class="move rounded-xl border border-white/10 bg-[#29213d] px-4 py-3 text-xl shadow-lg" data-key="ArrowRight" aria-label="Move right">&#8594;</button>
+      <button id="knock" class="rounded-xl bg-pumpkin px-4 py-3 font-bold text-[#20162a] shadow-lg">Knock</button>
+    </div>
+    <div id="message" class="my-4 flex min-h-14 items-center justify-center rounded-xl border border-purple-200/10 bg-[#211b35]/90 px-4 py-3 text-center text-sm shadow-lg sm:text-base" role="status" aria-live="polite">The moon is up and the neighborhood is waiting. Find a house and knock!</div>
+    <div class="flex justify-center gap-3">
+      <button id="reset" class="rounded-xl bg-gradient-to-b from-amber-300 to-pumpkin px-5 py-3 font-bold text-[#20162a] shadow-lg shadow-orange-950/30 transition hover:-translate-y-0.5 hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white" type="button">Play again</button>
+      <button id="shuffle" class="rounded-xl border border-white/10 bg-[#29213d] px-5 py-3 font-bold shadow-lg transition hover:-translate-y-0.5 hover:bg-[#3b2c4b] focus:outline-none focus:ring-2 focus:ring-white" type="button">Shuffle street</button>
+    </div>
+    <p class="mt-4 text-center text-sm text-lilac">Each house gives 0 to 100 random candies. Visit each house once.</p>
+  </main>
+
+  <div id="jumpscare" class="fixed inset-0 z-50 hidden items-center justify-center overflow-hidden bg-[#09040d]/95 p-6 text-center" aria-hidden="true">
+    <div class="absolute inset-0 bg-[radial-gradient(circle,#7f1d1d_0%,#270913_45%,#05030a_100%)] opacity-90"></div>
+    <div id="scare-card" class="relative rounded-[2rem] border-4 border-red-500/80 bg-[#160711] px-10 py-12 shadow-[0_0_90px_25px_rgba(220,38,38,.45)]">
+      <div class="text-[7rem] leading-none drop-shadow-[0_0_25px_rgba(255,0,0,.8)] sm:text-[10rem]">&#128128;</div>
+      <p class="mt-4 text-5xl font-black tracking-[.18em] text-red-100 sm:text-7xl">BOO!</p>
+      <p class="mt-2 font-bold uppercase tracking-[.2em] text-red-300">Something answered the door...</p>
+    </div>
+  </div>
+
+  <script>
+    const emoji = code => String.fromCodePoint(code);
+    const houses = [
+      { name: "Pumpkin Patch", art: emoji(0x1f3da), x: 125, y: 105, visited: false, reward: 0 },
+      { name: "Witch's Cottage", art: emoji(0x1f9d9), x: 340, y: 105, visited: false, reward: 0 },
+      { name: "Crooked Manor", art: emoji(0x1f3f0), x: 560, y: 105, visited: false, reward: 0 },
+      { name: "Moonlight House", art: emoji(0x1f3e0), x: 775, y: 105, visited: false, reward: 0 },
+      { name: "Black Cat Villa", art: emoji(0x1f408), x: 125, y: 395, visited: false, reward: 0 },
+      { name: "Spooky Shack", art: emoji(0x1f47b), x: 340, y: 395, visited: false, reward: 0 },
+      { name: "Candy Castle", art: emoji(0x1f36d), x: 560, y: 395, visited: false, reward: 0 },
+      { name: "Haunted Hollow", art: emoji(0x1f578), x: 775, y: 395, visited: false, reward: 0 }
+    ];
+    const canvas = document.querySelector("#game");
+    const ctx = canvas.getContext("2d");
+    const candyEl = document.querySelector("#candy-count");
+    const countEl = document.querySelector("#house-count");
+    const progressEl = document.querySelector("#progress");
+    const messageEl = document.querySelector("#message");
+    const jumpscareEl = document.querySelector("#jumpscare");
+    const scareCardEl = document.querySelector("#scare-card");
+    let candies = 0;
+    let visited = 0;
+
+    const player = { x: 450, y: 250, speed: 3.2, moving: false };
+    const keys = new Set();
+    let lastTime = 0;
+
+    function drawHouse(house) {
+      const near = !house.visited && Math.hypot(player.x - house.x, player.y - house.y) < 82;
+      ctx.save();
+      ctx.shadowColor = "#050711"; ctx.shadowBlur = 16; ctx.shadowOffsetY = 8;
+      ctx.fillStyle = house.visited ? "#302943" : "#29233b";
+      ctx.beginPath(); ctx.roundRect(house.x - 57, house.y - 31, 114, 75, 8); ctx.fill();
+      ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+      ctx.fillStyle = house.visited ? "#604274" : "#754666";
+      ctx.beginPath(); ctx.moveTo(house.x - 68, house.y - 29); ctx.lineTo(house.x, house.y - 78); ctx.lineTo(house.x + 68, house.y - 29); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = near ? "#ffcf86" : house.visited ? "#9970b7" : "#a27bb3";
+      ctx.lineWidth = near ? 3 : 2; ctx.stroke();
+      ctx.fillStyle = "#ffd781";
+      ctx.beginPath(); ctx.roundRect(house.x - 43, house.y - 13, 18, 19, 3); ctx.fill();
+      ctx.beginPath(); ctx.roundRect(house.x + 25, house.y - 13, 18, 19, 3); ctx.fill();
+      ctx.fillStyle = "#593c55";
+      ctx.beginPath(); ctx.roundRect(house.x - 9, house.y + 5, 18, 39, 4); ctx.fill();
+      ctx.textAlign = "center"; ctx.font = "24px sans-serif";
+      ctx.fillText(house.visited ? emoji(0x1f36c) : house.art, house.x, house.y - 37);
+      ctx.fillStyle = house.visited ? "#ffcf86" : "#fff7e6";
+      ctx.font = "bold 11px system-ui, sans-serif";
+      ctx.fillText(house.visited ? `+${house.reward} candies` : house.name, house.x, house.y + 62);
+      if (near) {
+        ctx.fillStyle = "#241a2d"; ctx.beginPath(); ctx.roundRect(house.x - 49, house.y - 101, 98, 19, 8); ctx.fill();
+        ctx.fillStyle = "#ffcf86"; ctx.font = "bold 10px system-ui, sans-serif";
+        ctx.fillText("SPACE TO KNOCK", house.x, house.y - 88);
+      }
+      ctx.restore();
+    }
+
+    function drawScene() {
+      ctx.clearRect(0, 0, 900, 500);
+      ctx.fillStyle = "#111a2b"; ctx.fillRect(0, 0, 900, 500);
+      ctx.fillStyle = "#263c35"; ctx.fillRect(0, 0, 900, 500);
+      ctx.fillStyle = "#1b292e"; ctx.fillRect(0, 180, 900, 145);
+      ctx.fillStyle = "#463a53"; ctx.fillRect(0, 245, 900, 14);
+      ctx.setLineDash([18, 18]); ctx.strokeStyle = "#a58a69"; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(0, 252); ctx.lineTo(900, 252); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = "#344735"; ctx.fillRect(0, 62, 900, 4); ctx.fillRect(0, 434, 900, 4);
+      ctx.textAlign = "center"; ctx.font = "19px sans-serif";
+      [[42, 208], [858, 218], [42, 306], [858, 300], [238, 237], [663, 274]].forEach(([x, y]) => ctx.fillText(emoji(0x1f383), x, y));
+      ctx.fillStyle = "#f7df9c"; ctx.beginPath(); ctx.arc(838, 78, 27, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#263c35"; ctx.beginPath(); ctx.arc(850, 68, 25, 0, Math.PI * 2); ctx.fill();
+      [[67, 95], [845, 158], [457, 88], [88, 360], [820, 377], [453, 414]].forEach(([x, y], i) => {
+        ctx.fillStyle = i % 2 ? "#f7df9c" : "#d8c8ff"; ctx.globalAlpha = .8;
+        ctx.beginPath(); ctx.arc(x, y, 1.7, 0, Math.PI * 2); ctx.fill();
+      }); ctx.globalAlpha = 1;
+      houses.forEach(drawHouse);
+      ctx.font = "42px sans-serif"; ctx.fillText(player.moving ? emoji(0x1f3c3) : emoji(0x1f9db), player.x, player.y + 14);
+      ctx.fillStyle = "#fff7e6"; ctx.font = "bold 14px system-ui, sans-serif";
+      const nearby = houses.some(h => !h.visited && Math.hypot(player.x - h.x, player.y - h.y) < 82);
+      ctx.fillText(visited === houses.length ? "You visited every house! Happy Halloween!" : nearby ? "Press SPACE to knock!" : "Find a house and walk close to its door", 450, 25);
+    }
+
+    function animate(time) {
+      const step = Math.min((time - lastTime) / 16.67 || 1, 2); lastTime = time;
+      let dx = 0, dy = 0;
+      if (keys.has("ArrowLeft") || keys.has("a")) dx--;
+      if (keys.has("ArrowRight") || keys.has("d")) dx++;
+      if (keys.has("ArrowUp") || keys.has("w")) dy--;
+      if (keys.has("ArrowDown") || keys.has("s")) dy++;
+      player.moving = Boolean(dx || dy);
+      if (dx || dy) {
+        const length = Math.hypot(dx, dy);
+        player.x = Math.max(25, Math.min(875, player.x + dx / length * player.speed * step));
+        player.y = Math.max(95, Math.min(420, player.y + dy / length * player.speed * step));
+      }
+      drawScene(); requestAnimationFrame(animate);
+    }
+
+    function knock() {
+      const house = houses.find(h => !h.visited && Math.hypot(player.x - h.x, player.y - h.y) < 82);
+      if (!house) { messageEl.textContent = "Walk closer to an unopened house before knocking!"; return; }
+      const gotScared = Math.random() < 0.22;
+      if (gotScared) showJumpscare();
+      house.visited = true;
+      house.reward = gotScared ? 0 : Math.floor(Math.random() * 101);
+      candies += house.reward; visited++;
+      candyEl.textContent = candies; countEl.textContent = `${visited} / ${houses.length}`;
+      progressEl.style.width = `${visited / houses.length * 100}%`;
+      messageEl.textContent = gotScared
+        ? `A scary surprise at ${house.name}! You got away with 0 candies. Keep exploring!`
+        : visited === houses.length
+          ? `All houses visited! You collected ${candies} candies. Happy Halloween!`
+          : `${house.name} gave you ${house.reward} ${house.reward === 1 ? "candy" : "candies"}! Keep exploring!`;
+    }
+
+    function showJumpscare() {
+      jumpscareEl.classList.remove("hidden");
+      jumpscareEl.classList.add("flex");
+      jumpscareEl.setAttribute("aria-hidden", "false");
+      scareCardEl.classList.remove("scare-pop");
+      void scareCardEl.offsetWidth;
+      scareCardEl.classList.add("scare-pop");
+      window.setTimeout(() => {
+        jumpscareEl.classList.add("hidden");
+        jumpscareEl.classList.remove("flex");
+        jumpscareEl.setAttribute("aria-hidden", "true");
+      }, 1100);
+    }
+
+    window.addEventListener("keydown", event => {
+      const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+      if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "].includes(event.key)) event.preventDefault();
+      if (key === " " && !event.repeat) knock(); else keys.add(key);
+    });
+    window.addEventListener("keyup", event => keys.delete(event.key.length === 1 ? event.key.toLowerCase() : event.key));
+    document.querySelectorAll(".move").forEach(button => {
+      const key = button.dataset.key;
+      button.addEventListener("pointerdown", event => { event.preventDefault(); keys.add(key); });
+      ["pointerup", "pointercancel", "pointerleave"].forEach(type => button.addEventListener(type, () => keys.delete(key)));
+    });
+    document.querySelector("#knock").addEventListener("click", knock);
+
+    function resetGame() {
+      candies = 0;
+      visited = 0;
+      houses.forEach(house => { house.visited = false; house.reward = 0; });
+      player.x = 450; player.y = 250;
+      candyEl.textContent = "0";
+      countEl.textContent = `0 / ${houses.length}`;
+      progressEl.style.width = "0%";
+      messageEl.textContent = "The moon is up and the neighborhood is waiting. Find a house and knock!";
+    }
+
+    document.querySelector("#reset").addEventListener("click", resetGame);
+    document.querySelector("#shuffle").addEventListener("click", () => {
+      for (let i = houses.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [houses[i], houses[j]] = [houses[j], houses[i]];
+      }
+      resetGame();
+      messageEl.textContent = "The neighborhood has been shuffled! Pick a house to start trick-or-treating.";
+    });
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>
