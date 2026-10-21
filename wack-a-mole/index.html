@@ -45,18 +45,18 @@
 
   /* Shovel Mallet cursor */
   #mallet {
-    position: fixed; width: 72px; height: 72px; pointer-events: none; z-index: 9999;
+    position: fixed; width: 82px; height: 82px; pointer-events: none; z-index: 9999;
     transform: translate(-30%, -70%) rotate(-12deg);
     transform-origin: 75% 75%;
     transition: transform 0.05s ease-out;
     display: none;
-    filter: drop-shadow(3px 8px 10px rgba(0,0,0,0.6));
+    filter: drop-shadow(3px 8px 12px rgba(0,0,0,0.65));
   }
   #mallet.whack {
     transform: translate(-38%, -65%) rotate(-65deg) scale(0.9);
   }
   body.custom-cursor { cursor: none; }
-  body.custom-cursor button, body.custom-cursor .guide { cursor: pointer; }
+  body.custom-cursor button, body.custom-cursor .guide, body.custom-cursor input { cursor: pointer; }
 
   header { z-index: 1; text-align: center; }
   h1 {
@@ -67,74 +67,156 @@
 
   .hud {
     position: relative; z-index: 1;
-    display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
-    font-size: 1.1rem; margin-bottom: 12px;
-    background: rgba(18, 12, 32, 0.75); padding: 8px 22px; border-radius: 14px;
+    display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; align-items: center;
+    font-size: 1.15rem; margin-bottom: 12px;
+    background: rgba(18, 12, 32, 0.75); padding: 8px 24px; border-radius: 14px;
     border: 1px solid #5a3880; box-shadow: 0 6px 18px rgba(0,0,0,0.5);
   }
   .hud-item { display: flex; align-items: center; gap: 6px; }
   .hud b { color: #fff; font-size: 1.25rem; }
   .hud .candy-val { color: #ffd23b; font-weight: 900; }
 
-  /* Timer bar */
-  .timer-wrap {
+  /* Config button & side drawer */
+  .config-btn {
+    background: #442468; color: #b4ff61; border: 1px solid #7c44be;
+    padding: 6px 14px; font-size: 0.95rem; border-radius: 8px; cursor: pointer;
+    box-shadow: none; margin: 0; font-weight: bold; transition: all .15s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .config-btn:hover { background: #5a2e8c; color: #fff; }
+  .config-btn:active { transform: translateY(1px); }
+
+  #configDrawer {
+    position: fixed; top: 0; right: 0; width: 380px; max-width: 92vw; height: 100vh;
+    background: linear-gradient(180deg, #221435 0%, #11091c 100%);
+    border-left: 3px solid #6c3da8;
+    box-shadow: -10px 0 40px rgba(0,0,0,0.9);
+    z-index: 500; padding: 22px 18px;
+    display: flex; flex-direction: column; gap: 14px;
+    transform: translateX(100%);
+    transition: transform .25s ease-in-out;
+    overflow-y: auto;
+  }
+  #configDrawer.open { transform: translateX(0); }
+  #configDrawer h3 {
+    color: #b4ff61; font-size: 1.45rem; text-shadow: 0 0 10px #49e810;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid #4a2873; padding-bottom: 10px;
+  }
+  .close-cfg-btn {
+    background: transparent; border: none; color: #b79ed4; font-size: 1.5rem;
+    cursor: pointer; padding: 0 6px; margin: 0; box-shadow: none;
+  }
+  .close-cfg-btn:hover { color: #ff5e5e; }
+  .cfg-group {
+    display: flex; flex-direction: column; gap: 6px;
+    background: rgba(0,0,0,0.4); padding: 10px 12px; border-radius: 10px; border: 1px solid #3d235c;
+  }
+  .cfg-group label {
+    font-size: 0.95rem; color: #d6beff; font-weight: bold;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .cfg-group .cfg-sub { font-size: 0.8rem; color: #9c84ba; }
+  .cfg-input-row { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
+  .cfg-input {
+    width: 100%; background: #0b0613; border: 2px solid #5a3485; border-radius: 8px;
+    color: #ffd23b; font-size: 1.15rem; font-weight: bold; padding: 6px 10px;
+    font-family: inherit; text-align: center;
+  }
+  .cfg-input:focus { outline: none; border-color: #b4ff61; box-shadow: 0 0 10px rgba(180,255,97,0.4); }
+  .cfg-actions { margin-top: auto; display: flex; flex-direction: column; gap: 8px; padding-top: 10px; }
+  .cfg-save-btn {
+    background: #6a34a8; color: #fff; font-size: 1.1rem; padding: 10px;
+    border-radius: 8px; border: none; cursor: pointer; box-shadow: 0 4px 0 #3a1863;
+    margin: 0; font-weight: bold;
+  }
+  .cfg-save-btn:hover { background: #7b40bf; }
+  .cfg-save-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #3a1863; }
+  .cfg-reset-btn {
+    background: transparent; color: #a48cbfa4; font-size: 0.85rem; padding: 6px;
+    border: 1px dashed #5a3880; border-radius: 6px; cursor: pointer; box-shadow: none; margin: 0;
+  }
+  .cfg-reset-btn:hover { color: #ff8080; border-color: #ff8080; }
+
+  /* Timer Row (Bar + Numbered Timer Beside) */
+  .timer-row {
     position: relative; z-index: 1;
-    width: 640px; max-width: 95vw; height: 16px; background: #12091d;
+    display: flex; align-items: center; justify-content: center; gap: 14px;
+    width: 96vw; max-width: 1360px; margin-bottom: 12px;
+  }
+  .timer-wrap {
+    flex: 1; height: 20px; background: #12091d;
     border-radius: 999px; overflow: hidden; border: 2px solid #533177;
-    margin-bottom: 12px; box-shadow: inset 0 2px 6px #000;
+    box-shadow: inset 0 2px 6px #000;
   }
   #timerBar {
     height: 100%; width: 100%;
     background: linear-gradient(90deg, #ff3b3b, #ffd23b, #a0ff4d);
     transition: width 0.1s linear;
   }
+  .timer-number {
+    font-size: 1.7rem; font-weight: 900; color: #a0ff4d;
+    min-width: 68px; text-align: left;
+    text-shadow: 0 0 12px rgba(160,255,77,0.6);
+    font-variant-numeric: tabular-nums;
+  }
+  .timer-number.urgent {
+    color: #ff3b3b; text-shadow: 0 0 14px #ff1a1a; animation: pulseUrgent .5s infinite alternate;
+  }
+  @keyframes pulseUrgent { from { transform: scale(1); } to { transform: scale(1.15); } }
 
-  /* Graveyard Ground & Cemetery Plot */
+  /* Graveyard Ground (Almost Full Screen 96vw & 64vh) */
   .cemetery-field {
     position: relative; z-index: 1;
-    width: 650px; max-width: 95vw;
+    width: 96vw; max-width: 1360px;
+    min-height: 64vh;
     background: radial-gradient(circle at 50% 20%, #2b1f3d, #1a1228 65%, #100b1a);
     border: 4px solid #503173;
     border-radius: 26px;
-    padding: 22px 14px 18px;
-    box-shadow: 0 16px 36px rgba(0,0,0,0.7), inset 0 2px 10px rgba(180,120,255,0.2), 0 0 24px rgba(60,20,90,0.5);
+    padding: 24px 20px 20px;
+    box-shadow: 0 18px 45px rgba(0,0,0,0.8), inset 0 2px 10px rgba(180,120,255,0.2), 0 0 35px rgba(60,20,90,0.5);
+    display: flex; flex-direction: column; justify-content: center;
   }
 
   .grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 18px 12px;
+    gap: 22px 18px;
+  }
+  @media (max-width: 768px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
   }
 
-  /* Grave Plot */
+  /* Grave Plot (Large format for 6 holes) */
   .grave-plot {
-    aspect-ratio: 1;
+    aspect-ratio: 1.25;
+    min-height: 200px;
     position: relative;
     overflow: hidden;
-    border-radius: 16px;
+    border-radius: 18px;
     background: transparent;
   }
 
   /* Weathered Tombstone behind the grave */
   .tombstone {
-    position: absolute; top: 0; left: 24%; right: 24%; height: 50%;
+    position: absolute; top: 0; left: 25%; right: 25%; height: 52%;
     background: linear-gradient(180deg, #5c556b 0%, #3e384b 65%, #2a2533 100%);
-    border-radius: 20px 20px 0 0;
+    border-radius: 24px 24px 0 0;
     border: 2px solid #6b637c;
     border-bottom: none;
     box-shadow: inset 0 3px 5px rgba(255,255,255,0.2), 0 4px 10px rgba(0,0,0,0.6);
     display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-    padding-top: 6px;
+    padding-top: 8px;
     color: #9f97b5;
     z-index: 1;
   }
   .tombstone::after {
     content: "R.I.P.";
-    font-size: 0.85rem; font-weight: 900; letter-spacing: 2px;
+    font-size: 1.05rem; font-weight: 900; letter-spacing: 3px;
     opacity: 0.75; text-shadow: 0 1px 1px #000;
   }
   .tombstone .crack {
-    position: absolute; top: 20px; right: 8px; width: 8px; height: 12px;
+    position: absolute; top: 22px; right: 10px; width: 10px; height: 16px;
     border-left: 2px solid #231e2b; transform: rotate(15deg);
   }
 
@@ -300,20 +382,82 @@
   </header>
 
   <div class="hud">
-    <div class="hud-item">⏱ Time: <b id="timeVal">30s</b></div>
     <div class="hud-item">⭐ Score: <b id="scoreVal">0</b></div>
     <div class="hud-item">⚰️ Whacks: <b id="whacksVal">0</b></div>
     <div class="hud-item">🍬 Total Candy: <b id="totalCandy" class="candy-val">0</b></div>
+    <button id="openConfigBtn" class="config-btn" title="Points & Candy Rewards Settings">⚙️ Config</button>
     <button id="soundToggle" class="audio-btn">🔊 Sound: ON</button>
   </div>
 
-  <div class="timer-wrap">
-    <div id="timerBar"></div>
+  <!-- Hideable Config Drawer (Points to Rewards) -->
+  <div id="configDrawer">
+    <h3>
+      <span>⚙️ Points & Candy Settings</span>
+      <button id="closeConfigBtn" class="close-cfg-btn" title="Hide Settings">✕</button>
+    </h3>
+    
+    <div class="cfg-group">
+      <label>🥇 Gold Tier (High Score) 🍬</label>
+      <div class="cfg-sub">Points needed & candy reward range</div>
+      <div class="cfg-input-row">
+        <input type="number" id="cfgTier3Pts" class="cfg-input" min="50" max="99900" step="50" value="2000" title="Gold Points">
+        <span style="color:#b4ff61; font-size:0.85rem; white-space:nowrap;">pts ➜</span>
+        <input type="number" id="cfgTier3Min" class="cfg-input" min="1" max="999" value="8" title="Min Candy">
+        <span style="color:#ffd23b;">–</span>
+        <input type="number" id="cfgTier3Max" class="cfg-input" min="1" max="999" value="10" title="Max Candy">
+      </div>
+    </div>
+
+    <div class="cfg-group">
+      <label>🥈 Silver Tier (Medium Score) 🍬</label>
+      <div class="cfg-sub">Points needed & candy reward range</div>
+      <div class="cfg-input-row">
+        <input type="number" id="cfgTier2Pts" class="cfg-input" min="50" max="99900" step="50" value="1200" title="Silver Points">
+        <span style="color:#b4ff61; font-size:0.85rem; white-space:nowrap;">pts ➜</span>
+        <input type="number" id="cfgTier2Min" class="cfg-input" min="1" max="999" value="5" title="Min Candy">
+        <span style="color:#ffd23b;">–</span>
+        <input type="number" id="cfgTier2Max" class="cfg-input" min="1" max="999" value="7" title="Max Candy">
+      </div>
+    </div>
+
+    <div class="cfg-group">
+      <label>🥉 Bronze Tier (Base Score) 🍬</label>
+      <div class="cfg-sub">Points needed & candy reward range</div>
+      <div class="cfg-input-row">
+        <input type="number" id="cfgTier1Pts" class="cfg-input" min="50" max="99900" step="50" value="500" title="Bronze Points">
+        <span style="color:#b4ff61; font-size:0.85rem; white-space:nowrap;">pts ➜</span>
+        <input type="number" id="cfgTier1Min" class="cfg-input" min="1" max="999" value="2" title="Min Candy">
+        <span style="color:#ffd23b;">–</span>
+        <input type="number" id="cfgTier1Max" class="cfg-input" min="1" max="999" value="4" title="Max Candy">
+      </div>
+    </div>
+
+    <div class="cfg-group">
+      <label>⚰️ Below Bronze Score 🍬</label>
+      <div class="cfg-sub">Consolation prize if score is below Bronze tier</div>
+      <div class="cfg-input-row">
+        <input type="number" id="cfgConsolation" class="cfg-input" min="0" max="999" value="1" title="Consolation Candy">
+        <span style="color:#d6beff; font-size:0.9rem;">candy</span>
+      </div>
+    </div>
+
+    <div class="cfg-actions">
+      <button id="saveConfigBtn" class="cfg-save-btn">Save & Hide</button>
+      <button id="resetConfigBtn" class="cfg-reset-btn">Reset Defaults</button>
+    </div>
+  </div>
+
+  <!-- Numbered Timer beside the Bar Timer -->
+  <div class="timer-row">
+    <div class="timer-wrap">
+      <div id="timerBar"></div>
+    </div>
+    <div id="timerNumber" class="timer-number">30s</div>
   </div>
 
   <div class="cemetery-field" id="field">
     <div class="grid" id="grid">
-      <!-- 9 grave plots generated via JS -->
+      <!-- 6 grave plots generated via JS -->
     </div>
   </div>
 
@@ -370,8 +514,13 @@
           <h3>3 · GOLD GHOST 👻</h3>
         </div>
         <div class="step">
-          <div class="visual">
-            <div class="result-box good"><div>✅</div><div class="num">2–10</div><div>🍬</div></div>
+          <div class="visual" style="flex-direction:column; gap:4px;">
+            <div style="font-size:1.15rem; color:#ffd23b; font-weight:bold;">POINTS ➜ CANDY</div>
+            <div id="guideTierBox" style="font-size:0.85rem; line-height:1.45; color:#d6c7f0; text-align:center;">
+              🥇 2000+ pts ➜ 8–10 🍬<br>
+              🥈 1200+ pts ➜ 5–7 🍬<br>
+              🥉 500+ pts ➜ 2–4 🍬
+            </div>
           </div>
           <h3>4 · WIN CANDY</h3>
         </div>
@@ -617,6 +766,146 @@
     `;
   }
 
+  // ---------- Reward Configuration (Points to Candy) ----------
+  const DEFAULT_CONFIG = {
+    tier3Pts: 2000,
+    tier3Min: 8,
+    tier3Max: 10,
+
+    tier2Pts: 1200,
+    tier2Min: 5,
+    tier2Max: 7,
+
+    tier1Pts: 500,
+    tier1Min: 2,
+    tier1Max: 4,
+
+    consolation: 1
+  };
+  let config = { ...DEFAULT_CONFIG };
+
+  const configDrawer = document.getElementById('configDrawer');
+  const openConfigBtn = document.getElementById('openConfigBtn');
+  const closeConfigBtn = document.getElementById('closeConfigBtn');
+  const saveConfigBtn = document.getElementById('saveConfigBtn');
+  const resetConfigBtn = document.getElementById('resetConfigBtn');
+
+  const cfgTier3Pts = document.getElementById('cfgTier3Pts');
+  const cfgTier3Min = document.getElementById('cfgTier3Min');
+  const cfgTier3Max = document.getElementById('cfgTier3Max');
+
+  const cfgTier2Pts = document.getElementById('cfgTier2Pts');
+  const cfgTier2Min = document.getElementById('cfgTier2Min');
+  const cfgTier2Max = document.getElementById('cfgTier2Max');
+
+  const cfgTier1Pts = document.getElementById('cfgTier1Pts');
+  const cfgTier1Min = document.getElementById('cfgTier1Min');
+  const cfgTier1Max = document.getElementById('cfgTier1Max');
+
+  const cfgConsolation = document.getElementById('cfgConsolation');
+
+  function loadConfig() {
+    try {
+      const saved = localStorage.getItem('wackAMoleConfig');
+      if (saved) {
+        const p = JSON.parse(saved);
+        if (Number.isFinite(p.tier3Pts)) config.tier3Pts = Math.max(10, p.tier3Pts);
+        if (Number.isFinite(p.tier3Min)) config.tier3Min = Math.max(1, p.tier3Min);
+        if (Number.isFinite(p.tier3Max)) config.tier3Max = Math.max(config.tier3Min, p.tier3Max);
+
+        if (Number.isFinite(p.tier2Pts)) config.tier2Pts = Math.max(10, p.tier2Pts);
+        if (Number.isFinite(p.tier2Min)) config.tier2Min = Math.max(1, p.tier2Min);
+        if (Number.isFinite(p.tier2Max)) config.tier2Max = Math.max(config.tier2Min, p.tier2Max);
+
+        if (Number.isFinite(p.tier1Pts)) config.tier1Pts = Math.max(10, p.tier1Pts);
+        if (Number.isFinite(p.tier1Min)) config.tier1Min = Math.max(1, p.tier1Min);
+        if (Number.isFinite(p.tier1Max)) config.tier1Max = Math.max(config.tier1Min, p.tier1Max);
+
+        if (Number.isFinite(p.consolation)) config.consolation = Math.max(0, p.consolation);
+      }
+    } catch(e) {}
+    applyConfigToUI();
+  }
+
+  function saveConfig() {
+    const t3p = Math.max(10, parseInt(cfgTier3Pts.value, 10) || 2000);
+    const t3min = Math.max(1, parseInt(cfgTier3Min.value, 10) || 8);
+    const t3max = Math.max(t3min, parseInt(cfgTier3Max.value, 10) || 10);
+
+    const t2p = Math.max(10, parseInt(cfgTier2Pts.value, 10) || 1200);
+    const t2min = Math.max(1, parseInt(cfgTier2Min.value, 10) || 5);
+    const t2max = Math.max(t2min, parseInt(cfgTier2Max.value, 10) || 7);
+
+    const t1p = Math.max(10, parseInt(cfgTier1Pts.value, 10) || 500);
+    const t1min = Math.max(1, parseInt(cfgTier1Min.value, 10) || 2);
+    const t1max = Math.max(t1min, parseInt(cfgTier1Max.value, 10) || 4);
+
+    const cons = Math.max(0, parseInt(cfgConsolation.value, 10) || 0);
+
+    config = {
+      tier3Pts: t3p, tier3Min: t3min, tier3Max: t3max,
+      tier2Pts: t2p, tier2Min: t2min, tier2Max: t2max,
+      tier1Pts: t1p, tier1Min: t1min, tier1Max: t1max,
+      consolation: cons
+    };
+
+    try {
+      localStorage.setItem('wackAMoleConfig', JSON.stringify(config));
+    } catch(e) {}
+
+    applyConfigToUI();
+    closeConfig();
+  }
+
+  function applyConfigToUI() {
+    cfgTier3Pts.value = config.tier3Pts;
+    cfgTier3Min.value = config.tier3Min;
+    cfgTier3Max.value = config.tier3Max;
+
+    cfgTier2Pts.value = config.tier2Pts;
+    cfgTier2Min.value = config.tier2Min;
+    cfgTier2Max.value = config.tier2Max;
+
+    cfgTier1Pts.value = config.tier1Pts;
+    cfgTier1Min.value = config.tier1Min;
+    cfgTier1Max.value = config.tier1Max;
+
+    cfgConsolation.value = config.consolation;
+
+    // Update tutorial step 4 text
+    const guideBox = document.getElementById('guideTierBox');
+    if (guideBox) {
+      guideBox.innerHTML = `
+        🥇 ${config.tier3Pts}+ pts ➜ ${config.tier3Min}–${config.tier3Max} 🍬<br>
+        🥈 ${config.tier2Pts}+ pts ➜ ${config.tier2Min}–${config.tier2Max} 🍬<br>
+        🥉 ${config.tier1Pts}+ pts ➜ ${config.tier1Min}–${config.tier1Max} 🍬<br>
+        <span style="opacity:0.75; font-size:0.78rem;">Below ${config.tier1Pts} pts ➜ ${config.consolation} 🍬 prize</span>
+      `;
+    }
+  }
+
+  function openConfig() {
+    applyConfigToUI();
+    configDrawer.classList.add('open');
+  }
+
+  function closeConfig() {
+    configDrawer.classList.remove('open');
+  }
+
+  openConfigBtn.addEventListener('click', openConfig);
+  closeConfigBtn.addEventListener('click', closeConfig);
+  saveConfigBtn.addEventListener('click', saveConfig);
+  resetConfigBtn.addEventListener('click', () => {
+    config = { ...DEFAULT_CONFIG };
+    try { localStorage.removeItem('wackAMoleConfig'); } catch(e) {}
+    applyConfigToUI();
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeConfig();
+  });
+
   // ---------- Game Engine ----------
   const ROUND_TIME = 30; // seconds
   let timeLeft = ROUND_TIME;
@@ -629,11 +918,11 @@
 
   const gridEl = document.getElementById('grid');
   const fieldEl = document.getElementById('field');
-  const timeValEl = document.getElementById('timeVal');
   const scoreValEl = document.getElementById('scoreVal');
   const whacksValEl = document.getElementById('whacksVal');
   const totalCandyEl = document.getElementById('totalCandy');
   const timerBar = document.getElementById('timerBar');
+  const timerNumber = document.getElementById('timerNumber');
 
   const overlay = document.getElementById('overlay');
   const landing = document.getElementById('landing');
@@ -643,9 +932,10 @@
   const startGuideBtn = document.getElementById('startGuideBtn');
   const playAgainBtn = document.getElementById('playAgainBtn');
 
-  // Build 9 grave plots
+  // Build exactly 6 grave plots (3x2 grid)
   const holes = [];
-  for (let i = 0; i < 9; i++) {
+  gridEl.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
     const graveWrap = document.createElement('div');
     graveWrap.className = 'grave-plot';
     graveWrap.innerHTML = `
@@ -770,7 +1060,7 @@
 
       // Time zombie stays up from grave (speeds up as round progresses)
       const elapsed = ROUND_TIME - timeLeft;
-      const stayDuration = Math.max(540, 1080 - elapsed * 17);
+      const stayDuration = Math.max(520, 1060 - elapsed * 17);
 
       h.hideTimeout = setTimeout(() => {
         if (h.isUp && !h.isHit) {
@@ -784,7 +1074,7 @@
 
     // Schedule next grave spawn
     const elapsed = ROUND_TIME - timeLeft;
-    const nextSpawnDelay = Math.max(370, 840 - elapsed * 14);
+    const nextSpawnDelay = Math.max(360, 820 - elapsed * 14);
     spawnTimeout = setTimeout(popRandomMole, nextSpawnDelay);
   }
 
@@ -793,6 +1083,7 @@
     initAudio();
     landing.classList.add('hidden');
     overlay.classList.add('hidden');
+    closeConfig();
 
     // Fresh round reset
     score = 0;
@@ -803,7 +1094,8 @@
     scoreValEl.textContent = '0';
     whacksValEl.textContent = '0';
     totalCandyEl.textContent = '0';
-    timeValEl.textContent = `${ROUND_TIME}s`;
+    timerNumber.textContent = `${ROUND_TIME}s`;
+    timerNumber.classList.remove('urgent');
     timerBar.style.width = '100%';
 
     // Clear any active graves
@@ -823,7 +1115,9 @@
       const elapsedSec = (performance.now() - startTimestamp) / 1000;
       timeLeft = Math.max(0, ROUND_TIME - elapsedSec);
 
-      timeValEl.textContent = `${Math.ceil(timeLeft)}s`;
+      const secondsDisplay = Math.ceil(timeLeft);
+      timerNumber.textContent = `${secondsDisplay}s`;
+      timerNumber.classList.toggle('urgent', timeLeft <= 5);
       timerBar.style.width = `${(timeLeft / ROUND_TIME) * 100}%`;
 
       if (timeLeft <= 0) {
@@ -845,14 +1139,36 @@
 
     sfxWin();
 
-    // Reward: 2 to 10 candy (consistent with user request)
-    const earnedCandy = Math.floor(Math.random() * 9) + 2; // 2–10
+    // Reward calculation based on points configuration
+    let earnedCandy = 0;
+    let tierTitle = '';
+
+    if (score >= config.tier3Pts) {
+      const min = Math.min(config.tier3Min, config.tier3Max);
+      const max = Math.max(config.tier3Min, config.tier3Max);
+      earnedCandy = Math.floor(Math.random() * (max - min + 1)) + min;
+      tierTitle = '🥇 GOLD TIER REWARD!';
+    } else if (score >= config.tier2Pts) {
+      const min = Math.min(config.tier2Min, config.tier2Max);
+      const max = Math.max(config.tier2Min, config.tier2Max);
+      earnedCandy = Math.floor(Math.random() * (max - min + 1)) + min;
+      tierTitle = '🥈 SILVER TIER REWARD!';
+    } else if (score >= config.tier1Pts) {
+      const min = Math.min(config.tier1Min, config.tier1Max);
+      const max = Math.max(config.tier1Min, config.tier1Max);
+      earnedCandy = Math.floor(Math.random() * (max - min + 1)) + min;
+      tierTitle = '🥉 BRONZE TIER REWARD!';
+    } else {
+      earnedCandy = config.consolation;
+      tierTitle = earnedCandy > 0 ? '⚰️ CONSOLATION PRIZE!' : '⚰️ ROUND COMPLETE!';
+    }
+
     totalCandy = earnedCandy;
     totalCandyEl.textContent = totalCandy;
 
-    ovTitle.textContent = '⚰️ GRAVEYARD CLEARED! ⚰️';
-    candyReward.innerHTML = `<div class="big">${earnedCandy}</div><div class="label">🍬 CANDY 🍬</div>`;
-    ovSummary.innerHTML = `You whacked <b>${whacks}</b> ghouls for a score of <b>${score}</b>!`;
+    ovTitle.textContent = tierTitle;
+    candyReward.innerHTML = `<div class="big">${earnedCandy}</div><div class="label">🍬 CANDY EARNED 🍬</div>`;
+    ovSummary.innerHTML = `You whacked <b>${whacks}</b> ghouls for <b>${score}</b> points!`;
 
     overlay.classList.remove('hidden');
   }
@@ -860,6 +1176,8 @@
   // Buttons
   startGuideBtn.addEventListener('click', startGame);
   playAgainBtn.addEventListener('click', startGame);
+
+  loadConfig();
 </script>
 </body>
 </html>

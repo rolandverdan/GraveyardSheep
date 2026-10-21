@@ -20,11 +20,71 @@
     margin-bottom: 10px;
   }
   .hud {
-    display: flex; gap: 30px; font-size: 1.2rem; margin-bottom: 14px;
+    display: flex; gap: 20px; font-size: 1.2rem; margin-bottom: 14px;
     background: rgba(0,0,0,.45); padding: 10px 24px; border-radius: 12px;
-    border: 1px solid #3a5a2a;
+    border: 1px solid #3a5a2a; align-items: center; flex-wrap: wrap; justify-content: center;
   }
   .hud b { color: #fff; }
+
+  /* Config button & drawer */
+  .config-btn {
+    background: #253d1e; color: #a4f85e; border: 1px solid #4c7a36;
+    padding: 6px 14px; font-size: 0.95rem; border-radius: 8px; cursor: pointer;
+    box-shadow: none; margin: 0; font-weight: bold; transition: all .15s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .config-btn:hover { background: #35572b; color: #fff; }
+  .config-btn:active { transform: translateY(1px); }
+
+  #configDrawer {
+    position: fixed; top: 0; right: 0; width: 340px; max-width: 90vw; height: 100vh;
+    background: linear-gradient(180deg, #182813 0%, #0c1409 100%);
+    border-left: 3px solid #4c7a36;
+    box-shadow: -10px 0 35px rgba(0,0,0,0.85);
+    z-index: 50; padding: 22px 20px;
+    display: flex; flex-direction: column; gap: 16px;
+    transform: translateX(100%);
+    transition: transform .25s ease-in-out;
+  }
+  #configDrawer.open { transform: translateX(0); }
+  #configDrawer h3 {
+    color: #8bff5a; font-size: 1.5rem; text-shadow: 0 0 10px #3cff00;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid #3a5a2a; padding-bottom: 10px;
+  }
+  .close-cfg-btn {
+    background: transparent; border: none; color: #a0c996; font-size: 1.5rem;
+    cursor: pointer; padding: 0 6px; margin: 0; box-shadow: none;
+  }
+  .close-cfg-btn:hover { color: #ff5e5e; }
+  .cfg-group {
+    display: flex; flex-direction: column; gap: 6px;
+    background: rgba(0,0,0,0.35); padding: 12px; border-radius: 10px; border: 1px solid #28401e;
+  }
+  .cfg-group label {
+    font-size: 0.95rem; color: #bdfaa7; font-weight: bold;
+    display: flex; justify-content: space-between;
+  }
+  .cfg-group .cfg-sub { font-size: 0.8rem; color: #83a875; }
+  .cfg-input-row { display: flex; gap: 10px; align-items: center; margin-top: 4px; }
+  .cfg-input {
+    width: 100%; background: #070c06; border: 2px solid #3f682c; border-radius: 8px;
+    color: #ffd23b; font-size: 1.25rem; font-weight: bold; padding: 8px 12px;
+    font-family: inherit; text-align: center;
+  }
+  .cfg-input:focus { outline: none; border-color: #8bff5a; box-shadow: 0 0 10px rgba(139,255,90,0.4); }
+  .cfg-actions { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
+  .cfg-save-btn {
+    background: #4caf2a; color: #fff; font-size: 1.1rem; padding: 10px;
+    border-radius: 8px; border: none; cursor: pointer; box-shadow: 0 4px 0 #2a6a14;
+    margin: 0; font-weight: bold;
+  }
+  .cfg-save-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #2a6a14; }
+  .cfg-reset-btn {
+    background: transparent; color: #8ba880; font-size: 0.9rem; padding: 6px;
+    border: 1px dashed #3a5a2a; border-radius: 6px; cursor: pointer; box-shadow: none; margin: 0;
+  }
+  .cfg-reset-btn:hover { color: #ff8080; border-color: #ff8080; }
 
   /* ---------- Coffin (the flash screen) ---------- */
   .coffin-wrap {
@@ -162,6 +222,38 @@
 
   <div class="hud">
     <div>Total Candy: <b id="totalCandy">0</b> 🍬</div>
+    <button id="openConfigBtn" class="config-btn" title="Candy Reward Settings">⚙️ Config</button>
+  </div>
+
+  <!-- Hideable Config Drawer -->
+  <div id="configDrawer">
+    <h3>
+      <span>⚙️ Candy Settings</span>
+      <button id="closeConfigBtn" class="close-cfg-btn" title="Hide Settings">✕</button>
+    </h3>
+    
+    <div class="cfg-group">
+      <label>Win Range (Min – Max) 🍬</label>
+      <div class="cfg-sub">Candies awarded for picking the correct zombie.</div>
+      <div class="cfg-input-row">
+        <input type="number" id="cfgMinCandy" class="cfg-input" min="1" max="999" value="2" title="Min Candy">
+        <span style="font-size:1.4rem; color:#8bff5a;">–</span>
+        <input type="number" id="cfgMaxCandy" class="cfg-input" min="1" max="999" value="10" title="Max Candy">
+      </div>
+    </div>
+
+    <div class="cfg-group">
+      <label>Wrong / Lose Prize 🍬</label>
+      <div class="cfg-sub">Candy prize given even if you select the wrong zombie or run out of time.</div>
+      <div class="cfg-input-row">
+        <input type="number" id="cfgLoseCandy" class="cfg-input" min="0" max="999" value="1" title="Consolation Candy">
+      </div>
+    </div>
+
+    <div class="cfg-actions">
+      <button id="saveConfigBtn" class="cfg-save-btn">Save & Hide</button>
+      <button id="resetConfigBtn" class="cfg-reset-btn">Reset Defaults</button>
+    </div>
   </div>
 
   <!-- Coffin flash screen -->
@@ -215,8 +307,8 @@
         </div>
         <div class="step">
           <div class="visual">
-            <div class="result-box good"><div>✅</div><div class="num">2–10</div><div>🍬</div></div>
-            <div class="result-box bad"><div>❌</div><div class="num">0</div><div>🍬</div></div>
+            <div class="result-box good"><div>✅</div><div class="num" id="stepWinNum">2–10</div><div>🍬</div></div>
+            <div class="result-box bad"><div>❌</div><div class="num" id="stepLoseNum">1</div><div>🍬</div></div>
           </div>
           <h3>4 · WIN CANDY</h3>
         </div>
@@ -236,6 +328,94 @@
   </div>
 
 <script>
+  // --- Reward Configuration (Default & Saved) ---
+  const DEFAULT_CONFIG = {
+    minCandy: 2,
+    maxCandy: 10,
+    loseCandy: 1
+  };
+  let config = { ...DEFAULT_CONFIG };
+
+  function loadConfig() {
+    try {
+      const saved = localStorage.getItem('zombieMatchConfig');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Number.isFinite(parsed.minCandy)) config.minCandy = Math.max(1, Math.floor(parsed.minCandy));
+        if (Number.isFinite(parsed.maxCandy)) config.maxCandy = Math.max(config.minCandy, Math.floor(parsed.maxCandy));
+        if (Number.isFinite(parsed.loseCandy)) config.loseCandy = Math.max(0, Math.floor(parsed.loseCandy));
+      }
+    } catch(e) {}
+    applyConfigToUI();
+  }
+
+  function saveConfig() {
+    const minVal = Math.max(1, parseInt(cfgMinInput.value, 10) || 1);
+    let maxVal = Math.max(1, parseInt(cfgMaxInput.value, 10) || 1);
+    if (maxVal < minVal) maxVal = minVal;
+    const loseVal = Math.max(0, parseInt(cfgLoseInput.value, 10) || 0);
+
+    config.minCandy = minVal;
+    config.maxCandy = maxVal;
+    config.loseCandy = loseVal;
+
+    try {
+      localStorage.setItem('zombieMatchConfig', JSON.stringify(config));
+    } catch(e) {}
+
+    applyConfigToUI();
+    closeConfig();
+  }
+
+  function applyConfigToUI() {
+    cfgMinInput.value = config.minCandy;
+    cfgMaxInput.value = config.maxCandy;
+    cfgLoseInput.value = config.loseCandy;
+
+    // Update tutorial step 4 numbers
+    const winNumEl = document.getElementById('stepWinNum');
+    const loseNumEl = document.getElementById('stepLoseNum');
+    if (winNumEl) {
+      winNumEl.textContent = config.minCandy === config.maxCandy ? `${config.minCandy}` : `${config.minCandy}–${config.maxCandy}`;
+    }
+    if (loseNumEl) {
+      loseNumEl.textContent = `${config.loseCandy}`;
+    }
+  }
+
+  // Config Drawer Controls
+  const configDrawer = document.getElementById('configDrawer');
+  const openConfigBtn = document.getElementById('openConfigBtn');
+  const closeConfigBtn = document.getElementById('closeConfigBtn');
+  const saveConfigBtn = document.getElementById('saveConfigBtn');
+  const resetConfigBtn = document.getElementById('resetConfigBtn');
+  const cfgMinInput = document.getElementById('cfgMinCandy');
+  const cfgMaxInput = document.getElementById('cfgMaxCandy');
+  const cfgLoseInput = document.getElementById('cfgLoseCandy');
+
+  function openConfig() {
+    applyConfigToUI();
+    configDrawer.classList.add('open');
+  }
+
+  function closeConfig() {
+    configDrawer.classList.remove('open');
+  }
+
+  openConfigBtn.addEventListener('click', openConfig);
+  closeConfigBtn.addEventListener('click', closeConfig);
+  saveConfigBtn.addEventListener('click', saveConfig);
+  resetConfigBtn.addEventListener('click', () => {
+    config = { ...DEFAULT_CONFIG };
+    try { localStorage.removeItem('zombieMatchConfig'); } catch(e) {}
+    applyConfigToUI();
+  });
+
+  // Close when pressing Escape
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeConfig();
+  });
+
   // Only uses the 8 photos in the "zombie pics" folder
   const ZOMBIES = Array.from({ length: 8 }, (_, i) =>
     encodeURI(`zombie pics/Gemini_Generated_Image_s0lhizs0lhizs0lh (${i + 1}).jpg`)
@@ -301,6 +481,7 @@
   // One game = one zombie to match
   function startGame() {
     overlay.classList.add('hidden');
+    closeConfig();
     totalCandy = 0; // fresh start every game
     document.getElementById('totalCandy').textContent = totalCandy;
     message.textContent = '';
@@ -359,17 +540,26 @@
 
     let candy = 0;
     if (result === 'correct') {
-      candy = Math.floor(Math.random() * 9) + 2; // random 2–10
+      const min = Math.min(config.minCandy, config.maxCandy);
+      const max = Math.max(config.minCandy, config.maxCandy);
+      candy = Math.floor(Math.random() * (max - min + 1)) + min;
       totalCandy += candy;
       document.getElementById('totalCandy').textContent = totalCandy;
       message.style.color = '#6aff3b';
-      message.textContent = '✅ Correct!';
-    } else if (result === 'wrong') {
-      message.style.color = '#ff4d4d';
-      message.textContent = '❌ Wrong zombie!';
+      message.textContent = `✅ Correct! (+${candy} 🍬)`;
     } else {
-      message.style.color = '#ffb03b';
-      message.textContent = "⌛ Time's up!";
+      // Lose or select wrong zombie: award consolation prize
+      candy = config.loseCandy;
+      totalCandy += candy;
+      document.getElementById('totalCandy').textContent = totalCandy;
+
+      if (result === 'wrong') {
+        message.style.color = '#ff4d4d';
+        message.textContent = candy > 0 ? `❌ Wrong zombie! (+${candy} 🍬 prize)` : '❌ Wrong zombie!';
+      } else {
+        message.style.color = '#ffb03b';
+        message.textContent = candy > 0 ? `⌛ Time's up! (+${candy} 🍬 prize)` : "⌛ Time's up!";
+      }
     }
 
     // Show the pop-up after a short pause so the answer can be seen
@@ -384,7 +574,13 @@
       ovText.innerHTML = 'Great memory!';
     } else {
       ovTitle.textContent = result === 'wrong' ? '💀 Wrong Zombie! 💀' : "⌛ Time's Up! ⌛";
-      ovText.innerHTML = 'No candy this time... try again!';
+      if (candy > 0) {
+        candyReward.innerHTML = `<div class="big">${candy}</div><div class="label">🍬 CONSOLATION PRIZE 🍬</div>`;
+        ovText.innerHTML = `You selected the wrong zombie, but you still won <b>${candy}</b> candy prize!`;
+      } else {
+        candyReward.innerHTML = `<div class="big">0</div><div class="label">🍬 CANDY 🍬</div>`;
+        ovText.innerHTML = 'No candy this time... try again!';
+      }
     }
     overlay.classList.remove('hidden');
   }
@@ -398,6 +594,7 @@
   // Fill tutorial pictures with zombies from the folder
   document.querySelectorAll('img[data-z]').forEach(im => { im.src = ZOMBIES[im.dataset.z - 1]; });
 
+  loadConfig();
   buildGrid();
 </script>
 </body>
