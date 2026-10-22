@@ -77,8 +77,14 @@
         </div>
         <button id="spin" class="spin relative z-10 w-full max-w-[300px] min-h-[58px] rounded-2xl border border-amber-100/50 bg-gradient-to-b from-amber-200 via-amber-300 to-pumpkin px-6 text-base font-black uppercase tracking-[.12em] text-[#25182d] focus:outline-none focus:ring-4 focus:ring-amber-200/40" type="button"><span class="mr-2" aria-hidden="true">✦</span>Spin the wheel<span class="ml-2" aria-hidden="true">✦</span></button>
       </div>
+      <aside hidden class="grid grid-cols-2 gap-3 rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#241b32]/82 to-[#151221]/88 p-4 shadow-[0_24px_70px_#0009,inset_0_1px_0_#ffffff1c] backdrop-blur-sm sm:gap-4 sm:p-5 lg:flex lg:flex-col lg:gap-4 lg:p-6" aria-label="Game score and result">
+        <div class="rounded-2xl border border-orange-200/15 bg-gradient-to-br from-[#4b3441] to-[#281d32] p-4 shadow-[inset_0_1px_0_#ffffff16] sm:p-5"><div class="text-[.65rem] font-black uppercase tracking-[.16em] text-lilac">Last spin prize</div><div id="candy-count" class="mt-1 text-3xl font-black text-pumpkin drop-shadow-[0_2px_10px_#ffb34d55]">🍬 0</div></div>
+        <div class="rounded-2xl border border-purple-200/15 bg-gradient-to-br from-[#3b3150] to-[#211b35] p-4 shadow-[inset_0_1px_0_#ffffff16] sm:p-5"><div class="text-[.65rem] font-black uppercase tracking-[.16em] text-lilac">Spins</div><div id="spin-count" class="mt-1 text-3xl font-black text-purple-200">0</div></div>
+        <div id="result" class="col-span-2 min-h-[130px] rounded-2xl border border-purple-200/20 bg-gradient-to-br from-purple-400/15 to-black/20 p-5 shadow-inner lg:col-span-1" aria-live="polite" aria-atomic="true"><div class="mb-2 text-[.65rem] font-black uppercase tracking-[.18em] text-purple-200">Wheel result</div><h2 id="result-title" class="text-xl font-black">Ready for a fright?</h2><p id="result-copy" class="mt-2 text-sm leading-relaxed text-lilac">Press the button and see where fate points.</p></div>
+        <p id="odds-copy" class="col-span-2 rounded-xl border border-white/5 bg-black/15 p-4 text-sm leading-relaxed text-lilac lg:col-span-1">Jackpot chance: 2%. On other spins, there is a 50% near-miss chance.</p>
+      </aside>
     </section>
-    <p id="spin-status" class="sr-only" aria-live="polite"></p>
+    <p id="spin-status" class="sr-only" aria-live="polite"></p>f
   </main>
   <div id="win-popup" class="fixed inset-0 z-50 hidden items-center justify-center bg-[#09040d]/80 p-5 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="win-popup-title" aria-hidden="true">
     <div class="relative w-full max-w-sm overflow-hidden rounded-[2rem] border border-amber-200/30 bg-gradient-to-br from-[#49334e] via-[#2a2038] to-[#171326] p-7 text-center shadow-[0_25px_100px_#000c,0_0_50px_#fbbf2440]">
@@ -87,7 +93,7 @@
       <p class="relative mt-3 text-[.68rem] font-black uppercase tracking-[.2em] text-purple-200">The wheel chose you</p>
       <h2 id="win-popup-title" class="relative mt-2 text-3xl font-black text-amber-200">You won!</h2>
       <p id="win-popup-copy" class="relative mt-3 text-lilac">Candy found!</p>
-      <button id="win-popup-close" class="relative mt-6 w-full rounded-xl bg-gradient-to-b from-amber-200 to-pumpkin px-6 py-3 font-black uppercase tracking-wider text-[#25182d] shadow-[0_4px_0_#9c511e] transition hover:-translate-y-0.5 hover:brightness-110 focus:outline-none focus:ring-4 focus:ring-amber-200/40" type="button">Keep spinning</button>
+      <button id="win-popup-close" class="relative mt-6 w-full rounded-xl bg-gradient-to-b from-amber-200 to-pumpkin px-6 py-3 font-black uppercase tracking-wider text-[#25182d] shadow-[0_4px_0_#9c511e] transition hover:-translate-y-0.5 hover:brightness-110 focus:outline-none focus:ring-4 focus:ring-amber-200/40" type="button">Start Spin Again</button>
     </div>
   </div>
   <script>
@@ -129,15 +135,23 @@
     const nearMissChance = 0.50;
     const wheel = document.querySelector("#wheel");
     const spinButton = document.querySelector("#spin");
+    const candyCountEl = document.querySelector("#candy-count");
+    const spinCountEl = document.querySelector("#spin-count");
+    const resultTitleEl = document.querySelector("#result-title");
+    const resultCopyEl = document.querySelector("#result-copy");
+    const resultCardEl = document.querySelector("#result");
     const statusEl = document.querySelector("#spin-status");
     const jackpotLabelEl = document.querySelector(".jackpot-label");
     const jackpotAmountEl = document.querySelector(".jackpot-amount");
+    const oddsCopyEl = document.querySelector("#odds-copy");
     const settingsForm = document.querySelector("#prize-settings");
     const settingsStatusEl = document.querySelector("#settings-status");
     const winPopupEl = document.querySelector("#win-popup");
     const winPopupTitleEl = document.querySelector("#win-popup-title");
     const winPopupCopyEl = document.querySelector("#win-popup-copy");
     const winPopupIconEl = document.querySelector("#win-popup-icon");
+    let lastPrizeCandy = 0;
+    let spins = 0;
     let rotation = 0;
     let isSpinning = false;
 
@@ -149,6 +163,7 @@
       });
       jackpotAmountEl.textContent = payoutTiers.jackpot;
       wheel.setAttribute("aria-label", `Roulette wheel with twelve spooky prizes, including a ${payoutTiers.jackpot}-candy jackpot`);
+      oddsCopyEl.textContent = `Jackpot chance: ${Math.round(jackpotChance * 100)}%. On other spins, there is a ${Math.round(nearMissChance * 100)}% near-miss chance.`;
     }
 
     settingsForm.addEventListener("submit", event => {
@@ -174,6 +189,9 @@
       if (isSpinning) return;
       isSpinning = true;
       spinButton.disabled = true;
+      resultTitleEl.textContent = "The wheel is turning…";
+      resultCopyEl.textContent = "Waiting to see what the spirits choose.";
+      resultCardEl.classList.remove("jackpot-win");
       jackpotLabelEl.classList.remove("jackpot-near-miss");
       const spinRoll = Math.random();
       const winsJackpot = spinRoll < jackpotChance;
@@ -212,14 +230,27 @@
       wheel.style.transform = `rotate(${rotation}deg)`;
 
       window.setTimeout(() => {
+        spins++;
+        lastPrizeCandy = prize.candy;
         const clockwiseDistance = (prizeIndex - jackpotIndex + prizes.length) % prizes.length;
         const counterClockwiseDistance = (jackpotIndex - prizeIndex + prizes.length) % prizes.length;
         const nearMiss = (clockwiseDistance === 1 && stopOffset > 9)
           || (counterClockwiseDistance === 1 && stopOffset < -9);
+        spinCountEl.textContent = spins;
+        candyCountEl.textContent = `🍬 ${lastPrizeCandy}`;
         if (nearMiss) jackpotLabelEl.classList.add("jackpot-near-miss");
-        statusEl.textContent = prize.candy > 0
-          ? `${nearMiss ? "So close to the jackpot. " : ""}${prize.name}. You won ${prize.candy} candies.`
-          : `${nearMiss ? "So close to the jackpot. " : ""}${prize.name}. Zero rewards this spin.`;
+        if (prize.candy > 0) {
+          resultTitleEl.textContent = nearMiss ? `So close! ${prize.icon} ${prize.name}!` : `${prize.icon} ${prize.name}!`;
+          resultCopyEl.textContent = prize.name === "Jackpot"
+            ? `You hit the jackpot and won ${prize.candy} candies!`
+            : `${nearMiss ? "You nearly hit the jackpot! " : ""}You won ${prize.candy} ${prize.candy === 1 ? "candy" : "candies"}!`;
+          resultCardEl.classList.toggle("jackpot-win", prize.name === "Jackpot");
+          statusEl.textContent = `${nearMiss ? "So close to the jackpot. " : ""}${prize.name}. You won ${prize.candy} candies.`;
+        } else {
+          resultTitleEl.textContent = nearMiss ? "So close to the jackpot!" : `${prize.icon} Trick!`;
+          resultCopyEl.textContent = `${nearMiss ? "The jackpot slipped by. " : ""}${prize.name} got you. No candy this spin!`;
+          statusEl.textContent = `${nearMiss ? "So close to the jackpot. " : ""}${prize.name}. No candy this spin.`;
+        }
         isSpinning = false;
         spinButton.disabled = false;
         showWinPopup(prize, nearMiss);
