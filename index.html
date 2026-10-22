@@ -9,52 +9,509 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500;600&family=Nunito:wght@500;600;700;800;900;1000&display=swap" rel="stylesheet">
   <style>
-    :root{color-scheme:dark;--night:#171321;--panel:#211c2c;--bone:#fff0d1;--muted:#b9b1c4;--orange:#ff9f43;--lilac:#bba7ff;--mint:#a5f3c5}
-    *{box-sizing:border-box}html{min-height:100%;background:var(--night)}body{margin:0;min-height:100vh;color:var(--bone);font-family:Nunito,system-ui,sans-serif;background:radial-gradient(ellipse at 50% -12%,#41334e 0,#252036 35%,var(--night) 75%);overflow-x:hidden}
-    .wrap{width:min(1120px,calc(100% - 40px));margin:auto}.top{display:flex;align-items:center;justify-content:space-between;padding:25px 0;border-bottom:1px solid #ffffff19}.brand{display:flex;align-items:center;gap:11px;font-weight:1000;letter-spacing:.08em}.brand-mark{display:grid;place-items:center;width:42px;height:42px;border:1px solid #bba7ff77;border-radius:14px;background:#bba7ff16;font-size:22px}.mono{font:600 11px 'DM Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#bba7ff}.top-note{font:500 11px 'DM Mono',monospace;letter-spacing:.12em;color:#b8adbd}
-    .hero{position:relative;padding:70px 0 43px;text-align:center}.moon{position:absolute;right:8%;top:44px;width:68px;height:68px;border-radius:50%;background:#ffcf8e;box-shadow:0 0 0 10px #ffcf8e12}.eyebrow{display:inline-flex;gap:8px;align-items:center;padding:8px 13px;border:1px solid #bba7ff55;border-radius:99px;background:#211c2c;color:#d4c7ff;font:600 10px 'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase}.hero h1{position:relative;margin:17px 0 8px;font-size:clamp(42px,8vw,82px);line-height:.98;font-weight:1000;letter-spacing:-.055em}.hero h1 span{color:var(--orange)}.hero p{max-width:540px;margin:16px auto 0;color:#c6bdcd;font-size:16px;line-height:1.7}.yard{position:absolute;left:50%;bottom:0;z-index:-1;width:100vw;height:90px;transform:translateX(-50%);background:linear-gradient(transparent,#171321 85%)}
-    .section-head{display:flex;align-items:end;justify-content:space-between;margin:10px 0 17px}.section-head h2{margin:0;font-size:21px;font-weight:900}.section-head p{margin:0;color:#aaa1b4;font:500 10px 'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase}
-    .games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;padding-bottom:34px}.card{--accent:var(--orange);position:relative;display:flex;min-height:210px;flex-direction:column;overflow:hidden;border:1px solid #ffffff20;border-radius:22px;background:linear-gradient(145deg,#282235,#1e1a29 72%);color:inherit;text-decoration:none;transition:transform .18s,border-color .18s,background .18s}.card:hover,.card:focus-visible{transform:translateY(-4px);border-color:var(--accent);background:linear-gradient(145deg,#30283d,#211c2c 75%);outline:none}.card-top{display:flex;align-items:flex-start;justify-content:space-between;padding:20px 21px 2px}.icon{display:grid;place-items:center;width:58px;height:58px;border:1px solid color-mix(in srgb,var(--accent),transparent 60%);border-radius:18px;background:color-mix(in srgb,var(--accent),transparent 89%);font-size:31px}.play{display:grid;place-items:center;width:36px;height:36px;border:1px solid #ffffff24;border-radius:50%;color:var(--accent);font-size:19px;transition:transform .18s}.card:hover .play{transform:translateX(3px)}.card-body{padding:12px 21px 20px}.card h3{margin:0 0 6px;font-size:22px;line-height:1.2;font-weight:1000}.card p{max-width:440px;margin:0;color:#bdb4c6;font-size:14px;line-height:1.5}.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:15px}.tag{padding:5px 9px;border-radius:99px;background:#ffffff0c;color:#d4ccda;font:500 9px 'DM Mono',monospace;letter-spacing:.08em;text-transform:uppercase}.card.bones{--accent:#a5f3c5}.card.whack{--accent:#ff9f43}.card.treat{--accent:#ff79a8}.card.match{--accent:#bba7ff}
-    .bottom{display:flex;justify-content:space-between;gap:15px;padding:17px 0 25px;border-top:1px solid #ffffff19;color:#968da0;font:500 10px 'DM Mono',monospace;letter-spacing:.08em}.bottom b{color:#d2c7dc;font-weight:600}.star{color:var(--orange)}
-    @media(max-width:650px){.wrap{width:min(100% - 28px,500px)}.top{padding:17px 0}.top-note{font-size:9px}.hero{padding:54px 0 35px}.moon{right:4%;top:33px;width:42px;height:42px}.hero p{font-size:14px}.section-head p{max-width:120px;text-align:right;line-height:1.5}.games{grid-template-columns:1fr;gap:12px}.card{min-height:184px}.card-top{padding:16px 17px 0}.card-body{padding:10px 17px 17px}.bottom{font-size:9px}}
-    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+    :root {
+      color-scheme: dark;
+      --night: #171321;
+      --panel: #211c2c;
+      --bone: #fff0d1;
+      --muted: #b9b1c4;
+      --orange: #ff9f43;
+      --lilac: #bba7ff;
+      --mint: #a5f3c5;
+      --pink: #ff79a8;
+      --gold: #ffd76b;
+    }
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--night); }
+    body {
+      margin: 0; min-height: 100vh; color: var(--bone);
+      font-family: Nunito, system-ui, sans-serif;
+      background: radial-gradient(ellipse at 50% -12%, #41334e 0, #252036 35%, var(--night) 75%);
+      overflow-x: hidden;
+    }
+    .wrap { width: min(1140px, calc(100% - 40px)); margin: auto; }
+    .top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 25px 0; border-bottom: 1px solid #ffffff19;
+    }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 1000; letter-spacing: .08em; }
+    .brand-mark {
+      display: grid; place-items: center; width: 42px; height: 42px;
+      border: 1px solid #bba7ff77; border-radius: 14px; background: #bba7ff16; font-size: 22px;
+    }
+    .mono { font: 600 11px 'DM Mono', monospace; letter-spacing: .14em; text-transform: uppercase; color: #bba7ff; }
+    .top-note { font: 500 11px 'DM Mono', monospace; letter-spacing: .12em; color: #b8adbd; }
+
+    .hero { position: relative; padding: 64px 0 40px; text-align: center; }
+    .moon {
+      position: absolute; right: 8%; top: 40px; width: 68px; height: 68px;
+      border-radius: 50%; background: #ffcf8e; box-shadow: 0 0 0 10px #ffcf8e12;
+    }
+    .eyebrow {
+      display: inline-flex; gap: 8px; align-items: center; padding: 8px 13px;
+      border: 1px solid #bba7ff55; border-radius: 99px; background: #211c2c;
+      color: #d4c7ff; font: 600 10px 'DM Mono', monospace; letter-spacing: .12em; text-transform: uppercase;
+    }
+    .hero h1 {
+      position: relative; margin: 17px 0 8px;
+      font-size: clamp(42px, 8vw, 82px); line-height: .98; font-weight: 1000; letter-spacing: -.055em;
+    }
+    .hero h1 span { color: var(--orange); }
+    .hero p { max-width: 560px; margin: 16px auto 0; color: #c6bdcd; font-size: 16px; line-height: 1.7; }
+    .yard {
+      position: absolute; left: 50%; bottom: 0; z-index: -1; width: 100vw; height: 90px;
+      transform: translateX(-50%); background: linear-gradient(transparent, #171321 85%);
+    }
+
+    .section-head { display: flex; align-items: end; justify-content: space-between; margin: 10px 0 17px; }
+    .section-head h2 { margin: 0; font-size: 21px; font-weight: 900; }
+    .section-head p { margin: 0; color: #aaa1b4; font: 500 10px 'DM Mono', monospace; letter-spacing: .1em; text-transform: uppercase; }
+
+    /* ---------- Y8-Style Game Cards Grid ---------- */
+    .games {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+      gap: 18px;
+      padding-bottom: 38px;
+    }
+    .card {
+      --accent: var(--orange);
+      position: relative;
+      display: flex;
+      min-height: 235px;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      border: 1px solid #ffffff20;
+      border-radius: 22px;
+      background: linear-gradient(145deg, #282235, #1e1a29 72%);
+      color: inherit;
+      text-decoration: none;
+      isolation: isolate;
+      transition: transform .22s cubic-bezier(.2,.9,.3,1), border-color .22s, box-shadow .22s;
+    }
+    .card:hover, .card:focus-visible {
+      transform: translateY(-5px) scale(1.015);
+      border-color: var(--accent);
+      box-shadow: 0 16px 36px rgba(0,0,0,0.6), 0 0 22px color-mix(in srgb, var(--accent), transparent 65%);
+      outline: none;
+    }
+
+    /* ---------- Low-Opacity Hover Preview Layer (Y8 Style) ---------- */
+    .preview-bg {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+      overflow: hidden;
+      background: #0e0b16;
+    }
+    .card:hover .preview-bg, .card:focus-visible .preview-bg {
+      opacity: 0.34; /* Low opacity gameplay playing on hover */
+    }
+    /* Scaled live game iframe + animated preview fallback */
+    .preview-bg iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 250%; height: 250%;
+      transform: scale(0.4);
+      transform-origin: top left;
+      border: 0;
+      pointer-events: none;
+      opacity: 0.55;
+    }
+    .preview-sim {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Live Preview Pill Badge */
+    .live-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 99px;
+      background: rgba(15, 12, 24, 0.82);
+      border: 1px solid color-mix(in srgb, var(--accent), transparent 40%);
+      color: var(--accent);
+      font: 600 9px 'DM Mono', monospace;
+      letter-spacing: .1em; text-transform: uppercase;
+      opacity: 0; transform: translateY(-4px);
+      transition: opacity .22s, transform .22s;
+    }
+    .live-pill::before {
+      content: ""; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 6px var(--accent);
+      animation: pulseDot .8s infinite alternate;
+    }
+    @keyframes pulseDot { from { opacity: .3; } to { opacity: 1; } }
+    .card:hover .live-pill, .card:focus-visible .live-pill {
+      opacity: 1; transform: translateY(0);
+    }
+
+    /* Card Foreground Content */
+    .card-top {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding: 20px 21px 2px; position: relative; z-index: 2;
+    }
+    .icon {
+      display: grid; place-items: center; width: 58px; height: 58px;
+      border: 1px solid color-mix(in srgb, var(--accent), transparent 60%);
+      border-radius: 18px;
+      background: color-mix(in srgb, var(--accent), transparent 86%);
+      backdrop-filter: blur(4px);
+      font-size: 31px;
+    }
+    .top-right-group {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .play {
+      display: grid; place-items: center; width: 36px; height: 36px;
+      border: 1px solid #ffffff24; border-radius: 50%;
+      background: rgba(20, 16, 30, 0.6);
+      color: var(--accent); font-size: 19px; transition: transform .18s, background .18s;
+    }
+    .card:hover .play {
+      transform: translateX(3px) scale(1.06);
+      background: color-mix(in srgb, var(--accent), transparent 80%);
+    }
+
+    .card-body {
+      padding: 12px 21px 20px; position: relative; z-index: 2;
+      background: linear-gradient(to top, rgba(20, 16, 31, 0.88) 20%, rgba(20, 16, 31, 0.35) 80%, transparent);
+    }
+    .card h3 { margin: 0 0 6px; font-size: 22px; line-height: 1.2; font-weight: 1000; }
+    .card p { max-width: 440px; margin: 0; color: #cfc7d8; font-size: 14px; line-height: 1.5; }
+    .tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 15px; }
+    .tag {
+      padding: 5px 9px; border-radius: 99px; background: rgba(255,255,255,0.09);
+      color: #e4dce9; font: 500 9px 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase;
+      backdrop-filter: blur(4px);
+    }
+
+    .card.bones { --accent: var(--mint); }
+    .card.whack { --accent: var(--orange); }
+    .card.treat { --accent: var(--pink); }
+    .card.match { --accent: var(--lilac); }
+    .card.roulette { --accent: var(--gold); }
+
+    /* ---------- Animated Gameplay Loops Inside Each Card on Hover ---------- */
+    /* 1. Bone to Pick animation */
+    .sim-bones-stage { position: relative; width: 100%; height: 100%; }
+    .sim-runner {
+      position: absolute; font-size: 34px;
+      animation: runLoop 2.4s infinite linear;
+    }
+    .sim-zombie-chase {
+      position: absolute; font-size: 34px;
+      animation: runLoop 2.4s infinite linear;
+      animation-delay: -0.5s;
+    }
+    .sim-bone-item {
+      position: absolute; font-size: 22px;
+      animation: bobBone .8s infinite alternate ease-in-out;
+    }
+    @keyframes runLoop {
+      0%   { left: 12%; top: 18%; }
+      25%  { left: 76%; top: 22%; }
+      50%  { left: 72%; top: 68%; }
+      75%  { left: 16%; top: 64%; }
+      100% { left: 12%; top: 18%; }
+    }
+    @keyframes bobBone { from { transform: scale(0.85) rotate(-12deg); } to { transform: scale(1.2) rotate(12deg); } }
+
+    /* 2. Whack-a-Mole animation */
+    .sim-whack-stage {
+      display: grid; grid-template-columns: repeat(3, 74px); gap: 12px;
+      align-items: end; padding-top: 20px; position: relative;
+    }
+    .sim-hole {
+      height: 64px; border-bottom: 7px solid #5a3880; border-radius: 10px;
+      position: relative; overflow: hidden; background: rgba(0,0,0,0.4);
+    }
+    .sim-pop {
+      position: absolute; left: 50%; bottom: -44px; transform: translateX(-50%);
+      font-size: 32px; animation: moleUp 1.3s infinite ease-in-out;
+    }
+    .sim-hole:nth-child(2) .sim-pop { animation-delay: .35s; }
+    .sim-hole:nth-child(3) .sim-pop { animation-delay: .75s; }
+    .sim-hole:nth-child(4) .sim-pop { animation-delay: .95s; }
+    .sim-hole:nth-child(5) .sim-pop { animation-delay: .2s; }
+    .sim-hole:nth-child(6) .sim-pop { animation-delay: .6s; }
+    @keyframes moleUp { 0%, 100% { bottom: -44px; } 40%, 65% { bottom: 4px; } }
+    .sim-mallet {
+      position: absolute; right: 20%; top: 18%; font-size: 40px;
+      animation: malletSwing .65s infinite ease-in-out;
+    }
+    @keyframes malletSwing { 0%, 100% { transform: rotate(10deg); } 50% { transform: rotate(-55deg) translate(-10px, 12px); } }
+
+    /* 3. Trick or Treat animation */
+    .sim-treat-stage {
+      display: flex; gap: 18px; align-items: center; justify-content: center;
+    }
+    .sim-door {
+      width: 58px; height: 92px; border-radius: 12px 12px 0 0;
+      border: 3px solid #ffb34d; background: #3b234a;
+      display: grid; place-items: center; font-size: 30px;
+      animation: doorOpen 1.4s infinite ease-in-out;
+    }
+    .sim-door:nth-child(2) { animation-delay: .45s; border-color: #ff79a8; }
+    .sim-door:nth-child(3) { animation-delay: .9s; border-color: #a5f3c5; }
+    @keyframes doorOpen {
+      0%, 100% { transform: scale(0.95); filter: brightness(0.7); }
+      45% { transform: scale(1.12) translateY(-6px); filter: brightness(1.3); }
+    }
+
+    /* 4. Zombie Matching animation */
+    .sim-match-stage {
+      display: flex; align-items: center; gap: 18px;
+    }
+    .sim-coffin {
+      width: 56px; height: 84px; background: #6b3f1d;
+      clip-path: polygon(28% 0, 72% 0, 100% 20%, 80% 100%, 20% 100%, 0 20%);
+      display: grid; place-items: center; font-size: 30px;
+      animation: coffinFlash 1.2s infinite alternate;
+    }
+    @keyframes coffinFlash {
+      from { filter: brightness(0.5); transform: scale(0.94); }
+      to { filter: brightness(1.5); transform: scale(1.08); }
+    }
+    .sim-grid4 {
+      display: grid; grid-template-columns: repeat(4, 34px); gap: 6px;
+    }
+    .sim-cell {
+      width: 34px; height: 34px; border-radius: 7px; border: 2px solid #4c7a36;
+      background: #142210; display: grid; place-items: center; font-size: 18px;
+    }
+    .sim-cell.active {
+      border-color: #8bff5a; box-shadow: 0 0 12px #8bff5a;
+      animation: cellPick .7s infinite alternate;
+    }
+    @keyframes cellPick { from { transform: scale(0.95); } to { transform: scale(1.18); } }
+
+    /* 5. Scare-o-lette animation */
+    .sim-wheel {
+      width: 150px; height: 150px; border-radius: 50%;
+      border: 6px solid #f5d897;
+      background: conic-gradient(#a84d32 0deg 60deg, #48345f 60deg 120deg, #315f5b 120deg 180deg, #e4ad2f 180deg 240deg, #924250 240deg 300deg, #425e52 300deg 360deg);
+      display: grid; place-items: center; font-size: 36px;
+      animation: spinWheel 2.5s infinite linear;
+      box-shadow: 0 0 25px rgba(255, 215, 107, 0.4);
+    }
+    @keyframes spinWheel { to { transform: rotate(360deg); } }
+
+    .bottom {
+      display: flex; justify-content: space-between; gap: 15px;
+      padding: 17px 0 25px; border-top: 1px solid #ffffff19;
+      color: #968da0; font: 500 10px 'DM Mono', monospace; letter-spacing: .08em;
+    }
+    .bottom b { color: #d2c7dc; font-weight: 600; }
+    .star { color: var(--orange); }
+
+    @media (max-width: 650px) {
+      .wrap { width: min(100% - 28px, 500px); }
+      .top { padding: 17px 0; }
+      .top-note { font-size: 9px; }
+      .hero { padding: 54px 0 35px; }
+      .moon { right: 4%; top: 33px; width: 42px; height: 42px; }
+      .hero p { font-size: 14px; }
+      .section-head p { max-width: 140px; text-align: right; line-height: 1.5; }
+      .games { grid-template-columns: 1fr; gap: 12px; }
+      .card { min-height: 196px; }
+      .card-top { padding: 16px 17px 0; }
+      .card-body { padding: 10px 17px 17px; }
+      .bottom { font-size: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+    }
   </style>
 </head>
 <body>
   <header class="wrap top">
     <div class="brand"><span class="brand-mark" aria-hidden="true">⚰</span><span>GRAVEYARD<br>ARCADE</span></div>
-    <div class="top-note">A little spooky · a lot of silly</div>
+    <div class="top-note">Hover any game to preview · Click to play</div>
   </header>
+
   <main class="wrap">
     <section class="hero" aria-labelledby="welcome">
       <div class="moon" aria-hidden="true"></div>
       <div class="eyebrow"><span class="star">✦</span> THE GATES ARE OPEN <span class="star">✦</span></div>
       <h1 id="welcome">Pick your <span>poison.</span></h1>
-      <p>Four quick Halloween games are waiting in the graveyard. Choose a game, round up your friends, and let the spooky silliness begin.</p>
+      <p>Five quick Halloween games are waiting in the graveyard. Hover over a tomb to watch a live preview, then jump right in!</p>
       <div class="yard" aria-hidden="true"></div>
     </section>
+
     <section aria-labelledby="games-title">
-      <div class="section-head"><h2 id="games-title">Choose a game</h2><p>Pick a tomb. Start a game.</p></div>
+      <div class="section-head">
+        <h2 id="games-title">Choose a game (5)</h2>
+        <p>Hover to preview · Click to play</p>
+      </div>
+
       <div class="games">
-        <a class="card bones" href="./bonetopick/">
-          <div class="card-top"><div class="icon" aria-hidden="true">🦴</div><span class="play" aria-hidden="true">↗</span></div>
-          <div class="card-body"><h3>BONE TO PICK</h3><p>Waddle through the cemetery, scoop up 10 bones, and dodge the goofy zombies.</p><div class="tags"><span class="tag">Action</span><span class="tag">2 lives</span><span class="tag">1 minute</span></div></div>
+        <!-- 1. Bone to Pick -->
+        <a class="card bones" href="./bonetopick/" data-preview="./bonetopick/index.html">
+          <div class="preview-bg" aria-hidden="true">
+            <div class="preview-sim">
+              <div class="sim-bones-stage">
+                <span class="sim-bone-item" style="left:75%;top:22%">🦴</span>
+                <span class="sim-bone-item" style="left:70%;top:68%">🦴</span>
+                <span class="sim-bone-item" style="left:18%;top:65%">🦴</span>
+                <span class="sim-runner">🏃</span>
+                <span class="sim-zombie-chase">🧟</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">🦴</div>
+            <div class="top-right-group">
+              <span class="live-pill">Preview</span>
+              <span class="play" aria-hidden="true">↗</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <h3>BONE TO PICK</h3>
+            <p>Waddle through the cemetery, scoop up 10 bones, and dodge the goofy zombies.</p>
+            <div class="tags"><span class="tag">Action</span><span class="tag">2 lives</span><span class="tag">1 minute</span></div>
+          </div>
         </a>
-        <a class="card whack" href="./wack-a-mole/">
-          <div class="card-top"><div class="icon" aria-hidden="true">🔨</div><span class="play" aria-hidden="true">↗</span></div>
-          <div class="card-body"><h3>GRAVEYARD WHACK</h3><p>Keep your eyes peeled and bonk the little monsters before they disappear.</p><div class="tags"><span class="tag">Arcade</span><span class="tag">Quick reflexes</span></div></div>
+
+        <!-- 2. Graveyard Whack -->
+        <a class="card whack" href="./wack-a-mole/" data-preview="./wack-a-mole/index.html">
+          <div class="preview-bg" aria-hidden="true">
+            <div class="preview-sim">
+              <div class="sim-whack-stage">
+                <div class="sim-hole"><span class="sim-pop">🧟</span></div>
+                <div class="sim-hole"><span class="sim-pop">👻</span></div>
+                <div class="sim-hole"><span class="sim-pop">🧟</span></div>
+                <div class="sim-hole"><span class="sim-pop">🧟</span></div>
+                <div class="sim-hole"><span class="sim-pop">👻</span></div>
+                <div class="sim-hole"><span class="sim-pop">🧟</span></div>
+                <span class="sim-mallet">🔨</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">🔨</div>
+            <div class="top-right-group">
+              <span class="live-pill">Preview</span>
+              <span class="play" aria-hidden="true">↗</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <h3>GRAVEYARD WHACK</h3>
+            <p>Keep your eyes peeled and bonk the undead ghouls and golden ghosts before they disappear.</p>
+            <div class="tags"><span class="tag">Arcade</span><span class="tag">6 Graves</span><span class="tag">Score Tiers</span></div>
+          </div>
         </a>
-        <a class="card treat" href="./trickyhouse/">
-          <div class="card-top"><div class="icon" aria-hidden="true">🍬</div><span class="play" aria-hidden="true">↗</span></div>
-          <div class="card-body"><h3>TRICK OR TREAT!</h3><p>Knock on spooky doors and see what kind of Halloween surprise is waiting.</p><div class="tags"><span class="tag">Adventure</span><span class="tag">Surprises</span></div></div>
+
+        <!-- 3. Trick or Treat! -->
+        <a class="card treat" href="./trickyhouse/" data-preview="./trickyhouse/index.html">
+          <div class="preview-bg" aria-hidden="true">
+            <div class="preview-sim">
+              <div class="sim-treat-stage">
+                <div class="sim-door">🍬</div>
+                <div class="sim-door">👻</div>
+                <div class="sim-door">🎃</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">🍬</div>
+            <div class="top-right-group">
+              <span class="live-pill">Preview</span>
+              <span class="play" aria-hidden="true">↗</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <h3>TRICK OR TREAT!</h3>
+            <p>Knock on spooky doors along the moonlit street and see what Halloween surprise is waiting.</p>
+            <div class="tags"><span class="tag">Adventure</span><span class="tag">8 Doors</span><span class="tag">Surprises</span></div>
+          </div>
         </a>
-        <a class="card match" href="./zombiematching/">
-          <div class="card-top"><div class="icon" aria-hidden="true">🧟</div><span class="play" aria-hidden="true">↗</span></div>
-          <div class="card-body"><h3>ZOMBIE MATCHING</h3><p>Flip the cards, remember what you saw, and find every creepy-cute pair.</p><div class="tags"><span class="tag">Memory</span><span class="tag">Brain game</span></div></div>
+
+        <!-- 4. Zombie Matching -->
+        <a class="card match" href="./zombiematching/" data-preview="./zombiematching/index.html">
+          <div class="preview-bg" aria-hidden="true">
+            <div class="preview-sim">
+              <div class="sim-match-stage">
+                <div class="sim-coffin">🧟</div>
+                <div class="sim-grid4">
+                  <div class="sim-cell">🧟</div>
+                  <div class="sim-cell">🧟</div>
+                  <div class="sim-cell active">🧟</div>
+                  <div class="sim-cell">🧟</div>
+                  <div class="sim-cell">🧟</div>
+                  <div class="sim-cell">🧟</div>
+                  <div class="sim-cell">🧟</div>
+                  <div class="sim-cell">🧟</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">🧟</div>
+            <div class="top-right-group">
+              <span class="live-pill">Preview</span>
+              <span class="play" aria-hidden="true">↗</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <h3>ZOMBIE MATCHING</h3>
+            <p>Watch the coffin flash open, remember the zombie face, and click the match within 15 seconds.</p>
+            <div class="tags"><span class="tag">Memory</span><span class="tag">15s Timer</span><span class="tag">Candy Prize</span></div>
+          </div>
+        </a>
+
+        <!-- 5. Scare-o-lette -->
+        <a class="card roulette" href="./scaroulette/" data-preview="./scaroulette/index.html">
+          <div class="preview-bg" aria-hidden="true">
+            <div class="preview-sim">
+              <div class="sim-wheel">🎃</div>
+            </div>
+          </div>
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">🎡</div>
+            <div class="top-right-group">
+              <span class="live-pill">Preview</span>
+              <span class="play" aria-hidden="true">↗</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <h3>SCARE-O-LETTE</h3>
+            <p>Give the haunted wheel a spin! Win a mountain of jackpot candy or face a spooky trick.</p>
+            <div class="tags"><span class="tag">Roulette</span><span class="tag">Jackpot</span><span class="tag">Luck</span></div>
+          </div>
         </a>
       </div>
     </section>
   </main>
-  <footer class="wrap bottom"><span>MADE FOR <b>MONSTER-SIZED FUN</b></span><span>WATCH YOUR STEP <span class="star">✦</span></span></footer>
+
+  <footer class="wrap bottom">
+    <span>MADE FOR <b>MONSTER-SIZED FUN</b></span>
+    <span>WATCH YOUR STEP <span class="star">✦</span></span>
+  </footer>
+
+  <script>
+    // Dynamically mount a live scaled-down iframe of the game on hover (Y8 style)
+    document.querySelectorAll('.card[data-preview]').forEach(card => {
+      let iframe = null;
+      const previewBg = card.querySelector('.preview-bg');
+
+      card.addEventListener('mouseenter', () => {
+        if (!iframe && previewBg) {
+          iframe = document.createElement('iframe');
+          iframe.src = card.dataset.preview;
+          iframe.tabIndex = -1;
+          iframe.setAttribute('aria-hidden', 'true');
+          previewBg.insertBefore(iframe, previewBg.firstChild);
+        }
+      });
+    });
+  </script>
 </body>
 </html>
