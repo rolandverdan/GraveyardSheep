@@ -11,154 +11,823 @@
     };
   </script>
   <style>
-    @keyframes scare-pop {
-      0% { transform: scale(.08) rotate(-12deg); opacity: 0; }
-      18% { transform: scale(1.12) rotate(5deg); opacity: 1; }
-      28%, 42%, 56% { transform: translateX(-9px) scale(1.04); }
-      35%, 49%, 63% { transform: translateX(9px) scale(1.04); }
-      100% { transform: scale(.96); opacity: 1; }
-    }
-    .scare-pop { animation: scare-pop 850ms cubic-bezier(.2,.8,.3,1) both; }
+    @keyframes friendly-pop { from { opacity: 0; transform: scale(1.03); } to { opacity: 1; transform: scale(1); } }
+    .scare-pop { animation: friendly-pop 420ms cubic-bezier(.2,.8,.3,1) both; }
+    .region-chip { transition: background-color 250ms, color 250ms, border-color 250ms, transform 250ms; }
+    body[data-theme="woods"] { --region-accent: #f2b84b; --region-glow: #f2b84b2b; --region-muted: #829374; background-image: radial-gradient(ellipse at 50% 0%, #345442 0%, #182a31 46%, #090d19 100%); }
+    body[data-theme="snow"] { --region-accent: #b9ecf4; --region-glow: #84d8ed33; --region-muted: #86b5c2; background-image: radial-gradient(ellipse at 50% 0%, #496f86 0%, #1c2e45 46%, #090d19 100%); }
+    body[data-theme="city"] { --region-accent: #d3b1ff; --region-glow: #ac7fe933; --region-muted: #a27653; background-image: radial-gradient(ellipse at 50% 0%, #47334c 0%, #242035 46%, #090d19 100%); }
+    body[data-theme="marsh"] { --region-accent: #ffad63; --region-glow: #ff873733; --region-muted: #a36c70; background-image: radial-gradient(ellipse at 50% 0%, #594050 0%, #29253a 46%, #090d19 100%); }
+    .region-chip[aria-current="step"] { border-color: var(--region-accent); background: var(--region-glow); color: #fff; transform: translateY(-1px); box-shadow: 0 0 16px var(--region-glow); }
+    .zone-dot { background: var(--region-accent); box-shadow: 0 0 12px var(--region-accent); }
+    body[data-theme] .zone-stage { color: var(--region-accent); }
+    .zone-toolbar { border-color: color-mix(in srgb, var(--region-accent), transparent 70%); background: linear-gradient(100deg, #211b35, color-mix(in srgb, var(--region-accent), #211b35 93%), #181528); }
+    #progress { background-image: linear-gradient(90deg, var(--region-muted), var(--region-accent), #ffb34d); }
+    .region-count { color: var(--region-accent); }
+    .character-choice:focus-visible, #begin-adventure:focus-visible { outline: 3px solid #ffd879; outline-offset: 3px; }
+    @keyframes start-card-in { from { opacity: 0; transform: translateY(22px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes moon-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+    @keyframes candy-bump { 0% { transform: scale(1); } 35% { transform: scale(1.35); } 100% { transform: scale(1); } }
+    .start-card-in { animation: start-card-in 650ms cubic-bezier(.2,.8,.3,1) both; }
+    .moon-float { animation: moon-float 3s ease-in-out infinite; }
+    .candy-bump { animation: candy-bump 420ms cubic-bezier(.2,.8,.3,1); }
+    #start-screen { transition: opacity 420ms ease, visibility 420ms ease; }
+    #start-screen.start-screen-exit { opacity: 0; visibility: hidden; pointer-events: none; }
+    #start-game { animation: start-card-in 850ms 180ms both; }
     @media (prefers-reduced-motion: reduce) { .scare-pop { animation: none; } }
+    @media (prefers-reduced-motion: reduce) {
+      .start-card-in, .moon-float, .candy-bump, #start-game { animation: none !important; }
+      #start-screen { transition: none; }
+    }
   </style>
 </head>
-<body class="min-h-screen bg-[radial-gradient(ellipse_at_50%_0%,#473064_0%,#1a1630_42%,#090d19_100%)] px-3 pb-12 pt-5 font-sans text-[#fff7e6] sm:px-6 sm:pt-9">
-  <main class="mx-auto w-full max-w-6xl">
+<body data-theme="woods" class="min-h-screen bg-[radial-gradient(ellipse_at_50%_0%,#473064_0%,#1a1630_42%,#090d19_100%)] px-3 pb-12 pt-5 font-sans text-[#fff7e6] sm:px-6 sm:pt-9">
+  <a href="../index.html" aria-label="Back to Graveyard Arcade" title="Back to Graveyard Arcade" style="position:fixed;top:12px;left:12px;z-index:100000;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid #ffd76b88;border-radius:12px;background:#171321ee;color:#fff0d1;font:800 14px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 4px 16px #0009;cursor:pointer;">&#8592; Graveyard Arcade</a>
+  <main class="mx-auto w-full max-w-6xl [perspective:1400px]">
     <header class="relative mb-7 overflow-hidden rounded-3xl border border-white/10 bg-[#171326]/80 px-5 py-7 text-center shadow-2xl shadow-black/30 sm:py-9">
-      <div class="absolute left-6 top-5 text-3xl opacity-70 sm:left-12 sm:top-8 sm:text-5xl">&#127769;</div>
-      <div class="absolute right-6 top-5 text-3xl opacity-70 sm:right-12 sm:top-8 sm:text-5xl">&#129414;</div>
-      <div class="text-xs font-extrabold uppercase tracking-[0.24em] text-pumpkin">Halloween night / Neighborhood adventure</div>
+      <div class="absolute left-6 top-5 grid h-10 w-10 place-items-center rounded-full border border-amber-100/20 bg-gradient-to-br from-amber-100 to-amber-300 shadow-[0_0_30px_#fcd34d66] sm:left-12 sm:top-8 sm:h-14 sm:w-14"></div>
+      <div class="absolute right-6 top-5 hidden text-xs font-bold uppercase tracking-[.3em] text-lilac/50 sm:block">Night 31</div>
+      <div class="text-xs font-extrabold uppercase tracking-[0.24em] text-pumpkin">A Halloween candy quest</div>
       <h1 class="my-2 text-5xl font-black tracking-tight drop-shadow-[0_5px_0_#572e79] sm:text-7xl">Trick or Treat!</h1>
-      <p class="mx-auto max-w-xl text-sm text-lilac sm:text-base">Explore the moonlit street, knock on every door, and fill your candy bag.</p>
+      <p class="mx-auto max-w-xl text-sm text-lilac sm:text-base">Walk along the winding road, explore four Halloween regions, and knock on houses to collect candy.</p>
     </header>
 
     <section class="mb-5 grid grid-cols-2 gap-3 sm:mb-6 sm:gap-4" aria-label="Game score">
-      <div class="flex items-center gap-3 rounded-2xl border border-orange-200/15 bg-gradient-to-br from-[#33243e] to-[#211b35] p-3 shadow-lg shadow-black/20 sm:gap-4 sm:p-4">
-        <span class="grid h-12 w-12 place-items-center rounded-xl bg-pumpkin/15 text-3xl sm:h-14 sm:w-14">&#127853;</span>
-        <div><span class="block text-[.65rem] font-bold uppercase tracking-[.16em] text-lilac sm:text-xs">Candy bag</span>
-        <strong id="candy-count" class="block text-2xl leading-tight text-pumpkin sm:text-3xl">0</strong></div>
+      <div class="group relative flex items-center gap-3 overflow-hidden rounded-2xl border border-orange-200/15 bg-gradient-to-br from-[#443047] via-[#30213c] to-[#211b35] p-3 shadow-[0_10px_25px_#08061188,inset_0_1px_0_#ffffff1a] transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_30px_#080611aa,inset_0_1px_0_#ffffff1a] sm:gap-4 sm:p-4">
+        <div class="absolute -right-8 -top-10 h-24 w-24 rounded-full bg-pumpkin/10 blur-2xl transition group-hover:bg-pumpkin/20"></div>
+        <span class="relative grid h-12 w-12 place-items-center rounded-xl border border-pumpkin/30 bg-gradient-to-br from-pumpkin/25 to-orange-950/40 text-2xl shadow-[inset_0_2px_5px_#ffffff22,0_4px_8px_#120b1c88] sm:h-14 sm:w-14" aria-hidden="true">&#127853;</span>
+        <div class="relative"><span class="block text-[.65rem] font-bold uppercase tracking-[.16em] text-lilac sm:text-xs">Candy bag</span>
+        <strong id="candy-count" class="block text-2xl leading-tight text-pumpkin drop-shadow-[0_2px_8px_#ffb34d55] sm:text-3xl">0</strong></div>
       </div>
-      <div class="flex items-center gap-3 rounded-2xl border border-purple-200/15 bg-gradient-to-br from-[#2d2645] to-[#211b35] p-3 shadow-lg shadow-black/20 sm:gap-4 sm:p-4">
-        <span class="grid h-12 w-12 place-items-center rounded-xl bg-purple-300/10 text-3xl sm:h-14 sm:w-14">&#127968;</span>
-        <div class="min-w-0 flex-1"><div class="flex items-baseline justify-between gap-2"><span class="text-[.65rem] font-bold uppercase tracking-[.16em] text-lilac sm:text-xs">Doors knocked</span>
-        <strong id="house-count" class="text-xl text-white sm:text-2xl">0 / 8</strong></div>
+      <div class="group relative flex items-center gap-3 overflow-hidden rounded-2xl border border-purple-200/15 bg-gradient-to-br from-[#39304f] via-[#2b2543] to-[#211b35] p-3 shadow-[0_10px_25px_#08061188,inset_0_1px_0_#ffffff1a] transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_30px_#080611aa,inset_0_1px_0_#ffffff1a] sm:gap-4 sm:p-4">
+        <div class="absolute -right-8 -top-10 h-24 w-24 rounded-full bg-purple-300/10 blur-2xl transition group-hover:bg-purple-300/20"></div>
+        <span class="relative grid h-12 w-12 place-items-center rounded-xl border border-purple-300/20 bg-gradient-to-br from-purple-300/20 to-indigo-950/40 text-xl font-black text-purple-200 shadow-[inset_0_2px_5px_#ffffff22,0_4px_8px_#120b1c88] sm:h-14 sm:w-14">32</span>
+        <div class="min-w-0 flex-1"><div class="flex items-baseline justify-between gap-2"><span class="text-[.65rem] font-bold uppercase tracking-[.16em] text-lilac sm:text-xs">Houses visited</span>
+        <strong id="house-count" class="text-xl text-white sm:text-2xl">0 / 32</strong></div>
         <div class="mt-2 h-2 overflow-hidden rounded-full bg-black/40"><div id="progress" class="h-full w-0 rounded-full bg-gradient-to-r from-purple-400 to-pumpkin transition-all duration-500"></div></div></div>
       </div>
     </section>
 
-    <section class="overflow-hidden rounded-2xl border border-white/10 bg-[#101526] shadow-2xl shadow-black/40 ring-1 ring-black/30" aria-label="Trick or treat game">
-      <div class="flex items-center justify-between border-b border-white/10 bg-[#181528] px-4 py-3">
-        <div class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]"></span><span class="text-xs font-bold uppercase tracking-[.16em] text-lilac">The old hollow</span></div>
-        <span class="text-xs text-lilac/70">October 31 / 8:00 PM</span>
+    <details class="mb-4 rounded-2xl border border-white/10 bg-[#171326]/80 p-4 shadow-lg">
+      <summary class="cursor-pointer font-black text-amber-100">Game settings</summary>
+      <div class="mt-4 grid gap-4 sm:grid-cols-2">
+        <label class="block text-sm font-bold text-lilac">Max candy from one house
+          <input id="max-candy-setting" class="mt-1 block w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-base text-white focus:outline-none focus:ring-2 focus:ring-amber-300" type="number" min="1" max="9999" step="1" value="10" inputmode="numeric">
+          <span class="mt-1 block text-xs font-normal text-lilac/70">Normal house rewards will be between 1 and this amount.</span>
+        </label>
+        <label class="block text-sm font-bold text-lilac">Consolation candy
+          <input id="consolation-candy-setting" class="mt-1 block w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-base text-white focus:outline-none focus:ring-2 focus:ring-amber-300" type="number" min="0" max="9999" step="1" value="1" inputmode="numeric">
+          <span class="mt-1 block text-xs font-normal text-lilac/70">Candy awarded when the ghost surprises a player.</span>
+        </label>
       </div>
-      <canvas id="game" class="block w-full touch-none" width="900" height="500" aria-label="Use arrow keys or WASD to move, then Space to knock on a nearby house."></canvas>
+    </details>
+
+    <section class="overflow-hidden rounded-2xl border border-white/10 bg-[#101526] shadow-[0_28px_70px_#02030b99,0_8px_18px_#0008,inset_0_1px_0_#ffffff1c] ring-1 ring-black/30" aria-label="Trick or treat game">
+      <div class="zone-toolbar flex items-center justify-between border-b border-white/10 px-4 py-3">
+        <div class="flex items-center gap-2"><span class="zone-dot h-2.5 w-2.5 rounded-full"></span><div><span id="zone-name" class="block text-xs font-bold uppercase tracking-[.16em] text-lilac">Whispering Woods</span><span id="zone-detail" class="block text-[.62rem] font-semibold text-lilac/70">Fireflies on the trail</span></div></div>
+        <div class="text-right"><span id="zone-stage" class="zone-stage block text-[.65rem] font-black uppercase tracking-wider">Region 1 of 4</span><span class="block text-[.6rem] font-semibold text-lilac/60">Halloween / 8:00 PM</span></div>
+      </div>
+      <canvas id="game" class="block w-full touch-none" width="900" height="500" tabindex="0" aria-label="Explore a scrolling pixel-art Halloween world. Use arrow keys or WASD to move, then Space to knock on a nearby house."></canvas>
     </section>
-    <div class="mt-3 hidden flex-wrap items-center justify-center gap-2 text-sm text-lilac sm:flex">
-      <span class="rounded-lg border border-white/10 bg-[#211b35] px-3 py-2"><kbd class="mr-1 rounded bg-white/10 px-1.5 py-0.5 font-bold text-white">W A S D</kbd> or arrows to move</span>
-      <span class="rounded-lg border border-white/10 bg-[#211b35] px-3 py-2"><kbd class="mr-1 rounded bg-white/10 px-1.5 py-0.5 font-bold text-white">SPACE</kbd> knock on the door</span>
+    <nav class="mt-3 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-[#171326]/90 p-2 shadow-lg sm:grid-cols-4" aria-label="Adventure regions">
+      <div id="region-woods" class="region-chip rounded-xl border border-white/10 bg-black/15 px-2 py-2 text-center text-xs font-bold text-slate-200/70 sm:text-sm" data-region="woods" aria-current="step"><span aria-hidden="true">&#127794;</span><span class="ml-1">Woods</span><span id="region-count-woods" class="region-count mt-0.5 block text-[.62rem] font-black">0 / 8 houses</span></div>
+      <div id="region-snow" class="region-chip rounded-xl border border-white/10 bg-black/15 px-2 py-2 text-center text-xs font-bold text-slate-200/70 sm:text-sm" data-region="snow" aria-current="false"><span aria-hidden="true">&#10052;</span><span class="ml-1">Snowy Village</span><span id="region-count-snow" class="region-count mt-0.5 block text-[.62rem] font-black">0 / 8 houses</span></div>
+      <div id="region-city" class="region-chip rounded-xl border border-white/10 bg-black/15 px-2 py-2 text-center text-xs font-bold text-slate-200/70 sm:text-sm" data-region="city" aria-current="false"><span aria-hidden="true">&#127961;</span><span class="ml-1">Abandoned City</span><span id="region-count-city" class="region-count mt-0.5 block text-[.62rem] font-black">0 / 8 houses</span></div>
+      <div id="region-marsh" class="region-chip rounded-xl border border-white/10 bg-black/15 px-2 py-2 text-center text-xs font-bold text-slate-200/70 sm:text-sm" data-region="marsh" aria-current="false"><span aria-hidden="true">&#127851;</span><span class="ml-1">Pumpkin Marsh</span><span id="region-count-marsh" class="region-count mt-0.5 block text-[.62rem] font-black">0 / 8 houses</span></div>
+    </nav>
+    <div class="my-3 hidden items-center justify-center gap-3 rounded-xl border border-white/10 bg-[#171326]/80 px-4 py-2 text-sm font-semibold text-lilac sm:flex"><span>Move: <kbd class="rounded bg-white/10 px-2 py-1 text-white">W A S D</kbd> or <kbd class="rounded bg-white/10 px-2 py-1 text-white">&#8592; &#8593; &#8595; &#8594;</kbd></span><span class="text-pumpkin">SPACE: knock · E: hop on a nearby skateboard</span></div>
+    <div class="my-3 grid grid-cols-[1fr_auto] items-center gap-3 sm:hidden" aria-label="Touch movement controls">
+      <div class="grid grid-cols-3 grid-rows-2 gap-2 justify-self-center">
+        <span></span><button class="move rounded-xl border border-white/15 bg-[#302744] px-5 py-3 text-xl font-black shadow-md active:bg-pumpkin active:text-black" data-key="ArrowUp" aria-label="Move up" type="button">&#8593;</button><span></span>
+        <button class="move rounded-xl border border-white/15 bg-[#302744] px-5 py-3 text-xl font-black shadow-md active:bg-pumpkin active:text-black" data-key="ArrowLeft" aria-label="Move left" type="button">&#8592;</button>
+        <button class="move rounded-xl border border-white/15 bg-[#302744] px-5 py-3 text-xl font-black shadow-md active:bg-pumpkin active:text-black" data-key="ArrowDown" aria-label="Move down" type="button">&#8595;</button>
+        <button class="move rounded-xl border border-white/15 bg-[#302744] px-5 py-3 text-xl font-black shadow-md active:bg-pumpkin active:text-black" data-key="ArrowRight" aria-label="Move right" type="button">&#8594;</button>
+      </div>
+      <div class="flex flex-col gap-2">
+        <button id="knock" class="rounded-xl bg-gradient-to-b from-amber-300 to-pumpkin px-5 py-3 font-black text-[#20162a] shadow-[0_4px_0_#99541e] active:translate-y-1 active:shadow-none" type="button">Knock!</button>
+        <button id="ride" class="rounded-xl border border-orange-200/30 bg-[#6b3540] px-5 py-3 font-black text-amber-50 shadow-[0_4px_0_#39202c] active:translate-y-1 active:shadow-none" type="button">Skate / Walk</button>
+      </div>
     </div>
-    <div class="mt-3 flex justify-center gap-2 sm:hidden" aria-label="Touch movement controls">
-      <button class="move rounded-xl border border-white/10 bg-[#29213d] px-4 py-3 text-xl shadow-lg" data-key="ArrowLeft" aria-label="Move left">&#8592;</button>
-      <button class="move rounded-xl border border-white/10 bg-[#29213d] px-4 py-3 text-xl shadow-lg" data-key="ArrowUp" aria-label="Move up">&#8593;</button>
-      <button class="move rounded-xl border border-white/10 bg-[#29213d] px-4 py-3 text-xl shadow-lg" data-key="ArrowDown" aria-label="Move down">&#8595;</button>
-      <button class="move rounded-xl border border-white/10 bg-[#29213d] px-4 py-3 text-xl shadow-lg" data-key="ArrowRight" aria-label="Move right">&#8594;</button>
-      <button id="knock" class="rounded-xl bg-pumpkin px-4 py-3 font-bold text-[#20162a] shadow-lg">Knock</button>
-    </div>
-    <div id="message" class="my-4 flex min-h-14 items-center justify-center rounded-xl border border-purple-200/10 bg-[#211b35]/90 px-4 py-3 text-center text-sm shadow-lg sm:text-base" role="status" aria-live="polite">The moon is up and the neighborhood is waiting. Find a house and knock!</div>
+    <div id="message" class="my-4 flex min-h-14 items-center justify-center rounded-xl border border-amber-200/20 bg-gradient-to-r from-[#29213d] via-[#382b48] to-[#29213d] px-4 py-3 text-center text-base font-semibold text-amber-50 shadow-[inset_0_1px_0_#ffffff12,0_8px_20px_#0005] sm:text-lg" role="status" aria-live="polite">The moon is up! Walk along the road and visit a house.</div>
     <div class="flex justify-center gap-3">
-      <button id="reset" class="rounded-xl bg-gradient-to-b from-amber-300 to-pumpkin px-5 py-3 font-bold text-[#20162a] shadow-lg shadow-orange-950/30 transition hover:-translate-y-0.5 hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white" type="button">Play again</button>
-      <button id="shuffle" class="rounded-xl border border-white/10 bg-[#29213d] px-5 py-3 font-bold shadow-lg transition hover:-translate-y-0.5 hover:bg-[#3b2c4b] focus:outline-none focus:ring-2 focus:ring-white" type="button">Shuffle street</button>
+      <button id="reset" class="rounded-xl bg-gradient-to-b from-amber-300 to-pumpkin px-5 py-3 font-bold text-[#20162a] shadow-[0_4px_0_#99541e,0_10px_18px_#0005] transition hover:-translate-y-0.5 hover:brightness-110 active:translate-y-1 active:shadow-none focus:outline-none focus:ring-2 focus:ring-white" type="button">New adventure</button>
+      <button id="shuffle" class="rounded-xl border border-white/10 bg-gradient-to-b from-[#514365] to-[#29213d] px-5 py-3 font-bold shadow-[0_4px_0_#100d19,0_10px_18px_#0005] transition hover:-translate-y-0.5 hover:brightness-110 active:translate-y-1 active:shadow-none focus:outline-none focus:ring-2 focus:ring-white" type="button">Mix up the world</button>
     </div>
-    <p class="mt-4 text-center text-sm text-lilac">Each house gives 0 to 100 random candies. Visit each house once.</p>
+    <p class="mt-4 text-center text-sm text-lilac">Walk close to a house and press SPACE or tap Knock! to collect candy.</p>
   </main>
 
-  <div id="jumpscare" class="fixed inset-0 z-50 hidden items-center justify-center overflow-hidden bg-[#09040d]/95 p-6 text-center" aria-hidden="true">
-    <div class="absolute inset-0 bg-[radial-gradient(circle,#7f1d1d_0%,#270913_45%,#05030a_100%)] opacity-90"></div>
-    <div id="scare-card" class="relative rounded-[2rem] border-4 border-red-500/80 bg-[#160711] px-10 py-12 shadow-[0_0_90px_25px_rgba(220,38,38,.45)]">
-      <div class="text-[7rem] leading-none drop-shadow-[0_0_25px_rgba(255,0,0,.8)] sm:text-[10rem]">&#128128;</div>
-      <p class="mt-4 text-5xl font-black tracking-[.18em] text-red-100 sm:text-7xl">BOO!</p>
-      <p class="mt-2 font-bold uppercase tracking-[.2em] text-red-300">Something answered the door...</p>
+  <div id="jumpscare" class="fixed inset-0 z-50 hidden items-center justify-center overflow-hidden bg-black text-center" aria-hidden="true">
+    <div id="scare-card" class="relative h-full w-full overflow-hidden">
+      <video id="scare-video" class="absolute inset-0 h-full w-full max-h-none max-w-none object-cover" autoplay playsinline aria-label="A Halloween jumpscare"></video>
     </div>
   </div>
 
+  <div id="candy-popup" class="fixed inset-0 z-40 hidden items-center justify-center bg-[#09040d]/80 p-5 text-center" role="dialog" aria-modal="true" aria-labelledby="candy-popup-title" aria-hidden="true">
+    <div class="w-full max-w-sm rounded-[2rem] border border-amber-200/30 bg-gradient-to-br from-[#342541] to-[#171326] p-7 shadow-[0_25px_90px_#000c]">
+      <div id="candy-popup-icon" class="text-5xl" aria-hidden="true">&#127852;</div>
+      <p id="candy-popup-house" class="mt-3 text-xs font-extrabold uppercase tracking-[.22em] text-purple-200"></p>
+      <h2 id="candy-popup-title" class="mt-2 text-3xl font-black text-amber-200">You got candy!</h2>
+      <p class="mt-3 text-lilac">You collected <strong id="candy-popup-amount" class="text-2xl text-pumpkin">0</strong> candies from this house.</p>
+      <button id="candy-popup-close" class="mt-6 rounded-xl bg-gradient-to-b from-amber-300 to-pumpkin px-7 py-3 font-black uppercase tracking-wide text-[#20162a] shadow-[0_4px_0_#99541e]" type="button">Next player</button>
+    </div>
+  </div>
+
+  <section id="start-screen" class="fixed inset-0 z-40 flex items-center justify-center overflow-y-auto bg-[radial-gradient(ellipse_at_50%_35%,#473064_0%,#1a1630_55%,#090d19_100%)] p-5 text-center" aria-labelledby="start-title">
+    <div class="start-card-in relative w-full max-w-5xl overflow-hidden rounded-[2rem] border border-white/15 bg-[#171326]/90 px-6 py-8 shadow-[0_30px_100px_#000b] sm:px-10 sm:py-10">
+      <div class="absolute -right-12 -top-14 h-40 w-40 rounded-full bg-amber-300/10 blur-3xl"></div>
+      <div class="relative grid gap-7 md:grid-cols-2 md:items-center md:gap-12">
+        <div class="text-center">
+          <div class="moon-float relative mx-auto grid h-16 w-16 place-items-center rounded-full border border-amber-100/20 bg-gradient-to-br from-amber-100 to-amber-300 text-4xl shadow-[0_0_40px_#fcd34d55] sm:h-20 sm:w-20" aria-hidden="true">&#127769;</div>
+          <h1 id="start-title" class="relative mt-2 text-5xl font-black tracking-tight drop-shadow-[0_5px_0_#572e79] sm:text-6xl">Trick or Treat!</h1>
+          <p class="relative mx-auto mt-4 max-w-md text-base leading-relaxed text-lilac sm:text-lg">Walk the winding roads through four spooky regions. Each player gets one house, then passes the turn!</p>
+          <button id="start-game" class="relative mt-6 w-full max-w-sm rounded-xl bg-gradient-to-b from-amber-300 to-pumpkin px-7 py-4 text-lg font-black uppercase tracking-wider text-[#20162a] shadow-[0_5px_0_#99541e,0_14px_30px_#0007] transition hover:-translate-y-1 hover:brightness-110 active:translate-y-1 active:shadow-none focus:outline-none focus:ring-2 focus:ring-white" type="button">Start trick-or-treating</button>
+          <p class="relative mt-4 text-xs text-lilac/70">A friendly ghost might pop by. Ready to explore?</p>
+        </div>
+        <div class="relative mx-auto w-full max-w-xl text-left" aria-label="How to play">
+          <h2 class="mb-3 text-center text-xl font-black text-white md:text-left">How to play</h2>
+          <div class="grid gap-3">
+            <div class="flex items-center gap-3 rounded-2xl border border-sky-200/20 bg-sky-300/10 p-3 sm:p-4">
+              <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-sky-200/15 text-3xl" aria-hidden="true">&#128694;</span>
+              <div><h3 class="font-black text-sky-100">1. Walk around</h3><p class="mt-1 text-sm leading-snug text-lilac">Use <kbd class="rounded bg-white/10 px-1 font-bold text-white">W A S D</kbd> or arrow keys. On phones, tap the arrows.</p></div>
+            </div>
+            <div class="flex items-center gap-3 rounded-2xl border border-purple-200/20 bg-purple-300/10 p-3 sm:p-4">
+              <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-purple-200/15 text-3xl" aria-hidden="true">&#127984;</span>
+              <div><h3 class="font-black text-purple-100">2. Find a house</h3><p class="mt-1 text-sm leading-snug text-lilac">Walk close until you see “Trick or Treat?”</p></div>
+            </div>
+            <div class="flex items-center gap-3 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-3 sm:p-4">
+              <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-amber-200/15 text-3xl" aria-hidden="true">&#127852;</span>
+              <div><h3 class="font-black text-amber-100">3. Knock for candy</h3><p class="mt-1 text-sm leading-snug text-lilac">Press <kbd class="rounded bg-white/10 px-1 font-bold text-white">SPACE</kbd> or tap <strong class="text-white">Knock!</strong></p></div>
+            </div>
+          </div>
+          <p class="relative mx-auto mt-3 rounded-xl border border-pumpkin/25 bg-pumpkin/10 px-4 py-3 text-center text-sm font-bold text-amber-100"><span aria-hidden="true">&#127853;</span> One house per player. If a gold special house appears, it has the max prize!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="character-screen" class="fixed inset-0 z-40 hidden items-center justify-center overflow-y-auto bg-[radial-gradient(ellipse_at_50%_35%,#473064_0%,#1a1630_55%,#090d19_100%)] p-5 text-center" aria-labelledby="character-title">
+    <div class="relative w-full max-w-2xl rounded-[2rem] border border-white/15 bg-[#171326]/95 px-5 py-8 shadow-[0_30px_100px_#000b] sm:px-10 sm:py-10">
+      <p class="text-xs font-extrabold uppercase tracking-[.28em] text-pumpkin">Before you head out</p>
+      <h2 id="character-title" class="mt-2 text-3xl font-black sm:text-4xl">Choose your costume</h2>
+      <p class="mt-2 text-sm text-lilac">Use <kbd class="rounded bg-white/10 px-1 font-bold text-white">W A S D</kbd> to move. Press <kbd class="rounded bg-white/10 px-1 font-bold text-white">SPACE</kbd> to choose, then press it again to start.</p>
+      <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3" role="group" aria-label="Choose a character">
+        <button class="character-choice rounded-2xl border-2 border-amber-300 bg-amber-300/10 p-4 text-left transition hover:-translate-y-1" data-character="witch" aria-pressed="true" type="button"><span class="block text-4xl" aria-hidden="true">🧙</span><span class="mt-2 block font-black">Witch</span><span class="mt-1 block text-xs text-lilac">A classic spellcaster</span></button>
+        <button class="character-choice rounded-2xl border-2 border-white/10 bg-black/20 p-4 text-left transition hover:-translate-y-1" data-character="vampire" aria-pressed="false" type="button"><span class="block text-4xl" aria-hidden="true">🧛</span><span class="mt-2 block font-black">Vampire</span><span class="mt-1 block text-xs text-lilac">Elegant and mysterious</span></button>
+        <button class="character-choice rounded-2xl border-2 border-white/10 bg-black/20 p-4 text-left transition hover:-translate-y-1" data-character="pumpkin" aria-pressed="false" type="button"><span class="block text-4xl" aria-hidden="true">🎃</span><span class="mt-2 block font-black">Pumpkin</span><span class="mt-1 block text-xs text-lilac">A little lantern spirit</span></button>
+        <button class="character-choice rounded-2xl border-2 border-white/10 bg-black/20 p-4 text-left transition hover:-translate-y-1" data-character="ghost" aria-pressed="false" type="button"><span class="block text-4xl" aria-hidden="true">👻</span><span class="mt-2 block font-black">Ghost</span><span class="mt-1 block text-xs text-lilac">A friendly floating phantom</span></button>
+        <button class="character-choice rounded-2xl border-2 border-white/10 bg-black/20 p-4 text-left transition hover:-translate-y-1" data-character="werewolf" aria-pressed="false" type="button"><span class="block text-4xl" aria-hidden="true">🐺</span><span class="mt-2 block font-black">Werewolf</span><span class="mt-1 block text-xs text-lilac">A moonlit neighborhood wolf</span></button>
+        <button class="character-choice rounded-2xl border-2 border-white/10 bg-black/20 p-4 text-left transition hover:-translate-y-1" data-character="skeleton" aria-pressed="false" type="button"><span class="block text-4xl" aria-hidden="true">💀</span><span class="mt-2 block font-black">Skeleton</span><span class="mt-1 block text-xs text-lilac">A bony trick-or-treater</span></button>
+      </div>
+      <button id="begin-adventure" class="mt-7 w-full max-w-sm rounded-xl bg-gradient-to-b from-amber-300 to-pumpkin px-7 py-4 text-lg font-black uppercase tracking-wider text-[#20162a] shadow-[0_5px_0_#99541e,0_14px_30px_#0007] transition hover:-translate-y-1 hover:brightness-110" type="button">Start adventure</button>
+    </div>
+  </section>
+
+
   <script>
-    const emoji = code => String.fromCodePoint(code);
-    const houses = [
-      { name: "Pumpkin Patch", art: emoji(0x1f3da), x: 125, y: 105, visited: false, reward: 0 },
-      { name: "Witch's Cottage", art: emoji(0x1f9d9), x: 340, y: 105, visited: false, reward: 0 },
-      { name: "Crooked Manor", art: emoji(0x1f3f0), x: 560, y: 105, visited: false, reward: 0 },
-      { name: "Moonlight House", art: emoji(0x1f3e0), x: 775, y: 105, visited: false, reward: 0 },
-      { name: "Black Cat Villa", art: emoji(0x1f408), x: 125, y: 395, visited: false, reward: 0 },
-      { name: "Spooky Shack", art: emoji(0x1f47b), x: 340, y: 395, visited: false, reward: 0 },
-      { name: "Candy Castle", art: emoji(0x1f36d), x: 560, y: 395, visited: false, reward: 0 },
-      { name: "Haunted Hollow", art: emoji(0x1f578), x: 775, y: 395, visited: false, reward: 0 }
+    const biomeWidth = 1800;
+    const specialHouseChance = 0.2;
+    const biomes = [
+      { key: "woods", name: "Whispering Woods", detail: "Fireflies on the trail", start: 0, ground: ["#263d3a", "#344736", "#172c2c"], road: "#1b292e", edge: "#756451", trees: "#20352f", houseNames: ["Pumpkin Patch", "Witch's Cottage", "Crooked Manor", "Moonlight House", "Black Cat Villa", "Spooky Shack", "Candy Castle", "Haunted Hollow"], tones: ["#a95036", "#70518e", "#536281", "#477985", "#70506f", "#668154", "#9a5d79", "#656179"] },
+      { key: "snow", name: "Frostbite Village", detail: "Soft snow is falling", start: biomeWidth, ground: ["#728a96", "#a8c3c8", "#526b7c"], road: "#435768", edge: "#d4e3e4", trees: "#e5f0e9", houseNames: ["Snowdrift Cabin", "Frozen Bell House", "Northlight Lodge", "Icicle Cottage", "Frost Fox Inn", "Blue Lantern Home", "Evergreen Chalet", "Winter Hollow"], tones: ["#7899a3", "#647c91", "#9b8194", "#567884", "#809a80", "#5e7790", "#a38a72", "#66758a"] },
+      { key: "city", name: "Abandoned City", detail: "The old streetlights glow", start: biomeWidth * 2, ground: ["#26272d", "#37353a", "#181c25"], road: "#25262e", edge: "#695b50", trees: "#34313a", houseNames: ["Rusted Row House", "The Shuttered Hotel", "Ash Alley Home", "Broken Clock Tower", "The Last Apartment", "Dead End Diner", "Hollow Station", "Midnight Factory"], tones: ["#685b58", "#595767", "#76634f", "#4d5660", "#695c6a", "#67584d", "#4e6060", "#62565a"] },
+      { key: "marsh", name: "Pumpkin Marsh", detail: "Lanterns glow over the bog", start: biomeWidth * 3, ground: ["#303c3b", "#425044", "#292c39"], road: "#293236", edge: "#987053", trees: "#554451", houseNames: ["Lantern Bog Cabin", "Crooked Stilt House", "Witchlight Cottage", "Cattail Crossing", "Marshmallow Manor", "Gourdwater Home", "Mossy Moon House", "The Toadstool Inn"], tones: ["#9b6043", "#685273", "#527264", "#9a7149", "#71566d", "#567567", "#85584c", "#68634e"] }
     ];
+    const worldWidth = biomeWidth * biomes.length;
+    const roadStep = 300;
+    let roadPoints = [];
+    let houseSpots = [];
+    function roadYAt(worldX) {
+      const segment = Math.min(roadPoints.length - 2, Math.max(0, Math.floor(worldX / roadStep)));
+      const start = roadPoints[segment];
+      const end = roadPoints[segment + 1];
+      const rawT = Math.max(0, Math.min(1, (worldX - start.x) / roadStep));
+      const t = rawT * rawT * (3 - 2 * rawT);
+      return start.y + (end.y - start.y) * t;
+    }
+    function randomizeRoadPath() {
+      roadPoints = [];
+      let previousY = 250;
+      for (let x = 0; x <= worldWidth; x += roadStep) {
+        previousY = Math.max(205, Math.min(295, previousY + (Math.random() - .5) * 150));
+        roadPoints.push({ x, y: previousY });
+      }
+      houseSpots = biomes.flatMap(biome => biome.houseNames.map((_, index) => {
+        const x = biome.start + 105 + index * 215 + Math.random() * 35;
+        const side = Math.random() < .5 ? "top" : "bottom";
+        return { biome: biome.key, x, y: Math.max(90, Math.min(410, roadYAt(x) + (side === "top" ? -145 : 145))), side };
+      }));
+    }
+    randomizeRoadPath();
+    const houses = biomes.flatMap(biome => biome.houseNames.map((name, index) => ({
+      name, tone: biome.tones[index], biome: biome.key,
+      ...houseSpots.filter(spot => spot.biome === biome.key)[index],
+      visited: false, reward: 0
+    })));
     const canvas = document.querySelector("#game");
     const ctx = canvas.getContext("2d");
     const candyEl = document.querySelector("#candy-count");
+    const maxCandySettingEl = document.querySelector("#max-candy-setting");
+    const consolationCandySettingEl = document.querySelector("#consolation-candy-setting");
     const countEl = document.querySelector("#house-count");
     const progressEl = document.querySelector("#progress");
     const messageEl = document.querySelector("#message");
+    const zoneNameEl = document.querySelector("#zone-name");
+    const zoneDetailEl = document.querySelector("#zone-detail");
+    const zoneStageEl = document.querySelector("#zone-stage");
+    const regionChips = document.querySelectorAll(".region-chip");
     const jumpscareEl = document.querySelector("#jumpscare");
     const scareCardEl = document.querySelector("#scare-card");
+    const scareVideoEl = document.querySelector("#scare-video");
+    const scareVideo = "./images/jumpscarevideo1.mp4";
+    const candyPopupEl = document.querySelector("#candy-popup");
+    const startScreenEl = document.querySelector("#start-screen");
+    const characterScreenEl = document.querySelector("#character-screen");
+    const touchDevice = window.matchMedia("(pointer: coarse)").matches;
+    let gameStarted = false;
     let candies = 0;
     let visited = 0;
+    let cameraX = 0;
+    let currentBiomeKey = "";
 
-    const player = { x: 450, y: 250, speed: 3.2, moving: false };
+    function getCandySetting(input, minimum, fallback) {
+      const parsed = Number.parseInt(input.value, 10);
+      const value = Number.isFinite(parsed) ? Math.min(9999, Math.max(minimum, parsed)) : fallback;
+      input.value = value;
+      return value;
+    }
+
+    const player = { x: 450, y: roadYAt(450), speed: 3.2, moving: false, direction: "down", character: "witch", riding: false };
+    const skateboard = { x: 495, y: roadYAt(495), ridden: false };
+    const characters = {
+      witch: { skin: "#d49b83", outfit: "#65446d", accent: "#b47985", hat: "#35243b", hatBand: "#b5734a", bag: "#a84e35" },
+      vampire: { skin: "#f0d8c9", outfit: "#29263f", accent: "#b73e52", hat: "#29263f", hatBand: "#b73e52", bag: "#61406f" },
+      pumpkin: { skin: "#f29a45", outfit: "#31563b", accent: "#e9b84a", hat: "#31563b", hatBand: "#e9b84a", bag: "#b64e2e" },
+      ghost: { skin: "#eef2f2", outfit: "#8295a5", accent: "#d8e2dc", hat: "#d8e2dc", hatBand: "#a8cbd0", bag: "#8bc6c1" },
+      werewolf: { skin: "#b77a50", outfit: "#60453b", accent: "#a75c41", hat: "#60453b", hatBand: "#d19a62", bag: "#a75c41" },
+      skeleton: { skin: "#e4d8bd", outfit: "#292638", accent: "#ddd0b0", hat: "#292638", hatBand: "#ddd0b0", bag: "#604a5b" }
+    };
     const keys = new Set();
     let lastTime = 0;
+    const playerSprite = document.createElement("canvas");
+    playerSprite.width = 20; playerSprite.height = 22;
+    const houseSprite = document.createElement("canvas");
+    houseSprite.width = 36; houseSprite.height = 38;
 
     function drawHouse(house) {
+      const x = house.x - cameraX, y = house.y;
+      const near = Math.hypot(player.x - house.x, player.y - house.y) < 82;
+      if (x < -110 || x > canvas.width + 110) return;
+      {
+      // Draw the pixel house sprite at every house; show the prompt only when nearby.
+      const sprite = houseSprite;
+      const pixel = sprite.getContext("2d");
+      pixel.clearRect(0, 0, sprite.width, sprite.height);
+      const block = (color, bx, by, width, height = 1) => {
+        pixel.fillStyle = color;
+        pixel.fillRect(bx, by, width, height);
+      };
+      const variant = houses.indexOf(house) % 3;
+      const isSpecial = house.special && !house.visited;
+      const wall = house.visited ? "#514957" : isSpecial ? "#d39a2e" : house.tone;
+      const roof = isSpecial ? "#75439a" : "#30263a";
+      const roofShadow = isSpecial ? "#49265f" : "#191522";
+
+      // Foundation, walls, crooked roof, and chimney.
+      block("#100d18", 5, 34, 26, 3);
+      block("#26202d", 7, 30, 22, 4);
+      block(wall, 9, 15, 18, 16);
+      block("rgba(255,255,255,.18)", 10, 16, 2, 14);
+      block(roof, 7, 12, 22, 3); block(roof, 10, 9, 16, 3);
+      block(roof, 13, 6, 10, 3); block(roof, 16, 3, 4, 3);
+      block(roofShadow, 4, 15, 28, 2);
+      block(roofShadow, 8, 11, 20, 2); block(roofShadow, 12, 8, 12, 2);
+      block(roofShadow, 15, 5, 6, 2); block(roofShadow, 17, 2, 2, 2);
+      block("#211827", 25, 4, 4, 8); block("#766071", 24, 3, 6, 2);
+      if (variant === 1) {
+        block("#30263a", 2, 19, 7, 3); block("#30263a", 4, 16, 6, 3);
+        block("#191522", 1, 21, 9, 2); block("#191522", 3, 18, 7, 2);
+      } else if (variant === 2) {
+        block("#3b2b43", 4, 8, 6, 15); block("#191522", 3, 7, 8, 2);
+        block("#3b2b43", 6, 4, 3, 4); block("#b47b4c", 6, 12, 2, 4);
+      }
+      // Glowing windows and a heavy front door.
+      const windowColor = house.visited ? "#514957" : isSpecial ? "#fff2a6" : "#ffc56b";
+      const doorX = 16;
+      const doorFacesRoadFromAbove = house.side === "bottom";
+      const windowY = doorFacesRoadFromAbove ? 27 : 19;
+      const windowHeight = doorFacesRoadFromAbove ? 3 : 6;
+      const doorY = doorFacesRoadFromAbove ? 16 : 23;
+      const windowXs = [10, 21];
+      windowXs.forEach(windowX => {
+        block("#171522", windowX, windowY - 1, 5, windowHeight + 2);
+        block(windowColor, windowX + 1, windowY, 3, windowHeight);
+        block("#58383c", windowX + 2, windowY, 1, windowHeight);
+      });
+      block("#201522", doorX, doorY, 5, 9); block("#815247", doorX + 1, doorY + 1, 3, 7);
+      block("#ffc56b", doorX + 3, doorY + 4, 1, 1);
+      block("#c8b28d", doorX - 1, doorY - 1, 7, 1);
+      if (house.biome === "snow") {
+        block("#dcebed", 8, 12, 20, 2); block("#f3fbf7", 12, 8, 13, 2);
+        block("#f3fbf7", 15, 5, 7, 2); block("#a9cbd1", 10, 14, 2, 1);
+      } else if (house.biome === "city") {
+        block("#3c3940", 10, windowY - 1, 6, windowHeight + 2); block("#3c3940", 21, windowY - 1, 6, windowHeight + 2);
+        block("#9a7753", 11, windowY, 1, windowHeight); block("#9a7753", 13, windowY, 1, windowHeight);
+        block("#9a7753", 22, windowY, 1, windowHeight); block("#9a7753", 24, windowY, 1, windowHeight);
+        block("#29232d", 17, doorY + 1, 3, 7);
+      }
+      if (isSpecial) {
+        // A crown, jewel-bright windows, and gold door make the jackpot house recognizable at a glance.
+        block("#ffe27a", 13, 3, 2, 4); block("#ffe27a", 17, 1, 2, 6); block("#ffe27a", 21, 3, 2, 4);
+        block("#ffd34e", 13, 6, 10, 2); block("#fff5c2", 17, 2, 2, 2);
+        windowXs.forEach(windowX => block("#fff2a6", windowX + 1, windowY, 3, windowHeight));
+        block("#ffe27a", doorX + 1, doorY + 1, 3, 7);
+        block("#fff5c2", doorX + 3, doorY + 4, 1, 1);
+      }
+
+      if (isSpecial) {
+        const glow = ctx.createRadialGradient(x, y, 8, x, y, 96);
+        glow.addColorStop(0, "rgba(255, 211, 78, .38)");
+        glow.addColorStop(1, "rgba(255, 211, 78, 0)");
+        ctx.fillStyle = glow;
+        ctx.beginPath(); ctx.ellipse(x, y, 96, 86, 0, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.save();
+      ctx.imageSmoothingEnabled = false;
+      ctx.translate(x, y);
+      ctx.drawImage(sprite, -72, -76, 144, 152);
+      ctx.imageSmoothingEnabled = true;
+      ctx.restore();
+
+      ctx.save();
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      const labelY = y + (house.side === "top" ? -80 : 80);
+      const houseLabel = house.visited ? `VISITED  +${house.reward} CANDY` : house.special ? "SPECIAL HOUSE - MAX PRIZE" : house.name.toUpperCase();
+      ctx.font = "bold 8px system-ui, sans-serif";
+      ctx.fillStyle = "rgba(18, 14, 29, .94)";
+      ctx.beginPath(); ctx.roundRect(x - 69, labelY - 10, 138, 20, 6); ctx.fill();
+      ctx.strokeStyle = near || (house.special && !house.visited) ? "#ffd34e" : house.tone; ctx.lineWidth = near || (house.special && !house.visited) ? 2 : 1;
+      ctx.stroke();
+      ctx.fillStyle = house.visited ? "#d3bce3" : house.special ? "#ffe27a" : "#fff2d4";
+      ctx.fillText(houseLabel, x, labelY, 128);
+      if (near) {
+        const promptY = y + (house.side === "top" ? 102 : -102);
+        ctx.fillStyle = "rgba(24, 18, 38, .97)";
+        ctx.beginPath(); ctx.roundRect(x - 73, promptY - 18, 146, 36, 8); ctx.fill();
+        ctx.strokeStyle = house.visited ? "#b9a3d2" : "#ffd879"; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = house.visited ? "#d7c3ed" : "#fff0c2";
+        ctx.font = "bold 8px system-ui, sans-serif";
+        ctx.fillText(house.visited ? "YOU VISITED THIS HOUSE" : house.special ? "SPECIAL HOUSE! MAX PRIZE" : "TRICK OR TREAT?", x, promptY - 6, 136);
+        ctx.fillStyle = house.visited ? "#baa7c9" : "#ffca70";
+        ctx.font = "bold 9px system-ui, sans-serif";
+        ctx.fillText(house.visited ? `You got ${house.reward} candies` : touchDevice ? "TAP KNOCK!" : "PRESS SPACE TO KNOCK", x, promptY + 8, 136);
+      }
+      ctx.restore();
+      return;
+      {
       const near = !house.visited && Math.hypot(player.x - house.x, player.y - house.y) < 82;
       ctx.save();
-      ctx.shadowColor = "#050711"; ctx.shadowBlur = 16; ctx.shadowOffsetY = 8;
-      ctx.fillStyle = house.visited ? "#302943" : "#29233b";
-      ctx.beginPath(); ctx.roundRect(house.x - 57, house.y - 31, 114, 75, 8); ctx.fill();
+      const x = house.x, y = house.y;
+      const wall = house.visited ? "#302b3b" : house.tone;
+      ctx.shadowColor = "#03020a"; ctx.shadowBlur = 24; ctx.shadowOffsetY = 15;
+      ctx.fillStyle = "#111522"; ctx.beginPath(); ctx.ellipse(x, y + 50, 77, 13, 0, 0, Math.PI * 2); ctx.fill();
       ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
-      ctx.fillStyle = house.visited ? "#604274" : "#754666";
-      ctx.beginPath(); ctx.moveTo(house.x - 68, house.y - 29); ctx.lineTo(house.x, house.y - 78); ctx.lineTo(house.x + 68, house.y - 29); ctx.closePath(); ctx.fill();
-      ctx.strokeStyle = near ? "#ffcf86" : house.visited ? "#9970b7" : "#a27bb3";
-      ctx.lineWidth = near ? 3 : 2; ctx.stroke();
-      ctx.fillStyle = "#ffd781";
-      ctx.beginPath(); ctx.roundRect(house.x - 43, house.y - 13, 18, 19, 3); ctx.fill();
-      ctx.beginPath(); ctx.roundRect(house.x + 25, house.y - 13, 18, 19, 3); ctx.fill();
-      ctx.fillStyle = "#593c55";
-      ctx.beginPath(); ctx.roundRect(house.x - 9, house.y + 5, 18, 39, 4); ctx.fill();
-      ctx.textAlign = "center"; ctx.font = "24px sans-serif";
-      ctx.fillText(house.visited ? emoji(0x1f36c) : house.art, house.x, house.y - 37);
-      ctx.fillStyle = house.visited ? "#ffcf86" : "#fff7e6";
-      ctx.font = "bold 11px system-ui, sans-serif";
-      ctx.fillText(house.visited ? `+${house.reward} candies` : house.name, house.x, house.y + 62);
+      // A beveled stone foundation lifts the walls off the ground.
+      ctx.fillStyle = "#24202f"; ctx.beginPath(); ctx.moveTo(x - 56, y + 35); ctx.lineTo(x + 48, y + 35); ctx.lineTo(x + 67, y + 27); ctx.lineTo(x + 67, y + 39); ctx.lineTo(x + 48, y + 49); ctx.lineTo(x - 56, y + 49); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "#514052"; ctx.beginPath(); ctx.moveTo(x - 56, y + 35); ctx.lineTo(x + 48, y + 35); ctx.lineTo(x + 48, y + 41); ctx.lineTo(x - 56, y + 41); ctx.closePath(); ctx.fill();
+      // Separate light-facing facade and shaded side wall create stronger depth.
+      const sideShade = ctx.createLinearGradient(x + 47, y, x + 68, y);
+      sideShade.addColorStop(0, "#383044"); sideShade.addColorStop(1, "#171522");
+      ctx.fillStyle = sideShade; ctx.beginPath(); ctx.moveTo(x + 47, y - 28); ctx.lineTo(x + 64, y - 36); ctx.lineTo(x + 64, y + 34); ctx.lineTo(x + 47, y + 43); ctx.closePath(); ctx.fill();
+      const frontLight = ctx.createLinearGradient(x - 52, y, x + 47, y);
+      frontLight.addColorStop(0, house.visited ? "#272634" : wall);
+      frontLight.addColorStop(.7, wall); frontLight.addColorStop(1, "#342b3d");
+      ctx.fillStyle = frontLight; ctx.beginPath(); ctx.moveTo(x - 52, y - 28); ctx.lineTo(x + 47, y - 28); ctx.lineTo(x + 47, y + 43); ctx.lineTo(x - 52, y + 43); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "#ffffff"; ctx.globalAlpha = .13; ctx.beginPath(); ctx.moveTo(x - 52, y - 28); ctx.lineTo(x + 47, y - 28); ctx.lineTo(x + 36, y - 19); ctx.lineTo(x - 42, y - 19); ctx.closePath(); ctx.fill(); ctx.globalAlpha = 1;
+      ctx.fillStyle = "#382d43"; ctx.beginPath(); ctx.moveTo(x - 65, y - 27); ctx.lineTo(x, y - 73); ctx.lineTo(x + 64, y - 27); ctx.lineTo(x + 49, y - 20); ctx.lineTo(x, y - 58); ctx.lineTo(x - 51, y - 20); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = near ? "#c27864" : house.visited ? "#62526d" : "#9b5866";
+      ctx.beginPath(); ctx.moveTo(x - 65, y - 27); ctx.lineTo(x, y - 73); ctx.lineTo(x, y - 57); ctx.lineTo(x - 51, y - 20); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = near ? "#e39b70" : house.visited ? "#816994" : "#bc7180";
+      ctx.beginPath(); ctx.moveTo(x, y - 73); ctx.lineTo(x + 64, y - 27); ctx.lineTo(x + 49, y - 20); ctx.lineTo(x, y - 57); ctx.closePath(); ctx.fill();
+      // Dark roof underside and a raised ridge catch the moonlight.
+      ctx.fillStyle = "#211827"; ctx.beginPath(); ctx.moveTo(x - 51, y - 20); ctx.lineTo(x, y - 57); ctx.lineTo(x + 49, y - 20); ctx.lineTo(x + 41, y - 14); ctx.lineTo(x, y - 48); ctx.lineTo(x - 43, y - 14); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = "#b78285"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, y - 73); ctx.lineTo(x, y - 57); ctx.stroke();
+      // Cracked roof seams and thorn-like eaves make the silhouette feel less friendly.
+      ctx.strokeStyle = near ? "#ffd88f" : "#221c2b"; ctx.lineWidth = near ? 3 : 2;
+      ctx.beginPath(); ctx.moveTo(x - 65, y - 27); ctx.lineTo(x, y - 73); ctx.lineTo(x + 64, y - 27); ctx.lineTo(x + 49, y - 20); ctx.lineTo(x, y - 57); ctx.lineTo(x - 51, y - 20); ctx.closePath(); ctx.stroke();
+      ctx.strokeStyle = "#261724"; ctx.lineWidth = 3; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(x - 65, y - 27); ctx.lineTo(x - 49, y - 31); ctx.lineTo(x - 39, y - 24);
+      ctx.moveTo(x + 64, y - 27); ctx.lineTo(x + 52, y - 31); ctx.lineTo(x + 43, y - 23);
+      ctx.moveTo(x - 10, y - 64); ctx.lineTo(x - 3, y - 52); ctx.lineTo(x - 12, y - 43); ctx.stroke();
+      const glow = .72 + Math.sin(performance.now() / 260 + house.x) * .18;
+      [[x - 38, y - 4], [x + 20, y - 4]].forEach(([wx, wy], windowIndex) => {
+        ctx.fillStyle = house.visited ? "#302b35" : "#7c322d";
+        ctx.shadowColor = house.visited ? "transparent" : "#ff4d37"; ctx.shadowBlur = house.visited ? 0 : 16 * glow;
+        ctx.fillRect(wx, wy, 16, 18); ctx.shadowBlur = 0;
+        if (!house.visited && !near && windowIndex === 0) {
+          const drift = Math.sin(performance.now() / 520 + house.x) * 3;
+          ctx.fillStyle = "#130d1a";
+          ctx.beginPath(); ctx.arc(wx + 8 + drift, wy + 6, 4, Math.PI, 0); ctx.lineTo(wx + 12 + drift, wy + 15); ctx.quadraticCurveTo(wx + 8 + drift, wy + 12, wx + 4 + drift, wy + 15); ctx.closePath(); ctx.fill();
+          ctx.fillStyle = "#ffe0b0";
+          ctx.beginPath(); ctx.arc(wx + 6 + drift, wy + 6, 1, 0, Math.PI * 2); ctx.arc(wx + 10 + drift, wy + 6, 1, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.strokeStyle = "#241522"; ctx.lineWidth = 2; ctx.strokeRect(wx, wy, 16, 18);
+        ctx.beginPath(); ctx.moveTo(wx + 8, wy); ctx.lineTo(wx + 8, wy + 18); ctx.moveTo(wx, wy + 9); ctx.lineTo(wx + 16, wy + 9); ctx.stroke();
+        if (!house.visited && !(windowIndex === 0 && !near)) {
+          ctx.fillStyle = `rgba(255, ${Math.round(74 + glow * 40)}, 38, ${glow})`;
+          ctx.beginPath(); ctx.arc(wx + 5, wy + 8, 2, 0, Math.PI * 2); ctx.arc(wx + 11, wy + 8, 2, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.fillStyle = "#191522"; ctx.fillRect(wx - 2, wy + 18, 20, 3);
+      });
+      // Recessed door frame and two shallow porch steps add foreground depth.
+      ctx.fillStyle = "#17121f"; ctx.fillRect(x - 13, y + 3, 29, 43);
+      ctx.fillStyle = "#493346"; ctx.fillRect(x - 10, y + 6, 23, 39);
+      ctx.fillStyle = "#211522"; ctx.fillRect(x - 8, y + 8, 19, 36);
+      ctx.strokeStyle = "#624454"; ctx.lineWidth = 2; ctx.strokeRect(x - 9, y + 6, 21, 38);
+      ctx.fillStyle = "#e25b42"; ctx.shadowColor = "#ff392b"; ctx.shadowBlur = 8;
+      ctx.beginPath(); ctx.arc(x + 7, y + 25, 2.5, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+      // Tiny skull knocker on the front door.
+      ctx.fillStyle = "#d8c5aa"; ctx.beginPath(); ctx.arc(x - 3, y + 15, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#241522"; ctx.fillRect(x - 5, y + 18, 4, 3);
+      ctx.fillStyle = "#140f1b"; ctx.beginPath(); ctx.arc(x - 4, y + 14, 1, 0, Math.PI * 2); ctx.arc(x - 1, y + 14, 1, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#665267"; ctx.beginPath(); ctx.moveTo(x - 15, y + 45); ctx.lineTo(x + 17, y + 45); ctx.lineTo(x + 23, y + 50); ctx.lineTo(x - 19, y + 50); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "#3a3042"; ctx.beginPath(); ctx.moveTo(x - 19, y + 50); ctx.lineTo(x + 23, y + 50); ctx.lineTo(x + 28, y + 54); ctx.lineTo(x - 23, y + 54); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "#25212d"; ctx.fillRect(x + 52, y - 61, 9, 27);
+      ctx.fillStyle = "#9b5866"; ctx.fillRect(x + 48, y - 65, 17, 5);
+      ctx.fillStyle = near ? "#ffcf86" : house.visited ? "#c2a2d5" : "#fff7e6";
+      ctx.textAlign = "center"; ctx.font = "bold 11px system-ui, sans-serif";
+      ctx.fillText(house.visited ? `+${house.reward} CANDY` : house.name.toUpperCase(), x, y + 60);
       if (near) {
-        ctx.fillStyle = "#241a2d"; ctx.beginPath(); ctx.roundRect(house.x - 49, house.y - 101, 98, 19, 8); ctx.fill();
-        ctx.fillStyle = "#ffcf86"; ctx.font = "bold 10px system-ui, sans-serif";
-        ctx.fillText("SPACE TO KNOCK", house.x, house.y - 88);
+        ctx.fillStyle = "#160e1e"; ctx.beginPath(); ctx.roundRect(x - 49, y - 97, 98, 19, 8); ctx.fill();
+        ctx.strokeStyle = "#ffc56b"; ctx.lineWidth = 1; ctx.stroke();
+        ctx.fillStyle = "#ffcf86"; ctx.font = "bold 10px system-ui, sans-serif"; ctx.fillText(touchDevice ? "TAP KNOCK BELOW" : "SPACE TO KNOCK", x, y - 84);
+      }
+      ctx.restore();
+      }
+      }
+    }
+
+    function drawPerson() {
+      const costume = characters[player.character];
+      const pixel = playerSprite.getContext("2d");
+      pixel.clearRect(0, 0, playerSprite.width, playerSprite.height);
+      const gaitFrame = player.moving ? Math.floor(performance.now() / 105) % 4 : 0;
+      const leftStep = player.moving ? [0, 1, 1, 0][gaitFrame] : 0;
+      const rightStep = player.moving ? [1, 0, -1, -1][gaitFrame] : 0;
+      const armSwing = player.moving ? [-1, 0, 1, 0][gaitFrame] : 0;
+      const bob = player.moving ? [0, 1, 2, 1][gaitFrame] : 0;
+      const block = (color, x, y, width, height = 1) => {
+        pixel.fillStyle = color;
+        pixel.fillRect(x, y, width, height);
+      };
+
+      // Pixel shadow, swinging arms, stepping legs, and bright boot details.
+      block("#100d18", 3, 20, 12, 2);
+      block("#171522", 5 + leftStep, 16 - Math.max(0, rightStep), 3, 4); block("#171522", 10 + rightStep, 16 - Math.max(0, leftStep), 3, 4);
+      block("#29233d", 4 + leftStep, 19 - Math.max(0, rightStep), 4, 2); block("#29233d", 10 + rightStep, 19 - Math.max(0, leftStep), 4, 2);
+      block("#93829a", 5 + leftStep, 19 - Math.max(0, rightStep), 2, 1); block("#93829a", 11 + rightStep, 20 - Math.max(0, leftStep), 2, 1);
+      block(costume.skin, 2, 10 + armSwing, 3, 4); block(costume.skin, 13, 10 - armSwing, 3, 4);
+      block(costume.accent, 2, 13 + armSwing, 3, 1); block(costume.accent, 13, 13 - armSwing, 3, 1);
+      block(costume.outfit, 4, 9, 10, 8);
+      block("#201522", 4, 9, 1, 8); block("#201522", 13, 9, 1, 8);
+      block(costume.accent, 7, 9, 4, 6);
+      block(costume.accent, 5, 10, 2, 2); block(costume.accent, 11, 10, 2, 2);
+      block("#e2ae69", 7, 15, 4, 1); block("#fff0b0", 8, 11, 1, 1); block("#fff0b0", 10, 13, 1, 1);
+      if (player.character === "ghost") {
+        block("#d8e2dc", 4, 16, 3, 2); block("#d8e2dc", 11, 16, 3, 2);
+        block("#b4d2d1", 6, 18, 2, 1); block("#b4d2d1", 10, 18, 2, 1);
+        block("#c2dfdc", 7, 12, 1, 2); block("#c2dfdc", 10, 14, 1, 2);
+      } else if (player.character === "werewolf") {
+        block("#60453b", 3, 8, 3, 4); block("#60453b", 12, 8, 3, 4);
+        block("#d19a62", 3, 8, 2, 2); block("#d19a62", 13, 8, 2, 2);
+        block("#a75c41", 7, 11, 4, 3); block("#e2c08a", 8, 12, 2, 1);
+        block("#ead8b6", 8, 13, 1, 2); block("#ead8b6", 10, 13, 1, 2);
+        block("#a75c41", 13, 15, 3, 2); block("#a75c41", 15, 14, 2, 2);
+      } else if (player.character === "skeleton") {
+        block("#e4d8bd", 5, 10, 2, 2); block("#e4d8bd", 11, 10, 2, 2);
+        block("#ddd0b0", 8, 11, 2, 3); block("#ddd0b0", 5, 14, 2, 1); block("#ddd0b0", 11, 14, 2, 1);
+        block("#ddd0b0", 8, 15, 1, 2); block("#ddd0b0", 10, 15, 1, 2);
+      }
+
+      // Head and distinct costume silhouette.
+      if (player.character === "pumpkin") {
+        block("#e88132", 5, 3, 8, 7); block("#f29a45", 4, 5, 10, 4);
+        block("#a94d28", 8, 2, 2, 1); block("#a94d28", 6, 4, 1, 5); block("#a94d28", 11, 4, 1, 5);
+        block("#291c2e", 6, 6, 2, 2); block("#291c2e", 10, 6, 2, 2);
+        block("#291c2e", 7, 8, 4, 1); block("#fff0b0", 6, 6, 1, 1); block("#fff0b0", 10, 6, 1, 1);
+        block("#f5a84c", 6, 4, 1, 1); block("#f5a84c", 11, 4, 1, 1);
+        block("#e88132", 7, 11, 4, 3); block("#a94d28", 8, 11, 2, 3);
+        block("#f7c35f", 8, 11, 1, 2); block("#f7c35f", 9, 12, 1, 2);
+      } else if (player.character === "ghost") {
+        block("#cbd8d8", 5, 4, 8, 5); block("#eef2f2", 6, 3, 6, 6);
+        block("#eef2f2", 4, 5, 2, 4); block("#eef2f2", 12, 5, 2, 4);
+        block("#273243", 7, 6, 2, 2); block("#273243", 10, 6, 2, 2);
+        block("#fff7e6", 7, 6, 1, 1); block("#fff7e6", 10, 6, 1, 1);
+        block("#8295a5", 8, 9, 3, 1);
+      } else if (player.character === "skeleton") {
+        block("#ddd0b0", 5, 4, 9, 6); block("#efe5cf", 6, 3, 7, 6);
+        block("#272333", 6, 6, 2, 2); block("#272333", 11, 6, 2, 2);
+        block("#272333", 8, 8, 3, 1); block("#272333", 8, 9, 1, 1); block("#272333", 10, 9, 1, 1);
+      } else if (player.character === "werewolf") {
+        block("#60453b", 5, 4, 3, 3); block("#60453b", 11, 4, 3, 3);
+        block("#d19a62", 6, 4, 1, 2); block("#d19a62", 12, 4, 1, 2);
+        block("#b77a50", 6, 5, 7, 5); block("#60453b", 6, 4, 7, 2);
+        block("#2b2024", 7, 7, 1, 1); block("#2b2024", 11, 7, 1, 1);
+        block("#a75c41", 8, 8, 4, 2); block("#e6c8a0", 9, 9, 2, 1);
+        block("#fff0b0", 8, 9, 1, 2); block("#fff0b0", 11, 9, 1, 2);
+      } else {
+        block("#241522", 5, 4, 2, 5); block(costume.skin, 6, 4, 7, 6);
+        block("#3c2630", 6, 3, 7, 2); block("#f0c4a7", 7, 5, 2, 1);
+        block("#241522", 7, 6, 1, 1); block("#241522", 11, 6, 1, 1);
+        if (player.character === "witch") {
+          block(costume.hat, 3, 4, 12, 2); block(costume.hat, 5, 2, 8, 2);
+          block(costume.hat, 7, 0, 4, 2); block(costume.hatBand, 5, 4, 8, 1);
+          block("#f9d782", 8, 4, 2, 1); block("#fff0b0", 9, 1, 1, 1);
+          block("#4e345d", 6, 12, 2, 2); block("#4e345d", 10, 12, 2, 2);
+          block("#d5b4ed", 7, 13, 1, 1); block("#d5b4ed", 11, 13, 1, 1);
+        } else if (player.character === "vampire") {
+          block("#29263f", 4, 2, 10, 4); block("#29263f", 6, 1, 6, 2);
+          block("#b73e52", 5, 5, 8, 1); block("#fff4dc", 8, 8, 1, 2); block("#fff4dc", 11, 8, 1, 2);
+          block("#b73e52", 3, 9, 3, 4); block("#b73e52", 12, 9, 3, 4);
+          block("#f18a9b", 4, 10, 1, 2); block("#f18a9b", 13, 10, 1, 2);
+          block("#e6c6a5", 8, 12, 2, 2);
+        }
+      }
+      // Extra costume details keep each trick-or-treater distinct at game scale.
+      if (player.character === "witch") {
+        block("#3a2948", 5, 15, 8, 2); block("#f4c95d", 8, 10, 2, 2);
+        block("#fff0b0", 6, 12, 1, 1); block("#d5b4ed", 12, 14, 1, 1);
+      } else if (player.character === "vampire") {
+        block("#8d3047", 3, 10, 3, 7); block("#8d3047", 12, 10, 3, 7);
+        block("#e8d8d0", 7, 10, 5, 5); block("#b73e52", 8, 10, 3, 2);
+        block("#f5d5cf", 8, 15, 1, 1); block("#f5d5cf", 10, 15, 1, 1);
+        block("#f18a9b", 7, 16, 1, 1); block("#f18a9b", 11, 16, 1, 1);
+      } else if (player.character === "pumpkin") {
+        block("#5d873f", 10, 1, 3, 1); block("#79a94d", 12, 0, 2, 1);
+        block("#ffbd55", 6, 12, 1, 3); block("#ffbd55", 11, 12, 1, 3);
+        block("#a94d28", 8, 14, 2, 1); block("#f7c35f", 7, 16, 1, 1);
+      } else if (player.character === "ghost") {
+        block("#f8ffff", 5, 12, 1, 4); block("#f8ffff", 12, 13, 1, 3);
+        block("#9ed5d2", 7, 15, 5, 1); block("#d8e2dc", 4, 17, 2, 1);
+        block("#d8e2dc", 12, 17, 2, 1); block("#fff7e6", 6, 8, 1, 1);
+      } else if (player.character === "werewolf") {
+        block("#d19a62", 6, 10, 2, 2); block("#d19a62", 10, 10, 2, 2);
+        block("#ead8b6", 5, 13, 1, 2); block("#ead8b6", 12, 13, 1, 2);
+        block("#a75c41", 2, 14, 2, 2); block("#a75c41", 1, 15, 2, 2);
+      } else if (player.character === "skeleton") {
+        block("#ddd0b0", 7, 10, 6, 1); block("#ddd0b0", 6, 12, 8, 1);
+        block("#ddd0b0", 7, 14, 6, 1); block("#272333", 9, 10, 1, 5);
+        block("#ddd0b0", 8, 16, 1, 2); block("#ddd0b0", 11, 16, 1, 2);
+      }
+      // A little handled candy bucket held at the character's side.
+      block(costume.skin, 14, 12, 2, 2);
+      block("#e2ae69", 14, 10, 1, 3); block("#e2ae69", 18, 10, 1, 3); block("#e2ae69", 15, 9, 3, 1);
+      block("#f0bd69", 13, 13, 7, 2);
+      block("#a84736", 14, 15, 5, 4); block("#d36a3d", 15, 15, 3, 3);
+      block("#763447", 15, 19, 3, 1);
+      block("#ffd887", 15, 16, 1, 1); block("#ffd887", 17, 17, 1, 1);
+
+      ctx.save();
+      ctx.imageSmoothingEnabled = false;
+      if (player.riding) ctx.drawImage(playerSprite, player.x - cameraX - 24, player.y - 64 - bob, 48, 58);
+      else ctx.drawImage(playerSprite, player.x - cameraX - 30, player.y - 36 - bob, 60, 72);
+      ctx.imageSmoothingEnabled = true;
+      ctx.restore();
+    }
+
+    function drawWanderer(worldX, biome, index, time) {
+      const cycle = (time / 1000 + index * 4.3 + biomes.indexOf(biome) * 2.1) % 24;
+      const roamX = worldX + Math.sin(time / 360 + index * 2.1 + biome.start * .003) * 48;
+      const roadY = roadYAt(roamX);
+      const side = index % 2 ? -1 : 1;
+      const roamY = Math.max(65, Math.min(435, roadY + side * (62 + (index % 3) * 15)));
+      const localHouses = houses.filter(house => house.biome === biome.key);
+      const targetHouse = localHouses[index % localHouses.length];
+      // The NPC walks to the road-facing side of a nearby house, knocks, then heads back out.
+      const doorX = targetHouse.x - 8;
+      const doorY = targetHouse.y + (targetHouse.side === "top" ? 60 : -60);
+      let x = roamX, y = roamY;
+      if (cycle < 4) {
+        const t = cycle / 4;
+        x += (doorX - x) * t; y += (doorY - y) * t;
+      } else if (cycle < 7) {
+        x = doorX; y = doorY;
+      } else if (cycle < 11) {
+        const t = (cycle - 7) / 4;
+        x = doorX + (roamX - doorX) * t; y = doorY + (roamY - doorY) * t;
+      }
+      const sx = x - cameraX;
+      if (sx < -55 || sx > canvas.width + 55) return;
+      const visiting = cycle >= 4 && cycle < 7;
+      const walking = !visiting;
+      const step = walking ? Math.sin(time / 80 + index * 3) * 4 : 0;
+      const zombie = (index + biomes.indexOf(biome)) % 2 === 0;
+      const skin = zombie ? (biome.key === "snow" ? "#9db9a0" : "#7ca779") : "#ded4bd";
+      const outfit = zombie ? "#45574b" : "#353345";
+      ctx.save();
+      ctx.globalAlpha = .94;
+      ctx.fillStyle = "#10121b"; ctx.beginPath(); ctx.ellipse(sx, y + 15, 15, 5, 0, 0, Math.PI * 2); ctx.fill();
+      // Tiny pixel people roam each biome on their own looping patrol.
+      ctx.fillStyle = outfit; ctx.fillRect(sx - 8, y - 10, 16, 19);
+      ctx.fillStyle = zombie ? "#718564" : "#82788d"; ctx.fillRect(sx - 8, y + 3, 16, 6);
+      ctx.fillStyle = skin; ctx.fillRect(sx - 7, y - 22, 14, 13);
+      if (zombie) {
+        ctx.fillStyle = "#28302a"; ctx.fillRect(sx - 5, y - 18, 3, 3); ctx.fillRect(sx + 2, y - 18, 3, 3);
+        ctx.fillStyle = "#d6b05b"; ctx.fillRect(sx - 4, y - 12, 8, 2);
+        ctx.fillStyle = outfit; ctx.fillRect(sx - 13, y - 8 + step, 5, 13); ctx.fillRect(sx + 8, y - 12 - step, 5, 13);
+      } else {
+        ctx.fillStyle = "#282431"; ctx.fillRect(sx - 5, y - 18, 3, 3); ctx.fillRect(sx + 2, y - 18, 3, 3);
+        ctx.fillStyle = "#f2e9d5"; ctx.fillRect(sx - 4, y - 12, 8, 4);
+        ctx.fillStyle = outfit; ctx.fillRect(sx - 12, y - 7 - step, 4, 11); ctx.fillRect(sx + 8, y - 7 + step, 4, 11);
+        ctx.fillStyle = "#eee5ce"; ctx.fillRect(sx - 9, y - 4, 18, 3);
+      }
+      ctx.fillStyle = outfit; ctx.fillRect(sx - 7, y + 8, 5, 8 + step); ctx.fillRect(sx + 2, y + 8, 5, 8 - step);
+      ctx.fillStyle = "#1e1b28"; ctx.fillRect(sx - 9, y + 14 + step, 7, 3); ctx.fillRect(sx + 2, y + 14 - step, 7, 3);
+      if (visiting) {
+        // A hand wave and speech bubble make the candy visit clear; NPC visits never touch the score.
+        ctx.fillStyle = outfit; ctx.fillRect(sx + 9, y - 20, 5, 14);
+        ctx.fillStyle = "#fff2d3"; ctx.beginPath(); ctx.roundRect(sx + 8, y - 43, 58, 18, 5); ctx.fill();
+        ctx.fillStyle = "#563449"; ctx.font = "bold 8px system-ui, sans-serif"; ctx.textAlign = "center";
+        ctx.fillText("TRICK OR TREAT!", sx + 37, y - 31);
       }
       ctx.restore();
     }
 
+    function drawSkateboard() {
+      const boardX = skateboard.ridden ? player.x - cameraX : skateboard.x - cameraX;
+      const boardY = skateboard.ridden ? player.y + 1 : skateboard.y;
+      if (boardX < -70 || boardX > canvas.width + 70) return;
+      const canRide = !skateboard.ridden && Math.hypot(player.x - skateboard.x, player.y - skateboard.y) < 78;
+      ctx.save();
+      ctx.translate(boardX, boardY);
+      if (skateboard.ridden && (player.direction === "up" || player.direction === "down")) ctx.rotate(Math.PI / 2);
+      if (skateboard.ridden && player.direction === "left") ctx.scale(-1, 1);
+      ctx.fillStyle = "rgba(5,7,14,.5)"; ctx.beginPath(); ctx.ellipse(0, 8, 30, 5, 0, 0, Math.PI * 2); ctx.fill();
+      // A chunky orange deck, metal trucks, and four little pixel wheels.
+      ctx.fillStyle = "#201b28"; ctx.fillRect(-20, 4, 40, 4);
+      ctx.fillStyle = "#d66a3b"; ctx.fillRect(-25, -1, 50, 6); ctx.fillRect(-21, -3, 42, 2);
+      ctx.fillStyle = "#ffbc66"; ctx.fillRect(-15, 0, 30, 2);
+      ctx.fillStyle = "#593249"; ctx.fillRect(-18, 7, 5, 3); ctx.fillRect(13, 7, 5, 3);
+      ctx.fillStyle = "#24212e"; ctx.fillRect(-21, 9, 7, 4); ctx.fillRect(14, 9, 7, 4);
+      ctx.fillStyle = "#c9b7d4"; ctx.fillRect(-19, 10, 3, 2); ctx.fillRect(-15, 10, 3, 2); ctx.fillRect(15, 10, 3, 2); ctx.fillRect(19, 10, 3, 2);
+      ctx.fillStyle = "#4c2b43"; ctx.fillRect(-3, -1, 2, 4); ctx.fillRect(2, -1, 2, 4);
+      ctx.restore();
+      if (canRide && gameStarted) {
+        ctx.save(); ctx.textAlign = "center"; ctx.font = "bold 10px system-ui, sans-serif";
+        ctx.fillStyle = "#181222"; ctx.beginPath(); ctx.roundRect(boardX - 43, boardY - 40, 86, 19, 7); ctx.fill();
+        ctx.strokeStyle = "#ffc56b"; ctx.lineWidth = 1; ctx.stroke();
+        ctx.fillStyle = "#ffdc91"; ctx.fillText(touchDevice ? "SKATE BUTTON" : "E TO SKATE", boardX, boardY - 27);
+        ctx.restore();
+      }
+    }
+
     function drawScene() {
-      ctx.clearRect(0, 0, 900, 500);
-      ctx.fillStyle = "#111a2b"; ctx.fillRect(0, 0, 900, 500);
-      ctx.fillStyle = "#263c35"; ctx.fillRect(0, 0, 900, 500);
-      ctx.fillStyle = "#1b292e"; ctx.fillRect(0, 180, 900, 145);
-      ctx.fillStyle = "#463a53"; ctx.fillRect(0, 245, 900, 14);
-      ctx.setLineDash([18, 18]); ctx.strokeStyle = "#a58a69"; ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.moveTo(0, 252); ctx.lineTo(900, 252); ctx.stroke(); ctx.setLineDash([]);
-      ctx.fillStyle = "#344735"; ctx.fillRect(0, 62, 900, 4); ctx.fillRect(0, 434, 900, 4);
-      ctx.textAlign = "center"; ctx.font = "19px sans-serif";
-      [[42, 208], [858, 218], [42, 306], [858, 300], [238, 237], [663, 274]].forEach(([x, y]) => ctx.fillText(emoji(0x1f383), x, y));
-      ctx.fillStyle = "#f7df9c"; ctx.beginPath(); ctx.arc(838, 78, 27, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = "#263c35"; ctx.beginPath(); ctx.arc(850, 68, 25, 0, Math.PI * 2); ctx.fill();
-      [[67, 95], [845, 158], [457, 88], [88, 360], [820, 377], [453, 414]].forEach(([x, y], i) => {
-        ctx.fillStyle = i % 2 ? "#f7df9c" : "#d8c8ff"; ctx.globalAlpha = .8;
-        ctx.beginPath(); ctx.arc(x, y, 1.7, 0, Math.PI * 2); ctx.fill();
-      }); ctx.globalAlpha = 1;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const firstBiome = Math.max(0, biomes.findIndex(biome => biome.start + biomeWidth > cameraX));
+      for (let index = firstBiome; index < biomes.length; index++) {
+        const biome = biomes[index];
+        const left = biome.start - cameraX;
+        if (left > canvas.width) break;
+        const ground = ctx.createLinearGradient(left, 0, left + biomeWidth, 0);
+        ground.addColorStop(0, biome.ground[0]); ground.addColorStop(.5, biome.ground[1]); ground.addColorStop(1, biome.ground[2]);
+        ctx.fillStyle = ground; ctx.fillRect(left, 0, biomeWidth, canvas.height);
+
+        for (let worldX = biome.start + 30; worldX < biome.start + biomeWidth; worldX += 145) {
+          const x = worldX - cameraX;
+          const variant = Math.abs(Math.floor(worldX / 145)) % 2;
+          const roadY = roadYAt(worldX);
+          if (biome.key === "city") {
+            [[14, 82], [408, 476]].forEach(([baseY, edge]) => {
+              const height = 48 + (Math.abs(Math.floor(worldX / 145) * 17 + edge) % 42);
+              const y = edge > 300 ? edge - height : baseY;
+              const width = 92 + variant * 12;
+              ctx.fillStyle = variant ? "#25242b" : "#302e36";
+              ctx.fillRect(x - width / 2, y, width, height);
+              ctx.fillStyle = "#171922"; ctx.fillRect(x - width / 2 + 6, y + 8, width - 12, 5);
+              for (let wy = y + 18; wy < y + height - 6; wy += 15) {
+                for (let wx = x - width / 2 + 11; wx < x + width / 2 - 8; wx += 19) {
+                  ctx.fillStyle = (Math.floor(wx + wy) % 3) ? "#171923" : "#866a4e";
+                  ctx.fillRect(wx, wy, 7, 8);
+                }
+              }
+            });
+          } else if (biome.key === "snow") {
+            [[12, 74], [425, 487]].forEach(([top]) => {
+              ctx.fillStyle = "#36535c"; ctx.fillRect(x - 3, top + 15, 6, 28);
+              ctx.fillStyle = variant ? "#527984" : "#446d77";
+              ctx.beginPath(); ctx.moveTo(x - 39, top + 35); ctx.lineTo(x, top - 7); ctx.lineTo(x + 39, top + 35); ctx.closePath(); ctx.fill();
+              ctx.beginPath(); ctx.moveTo(x - 30, top + 53); ctx.lineTo(x, top + 7); ctx.lineTo(x + 30, top + 53); ctx.closePath(); ctx.fill();
+              ctx.strokeStyle = "#edf5f0"; ctx.lineWidth = 4;
+              ctx.beginPath(); ctx.moveTo(x - 28, top + 23); ctx.lineTo(x, top - 7); ctx.lineTo(x + 28, top + 23); ctx.stroke();
+            });
+          } else if (biome.key === "marsh") {
+            [[18, 80], [420, 485]].forEach(([top]) => {
+              const marshY = top > 300 ? top - 26 : top + 26;
+              ctx.fillStyle = "#263735"; ctx.beginPath(); ctx.ellipse(x, marshY, 48, 18, 0, 0, Math.PI * 2); ctx.fill();
+              ctx.fillStyle = variant ? "#6c544f" : "#725d4a";
+              for (let reed = -3; reed <= 3; reed++) {
+                const ry = marshY + reed * 10;
+                ctx.fillRect(x - 10 + Math.abs(reed) * 3, ry, 3, 24 - Math.abs(reed) * 2);
+                ctx.fillRect(x - 13 + Math.abs(reed) * 3, ry - 1, 5, 8);
+              }
+              ctx.fillStyle = "#8b704e"; ctx.fillRect(x - 33, marshY + 22, 17, 4); ctx.fillRect(x + 9, marshY - 26, 20, 4);
+            });
+            ctx.fillStyle = "rgba(255, 171, 89, .85)"; ctx.shadowColor = "#ffab59"; ctx.shadowBlur = 14;
+            ctx.beginPath(); ctx.arc(x, Math.max(105, roadY - 105), 4, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + 28, Math.min(395, roadY + 105), 3, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+          } else {
+            [[12, 76], [425, 488]].forEach(([top]) => {
+              ctx.fillStyle = "#182522"; ctx.fillRect(x - 5, top + 29, 10, 34);
+              ctx.fillStyle = variant ? "#203c32" : "#294735";
+              ctx.fillRect(x - 27, top + 24, 54, 31); ctx.fillRect(x - 39, top + 34, 78, 22); ctx.fillRect(x - 20, top + 14, 40, 24);
+              ctx.fillStyle = "#426442"; ctx.fillRect(x - 20, top + 20, 8, 5); ctx.fillRect(x + 12, top + 37, 9, 5);
+              if (variant) { ctx.fillStyle = "#c87955"; ctx.fillRect(x - 34, top + 53, 8, 5); }
+            });
+          }
+        }
+
+        // Sprinkle little landmarks along both shoulders so every biome feels lived in.
+        for (let detailX = biome.start + 125; detailX < biome.start + biomeWidth; detailX += 235) {
+          const sx = detailX - cameraX;
+          if (sx < -40 || sx > canvas.width + 40) continue;
+          const detailIndex = Math.floor((detailX - biome.start) / 235);
+          const side = detailIndex % 2 ? -1 : 1;
+          const detailY = Math.max(58, Math.min(442, roadYAt(detailX) + side * (108 + detailIndex % 3 * 8)));
+          if (detailIndex % 3 === 0) {
+            // Little jack-o'-lanterns with glowing eyes.
+            ctx.fillStyle = "#d66a2f"; ctx.beginPath(); ctx.ellipse(sx, detailY, 13, 11, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = "#5b472e"; ctx.fillRect(sx - 2, detailY - 14, 4, 5);
+            ctx.fillStyle = "#ffe18a"; ctx.fillRect(sx - 7, detailY - 2, 3, 3); ctx.fillRect(sx + 4, detailY - 2, 3, 3);
+            ctx.fillStyle = "#512e2a"; ctx.fillRect(sx - 3, detailY + 4, 7, 2);
+          } else if (detailIndex % 3 === 1) {
+            // Crooked gravestones with a tiny carved moon or cross.
+            ctx.fillStyle = "rgba(13,16,24,.38)"; ctx.beginPath(); ctx.ellipse(sx, detailY + 14, 18, 5, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = biome.key === "snow" ? "#aebfc1" : biome.key === "city" ? "#5a555d" : "#676476";
+            ctx.beginPath(); ctx.roundRect(sx - 10, detailY - 13, 20, 27, 8); ctx.fill();
+            ctx.fillStyle = "#c9c3aa"; ctx.fillRect(sx - 1, detailY - 7, 2, 10); ctx.fillRect(sx - 4, detailY - 4, 8, 2);
+          } else {
+            // Small bioluminescent mushrooms and scattered stones.
+            ctx.fillStyle = "#d58c70"; ctx.fillRect(sx - 7, detailY - 8, 4, 12); ctx.fillRect(sx + 3, detailY - 4, 3, 8);
+            ctx.fillStyle = biome.key === "snow" ? "#f4f0df" : "#c57769";
+            ctx.beginPath(); ctx.ellipse(sx - 5, detailY - 8, 8, 4, 0, Math.PI, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(sx + 4, detailY - 4, 6, 3, 0, Math.PI, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = "#77716b"; ctx.fillRect(sx + 13, detailY + 5, 7, 4);
+          }
+        }
+
+        if (biome.key === "snow") {
+          ctx.fillStyle = "rgba(244,250,255,.65)";
+          for (let flakeX = biome.start + 28; flakeX < biome.start + biomeWidth; flakeX += 93) {
+            ctx.fillRect(flakeX - cameraX, 70 + ((flakeX * 13 + performance.now() / 32) % 350), 3, 3);
+          }
+        } else if (biome.key === "woods") {
+          for (let glowX = biome.start + 90; glowX < biome.start + biomeWidth; glowX += 185) {
+            const sx = glowX - cameraX;
+            const pulse = .35 + (Math.sin(performance.now() / 310 + glowX) + 1) * .22;
+            ctx.fillStyle = `rgba(255, 226, 137, ${pulse})`;
+            ctx.shadowColor = "#ffe289"; ctx.shadowBlur = 9;
+            ctx.fillRect(sx, 117 + (glowX % 3) * 9, 4, 4); ctx.fillRect(sx + 28, 365 - (glowX % 4) * 8, 3, 3);
+            ctx.shadowBlur = 0;
+          }
+        }
+        ctx.save();
+        ctx.beginPath(); ctx.rect(left, 0, biomeWidth, canvas.height); ctx.clip();
+        const roadStart = Math.max(-100, left - 10);
+        const roadEnd = Math.min(canvas.width + 100, left + biomeWidth + 10);
+        const strokeRoad = (color, width, dash = []) => {
+          ctx.beginPath();
+          for (let screenX = roadStart; screenX <= roadEnd; screenX += 18) {
+            const roadY = roadYAt(screenX + cameraX);
+            if (screenX === roadStart) ctx.moveTo(screenX, roadY);
+            else ctx.lineTo(screenX, roadY);
+          }
+          ctx.setLineDash(dash); ctx.strokeStyle = color; ctx.lineWidth = width; ctx.lineCap = "butt"; ctx.stroke();
+        };
+        strokeRoad(biome.edge, 164);
+        strokeRoad(biome.key === "snow" ? "#82969b" : biome.key === "city" ? "#49434a" : "#40394b", 148);
+        strokeRoad(biome.road, 140);
+        ctx.setLineDash([]);
+        ctx.restore();
+        if (biome.key === "city") {
+          for (let lampX = biome.start + 210; lampX < biome.start + biomeWidth; lampX += 430) {
+            const sx = lampX - cameraX;
+            const sy = roadYAt(lampX) - 83;
+            ctx.fillStyle = "#282630"; ctx.fillRect(sx - 2, sy, 4, 77); ctx.fillRect(sx - 9, sy - 3, 18, 5);
+            ctx.fillStyle = "#ffdc91"; ctx.shadowColor = "#ffc766"; ctx.shadowBlur = 14;
+            ctx.fillRect(sx - 4, sy + 3, 8, 7); ctx.shadowBlur = 0;
+          }
+        }
+      }
       houses.forEach(drawHouse);
-      ctx.font = "42px sans-serif"; ctx.fillText(player.moving ? emoji(0x1f3c3) : emoji(0x1f9db), player.x, player.y + 14);
-      ctx.fillStyle = "#fff7e6"; ctx.font = "bold 14px system-ui, sans-serif";
-      const nearby = houses.some(h => !h.visited && Math.hypot(player.x - h.x, player.y - h.y) < 82);
-      ctx.fillText(visited === houses.length ? "You visited every house! Happy Halloween!" : nearby ? "Press SPACE to knock!" : "Find a house and walk close to its door", 450, 25);
+      // Friendly monsters wander up to a house, knock for treats, then continue their stroll.
+      for (let biomeIndex = firstBiome; biomeIndex < biomes.length; biomeIndex++) {
+        const biome = biomes[biomeIndex];
+        if (biome.start - cameraX > canvas.width) break;
+        for (let walker = 0; walker < 5; walker++) {
+          drawWanderer(biome.start + 170 + walker * 390, biome, walker, performance.now());
+        }
+      }
+      drawSkateboard();
+      drawPerson();
     }
 
     function animate(time) {
@@ -171,47 +840,155 @@
       player.moving = Boolean(dx || dy);
       if (dx || dy) {
         const length = Math.hypot(dx, dy);
-        player.x = Math.max(25, Math.min(875, player.x + dx / length * player.speed * step));
-        player.y = Math.max(95, Math.min(420, player.y + dy / length * player.speed * step));
+        const speed = player.riding ? 6.4 : player.speed;
+        player.x = Math.max(25, Math.min(worldWidth - 25, player.x + dx / length * speed * step));
+        player.y = Math.max(25, Math.min(canvas.height - 25, player.y + dy / length * speed * step));
+        player.direction = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : (dy > 0 ? "down" : "up");
+      }
+      const playerScreenX = player.x - cameraX;
+      if (playerScreenX < 330) cameraX = player.x - 330;
+      else if (playerScreenX > 570) cameraX = player.x - 570;
+      cameraX = Math.max(0, Math.min(worldWidth - canvas.width, cameraX));
+      const activeBiome = biomes.find(biome => player.x >= biome.start && player.x < biome.start + biomeWidth) || biomes[biomes.length - 1];
+      if (activeBiome.key !== currentBiomeKey) {
+        currentBiomeKey = activeBiome.key;
+        document.body.dataset.theme = activeBiome.key;
+        zoneNameEl.textContent = activeBiome.name;
+        zoneDetailEl.textContent = activeBiome.detail;
+        zoneStageEl.textContent = `Region ${biomes.indexOf(activeBiome) + 1} of ${biomes.length}`;
+        regionChips.forEach(chip => chip.setAttribute("aria-current", chip.dataset.region === activeBiome.key ? "step" : "false"));
       }
       drawScene(); requestAnimationFrame(animate);
     }
 
+    function toggleSkateboard() {
+      if (!gameStarted) return;
+      if (player.riding) {
+        player.riding = false;
+        skateboard.ridden = false;
+        skateboard.x = player.x - 30;
+        skateboard.y = player.y;
+        messageEl.textContent = "You stepped off the skateboard. Press E nearby to skate again.";
+        return;
+      }
+      if (Math.hypot(player.x - skateboard.x, player.y - skateboard.y) > 78) {
+        messageEl.textContent = "Walk over to the skateboard and press E to skate.";
+        return;
+      }
+      player.x = skateboard.x;
+      player.y = skateboard.y;
+      player.riding = true;
+      skateboard.ridden = true;
+      messageEl.textContent = "You're skating! Use WASD or the arrow keys to roll around.";
+    }
+
     function knock() {
+      if (!gameStarted) return;
       const house = houses.find(h => !h.visited && Math.hypot(player.x - h.x, player.y - h.y) < 82);
-      if (!house) { messageEl.textContent = "Walk closer to an unopened house before knocking!"; return; }
-      const gotScared = Math.random() < 0.22;
-      if (gotScared) showJumpscare();
+      if (!house) { messageEl.textContent = "Walk right up to a glowing house, then knock!"; return; }
+      gameStarted = false;
+      const gotScared = !house.special && Math.random() < 0.5;
       house.visited = true;
-      house.reward = gotScared ? 0 : Math.floor(Math.random() * 101);
+      const maxHouseCandy = getCandySetting(maxCandySettingEl, 1, 100);
+      const consolationCandy = getCandySetting(consolationCandySettingEl, 0, 1);
+      house.reward = house.special ? maxHouseCandy : gotScared ? consolationCandy : Math.floor(Math.random() * maxHouseCandy) + 1;
+      const scareFinished = gotScared ? showJumpscare() : Promise.resolve();
       candies += house.reward; visited++;
       candyEl.textContent = candies; countEl.textContent = `${visited} / ${houses.length}`;
+      updateRegionCounts();
+      candyEl.classList.remove("candy-bump");
+      void candyEl.offsetWidth;
+      candyEl.classList.add("candy-bump");
       progressEl.style.width = `${visited / houses.length * 100}%`;
-      messageEl.textContent = gotScared
-        ? `A scary surprise at ${house.name}! You got away with 0 candies. Keep exploring!`
-        : visited === houses.length
-          ? `All houses visited! You collected ${candies} candies. Happy Halloween!`
-          : `${house.name} gave you ${house.reward} ${house.reward === 1 ? "candy" : "candies"}! Keep exploring!`;
+      messageEl.textContent = house.special
+        ? `Jackpot! ${house.name} was the special house and gave you the max prize: ${house.reward} candies!`
+        : gotScared
+        ? `A friendly ghost surprised you at ${house.name}, but left you ${house.reward} consolation ${house.reward === 1 ? "candy" : "candies"}!`
+        : `${house.name} gave you ${house.reward} ${house.reward === 1 ? "candy" : "candies"}! Nice trick-or-treating!`;
+      scareFinished.then(() => showCandyPopup(house, gotScared));
+    }
+
+    function showCandyPopup(house, gotScared) {
+      document.querySelector("#candy-popup-house").textContent = house.name;
+      document.querySelector("#candy-popup-amount").textContent = house.reward;
+      document.querySelector("#candy-popup-title").textContent = house.special ? "Special house jackpot!" : gotScared ? "A consolation candy!" : "You got candy!";
+      document.querySelector("#candy-popup-icon").textContent = house.special ? "\u{1F31F}" : gotScared ? "\u{1F47B}" : "\u{1F36C}";
+      candyPopupEl.classList.remove("hidden");
+      candyPopupEl.classList.add("flex");
+      candyPopupEl.setAttribute("aria-hidden", "false");
+      document.querySelector("#candy-popup-close").focus();
+    }
+
+    function closeCandyPopup() {
+      candyPopupEl.classList.add("hidden");
+      candyPopupEl.classList.remove("flex");
+      candyPopupEl.setAttribute("aria-hidden", "true");
+      resetGame();
+      document.querySelectorAll(".character-choice").forEach(choice => {
+        const selected = choice.dataset.character === "witch";
+        choice.setAttribute("aria-pressed", String(selected));
+        choice.classList.toggle("border-amber-300", selected);
+        choice.classList.toggle("bg-amber-300/10", selected);
+        choice.classList.toggle("border-white/10", !selected);
+        choice.classList.toggle("bg-black/20", !selected);
+      });
+      player.character = "witch";
+      startScreenEl.classList.remove("hidden");
+      startScreenEl.classList.add("flex");
+      document.querySelector("#start-game").focus();
     }
 
     function showJumpscare() {
-      jumpscareEl.classList.remove("hidden");
-      jumpscareEl.classList.add("flex");
-      jumpscareEl.setAttribute("aria-hidden", "false");
-      scareCardEl.classList.remove("scare-pop");
-      void scareCardEl.offsetWidth;
-      scareCardEl.classList.add("scare-pop");
-      window.setTimeout(() => {
-        jumpscareEl.classList.add("hidden");
-        jumpscareEl.classList.remove("flex");
-        jumpscareEl.setAttribute("aria-hidden", "true");
-      }, 1100);
+      return new Promise(resolve => {
+        const finish = () => {
+          scareVideoEl.removeEventListener("ended", finish);
+          scareVideoEl.removeEventListener("error", finish);
+          scareVideoEl.pause();
+          scareVideoEl.currentTime = 0;
+          jumpscareEl.classList.add("hidden");
+          jumpscareEl.classList.remove("flex");
+          jumpscareEl.setAttribute("aria-hidden", "true");
+          resolve();
+        };
+        scareVideoEl.addEventListener("ended", finish, { once: true });
+        scareVideoEl.addEventListener("error", finish, { once: true });
+        scareVideoEl.src = scareVideo;
+        scareVideoEl.currentTime = 0;
+        jumpscareEl.classList.remove("hidden");
+        jumpscareEl.classList.add("flex");
+        jumpscareEl.setAttribute("aria-hidden", "false");
+        scareCardEl.classList.remove("scare-pop");
+        void scareCardEl.offsetWidth;
+        scareCardEl.classList.add("scare-pop");
+        scareVideoEl.play().catch(finish);
+      });
     }
 
     window.addEventListener("keydown", event => {
       const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+      if (!gameStarted && !characterScreenEl.classList.contains("hidden") && ["w", "a", "s", "d"].includes(key)) {
+        event.preventDefault();
+        const choices = [...document.querySelectorAll(".character-choice")];
+        const currentIndex = Math.max(0, choices.indexOf(document.activeElement));
+        const columns = window.matchMedia("(min-width: 640px)").matches ? 3 : 2;
+        let nextIndex = currentIndex;
+        if (key === "a") nextIndex = (currentIndex + choices.length - 1) % choices.length;
+        if (key === "d") nextIndex = (currentIndex + 1) % choices.length;
+        if (key === "w" || key === "s") {
+          const rowCount = Math.ceil(choices.length / columns);
+          const row = Math.floor(currentIndex / columns);
+          const column = currentIndex % columns;
+          const nextRow = (row + (key === "w" ? rowCount - 1 : 1)) % rowCount;
+          nextIndex = Math.min(nextRow * columns + column, choices.length - 1);
+        }
+        choices[nextIndex].focus();
+        return;
+      }
+      if (!gameStarted) return;
       if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "].includes(event.key)) event.preventDefault();
-      if (key === " " && !event.repeat) knock(); else keys.add(key);
+      if (key === " " && !event.repeat) knock();
+      else if (key === "e" && !event.repeat) toggleSkateboard();
+      else keys.add(key);
     });
     window.addEventListener("keyup", event => keys.delete(event.key.length === 1 ? event.key.toLowerCase() : event.key));
     document.querySelectorAll(".move").forEach(button => {
@@ -220,27 +997,98 @@
       ["pointerup", "pointercancel", "pointerleave"].forEach(type => button.addEventListener(type, () => keys.delete(key)));
     });
     document.querySelector("#knock").addEventListener("click", knock);
+    document.querySelector("#ride").addEventListener("click", toggleSkateboard);
+    document.querySelector("#candy-popup-close").addEventListener("click", closeCandyPopup);
+    document.querySelector("#start-game").addEventListener("click", () => {
+      startScreenEl.classList.add("hidden");
+      characterScreenEl.classList.remove("hidden");
+      characterScreenEl.classList.add("flex");
+      document.querySelector(".character-choice").focus();
+    });
+    document.querySelectorAll(".character-choice").forEach(button => {
+      button.addEventListener("click", () => {
+        player.character = button.dataset.character;
+        document.querySelectorAll(".character-choice").forEach(choice => {
+          const selected = choice === button;
+          choice.setAttribute("aria-pressed", String(selected));
+          choice.classList.toggle("border-amber-300", selected);
+          choice.classList.toggle("bg-amber-300/10", selected);
+          choice.classList.toggle("border-white/10", !selected);
+          choice.classList.toggle("bg-black/20", !selected);
+        });
+        document.querySelector("#begin-adventure").focus();
+      });
+    });
+    document.querySelector("#begin-adventure").addEventListener("click", () => {
+      randomizeHouseLayout();
+      resetGame();
+      gameStarted = true;
+      characterScreenEl.classList.add("hidden");
+      characterScreenEl.classList.remove("flex");
+      document.querySelector("#game").focus();
+    });
 
     function resetGame() {
       candies = 0;
       visited = 0;
       houses.forEach(house => { house.visited = false; house.reward = 0; });
-      player.x = 450; player.y = 250;
+      const startingBiome = biomes[Math.floor(Math.random() * biomes.length)];
+      player.x = startingBiome.start + biomeWidth / 2;
+      player.y = roadYAt(player.x);
+      player.riding = false;
+      skateboard.x = player.x + 45;
+      skateboard.y = roadYAt(skateboard.x);
+      skateboard.ridden = false;
+      cameraX = Math.max(0, Math.min(worldWidth - canvas.width, player.x - canvas.width / 2));
+      currentBiomeKey = startingBiome.key;
+      zoneNameEl.textContent = startingBiome.name;
+      zoneDetailEl.textContent = startingBiome.detail;
+      zoneStageEl.textContent = `Region ${biomes.indexOf(startingBiome) + 1} of ${biomes.length}`;
+      document.body.dataset.theme = startingBiome.key;
+      regionChips.forEach(chip => chip.setAttribute("aria-current", chip.dataset.region === startingBiome.key ? "step" : "false"));
       candyEl.textContent = "0";
       countEl.textContent = `0 / ${houses.length}`;
       progressEl.style.width = "0%";
-      messageEl.textContent = "The moon is up and the neighborhood is waiting. Find a house and knock!";
+      updateRegionCounts();
+      messageEl.textContent = "Explore the woods, snow, abandoned city, and marsh to find all 32 houses!";
     }
 
-    document.querySelector("#reset").addEventListener("click", resetGame);
-    document.querySelector("#shuffle").addEventListener("click", () => {
-      for (let i = houses.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [houses[i], houses[j]] = [houses[j], houses[i]];
+    function updateRegionCounts() {
+      biomes.forEach(biome => {
+        const count = houses.filter(house => house.biome === biome.key && house.visited).length;
+        document.querySelector(`#region-count-${biome.key}`).textContent = `${count} / 8 houses`;
+      });
+    }
+
+    function randomizeHouseLayout() {
+      randomizeRoadPath();
+      biomes.forEach(biome => {
+        const spots = houseSpots.filter(spot => spot.biome === biome.key);
+        for (let i = spots.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [spots[i], spots[j]] = [spots[j], spots[i]];
+        }
+        houses.filter(house => house.biome === biome.key).forEach((house, index) => Object.assign(house, spots[index]));
+      });
+      houses.forEach(house => { house.special = false; });
+      if (Math.random() < specialHouseChance) {
+        houses[Math.floor(Math.random() * houses.length)].special = true;
       }
+    }
+
+    document.querySelector("#reset").addEventListener("click", () => {
+      randomizeHouseLayout();
       resetGame();
-      messageEl.textContent = "The neighborhood has been shuffled! Pick a house to start trick-or-treating.";
     });
+    document.querySelector("#shuffle").addEventListener("click", () => {
+      randomizeHouseLayout();
+      resetGame();
+      messageEl.textContent = "The houses have been shuffled within each region. Explore the world and find them!";
+    });
+    randomizeHouseLayout();
+    player.y = roadYAt(player.x);
+    skateboard.y = roadYAt(skateboard.x);
+    updateRegionCounts();
     requestAnimationFrame(animate);
   </script>
 </body>
