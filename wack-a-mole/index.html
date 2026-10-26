@@ -9,377 +9,115 @@
   body {
     font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
     background: radial-gradient(ellipse at 50% 0%, #301844 0%, #191029 45%, #0a0712 100%);
-    color: #e2dbf5;
-    min-height: 100vh;
-    display: flex; flex-direction: column; align-items: center;
-    padding: 12px 10px 24px;
-    overflow-x: hidden;
-    cursor: default;
-    position: relative;
+    color: #e2dbf5; min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    padding: 12px 10px 24px; overflow-x: hidden; cursor: default; position: relative;
   }
-
-  /* Spooky graveyard background atmosphere */
-  .cemetery-sky {
-    position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
-  }
-  .moon {
-    position: absolute; top: 18px; right: 8%; width: 72px; height: 72px;
-    background: radial-gradient(circle, #fffbe6 30%, #e6d385 70%, #a89445 100%);
-    border-radius: 50%;
-    box-shadow: 0 0 45px rgba(255,245,170,0.55), 0 0 100px rgba(160,110,255,0.25);
-  }
-  .moon::after {
-    content: ""; position: absolute; width: 18px; height: 14px; top: 16px; left: 18px;
-    background: rgba(0,0,0,0.08); border-radius: 50%;
-  }
-  .bat {
-    position: absolute; font-size: 1.5rem; opacity: 0.35;
-    animation: batFly 18s linear infinite;
-  }
-  @keyframes batFly {
-    0% { transform: translate(-80px, 40px) scale(0.7); opacity: 0; }
-    20% { opacity: 0.5; }
-    80% { opacity: 0.5; }
-    100% { transform: translate(105vw, 120px) scale(1); opacity: 0; }
-  }
-
-  /* Shovel Mallet cursor */
-  #mallet {
-    position: fixed; width: 82px; height: 82px; pointer-events: none; z-index: 9999;
-    transform: translate(-30%, -70%) rotate(-12deg);
-    transform-origin: 75% 75%;
-    transition: transform 0.05s ease-out;
-    display: none;
-    filter: drop-shadow(3px 8px 12px rgba(0,0,0,0.65));
-  }
-  #mallet.whack {
-    transform: translate(-38%, -65%) rotate(-65deg) scale(0.9);
-  }
+  .cemetery-sky { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .moon { position: absolute; top: 18px; right: 8%; width: 72px; height: 72px; background: radial-gradient(circle, #fffbe6 30%, #e6d385 70%, #a89445 100%); border-radius: 50%; box-shadow: 0 0 45px rgba(255,245,170,.55), 0 0 100px rgba(160,110,255,.25); }
+  .moon::after { content: ""; position: absolute; width: 18px; height: 14px; top: 16px; left: 18px; background: rgba(0,0,0,.08); border-radius: 50%; }
+  .bat { position: absolute; font-size: 1.5rem; opacity: .35; animation: batFly 18s linear infinite; }
+  @keyframes batFly { 0% { transform: translate(-80px,40px) scale(.7); opacity: 0; } 20%,80% { opacity: .5; } 100% { transform: translate(105vw,120px) scale(1); opacity: 0; } }
+  #mallet { position: fixed; width: 82px; height: 82px; pointer-events: none; z-index: 9999; transform: translate(-30%,-70%) rotate(-12deg); transform-origin: 75% 75%; transition: transform .05s ease-out; display: none; filter: drop-shadow(3px 8px 12px rgba(0,0,0,.65)); }
+  #mallet.whack { transform: translate(-38%,-65%) rotate(-65deg) scale(.9); }
   body.custom-cursor { cursor: none; }
   body.custom-cursor button, body.custom-cursor .guide, body.custom-cursor input { cursor: pointer; }
-
   header { z-index: 1; text-align: center; }
-  h1 {
-    font-size: 2.6rem; letter-spacing: 3px; color: #b4ff61;
-    text-shadow: 0 0 18px #49e810, 0 4px 0 #1b380a, 0 0 35px rgba(140,50,255,0.6);
-    margin-bottom: 6px;
-  }
-
-  .hud {
-    position: relative; z-index: 1;
-    display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; align-items: center;
-    font-size: 1.15rem; margin-bottom: 12px;
-    background: rgba(18, 12, 32, 0.75); padding: 8px 24px; border-radius: 14px;
-    border: 1px solid #5a3880; box-shadow: 0 6px 18px rgba(0,0,0,0.5);
-  }
+  h1 { font-size: 2.6rem; letter-spacing: 3px; color: #b4ff61; text-shadow: 0 0 18px #49e810, 0 4px 0 #1b380a, 0 0 35px rgba(140,50,255,.6); margin-bottom: 6px; }
+  .hud { position: relative; z-index: 1; display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; align-items: center; font-size: 1.15rem; margin-bottom: 12px; background: rgba(18,12,32,.75); padding: 8px 24px; border-radius: 14px; border: 1px solid #5a3880; box-shadow: 0 6px 18px rgba(0,0,0,.5); }
   .hud-item { display: flex; align-items: center; gap: 6px; }
   .hud b { color: #fff; font-size: 1.25rem; }
   .hud .candy-val { color: #ffd23b; font-weight: 900; }
-
-  /* Config button & side drawer */
-  .config-btn {
-    background: #442468; color: #b4ff61; border: 1px solid #7c44be;
-    padding: 6px 14px; font-size: 0.95rem; border-radius: 8px; cursor: pointer;
-    box-shadow: none; margin: 0; font-weight: bold; transition: all .15s;
-    display: inline-flex; align-items: center; gap: 6px;
-  }
+  .config-btn { background: #442468; color: #b4ff61; border: 1px solid #7c44be; padding: 6px 14px; font-size: .95rem; border-radius: 8px; cursor: pointer; box-shadow: none; margin: 0; font-weight: bold; transition: all .15s; display: inline-flex; align-items: center; gap: 6px; }
   .config-btn:hover { background: #5a2e8c; color: #fff; }
   .config-btn:active { transform: translateY(1px); }
-
-  #configDrawer {
-    position: fixed; top: 0; right: 0; width: 380px; max-width: 92vw; height: 100vh;
-    background: linear-gradient(180deg, #221435 0%, #11091c 100%);
-    border-left: 3px solid #6c3da8;
-    box-shadow: -10px 0 40px rgba(0,0,0,0.9);
-    z-index: 500; padding: 22px 18px;
-    display: flex; flex-direction: column; gap: 14px;
-    transform: translateX(100%);
-    transition: transform .25s ease-in-out;
-    overflow-y: auto;
-  }
+  #configDrawer { position: fixed; top: 0; right: 0; width: 380px; max-width: 92vw; height: 100vh; background: linear-gradient(180deg,#221435 0%,#11091c 100%); border-left: 3px solid #6c3da8; box-shadow: -10px 0 40px rgba(0,0,0,.9); z-index: 500; padding: 22px 18px; display: flex; flex-direction: column; gap: 14px; transform: translateX(100%); transition: transform .25s ease-in-out; overflow-y: auto; }
   #configDrawer.open { transform: translateX(0); }
-  #configDrawer h3 {
-    color: #b4ff61; font-size: 1.45rem; text-shadow: 0 0 10px #49e810;
-    display: flex; justify-content: space-between; align-items: center;
-    border-bottom: 1px solid #4a2873; padding-bottom: 10px;
-  }
-  .close-cfg-btn {
-    background: transparent; border: none; color: #b79ed4; font-size: 1.5rem;
-    cursor: pointer; padding: 0 6px; margin: 0; box-shadow: none;
-  }
+  #configDrawer h3 { color: #b4ff61; font-size: 1.45rem; text-shadow: 0 0 10px #49e810; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #4a2873; padding-bottom: 10px; }
+  .close-cfg-btn { background: transparent; border: none; color: #b79ed4; font-size: 1.5rem; cursor: pointer; padding: 0 6px; margin: 0; box-shadow: none; }
   .close-cfg-btn:hover { color: #ff5e5e; }
-  .cfg-group {
-    display: flex; flex-direction: column; gap: 6px;
-    background: rgba(0,0,0,0.4); padding: 10px 12px; border-radius: 10px; border: 1px solid #3d235c;
-  }
-  .cfg-group label {
-    font-size: 0.95rem; color: #d6beff; font-weight: bold;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .cfg-group .cfg-sub { font-size: 0.8rem; color: #9c84ba; }
+  .cfg-group { display: flex; flex-direction: column; gap: 6px; background: rgba(0,0,0,.4); padding: 10px 12px; border-radius: 10px; border: 1px solid #3d235c; }
+  .cfg-group label { font-size: .95rem; color: #d6beff; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+  .cfg-group .cfg-sub { font-size: .8rem; color: #9c84ba; }
   .cfg-input-row { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
-  .cfg-input {
-    width: 100%; background: #0b0613; border: 2px solid #5a3485; border-radius: 8px;
-    color: #ffd23b; font-size: 1.15rem; font-weight: bold; padding: 6px 10px;
-    font-family: inherit; text-align: center;
-  }
-  .cfg-input:focus { outline: none; border-color: #b4ff61; box-shadow: 0 0 10px rgba(180,255,97,0.4); }
+  .cfg-input { width: 100%; min-width: 0; background: #0b0613; border: 2px solid #5a3485; border-radius: 8px; color: #ffd23b; font-size: 1.15rem; font-weight: bold; padding: 6px 10px; font-family: inherit; text-align: center; }
+  .cfg-input:focus { outline: none; border-color: #b4ff61; box-shadow: 0 0 10px rgba(180,255,97,.4); }
   .cfg-actions { margin-top: auto; display: flex; flex-direction: column; gap: 8px; padding-top: 10px; }
-  .cfg-save-btn {
-    background: #6a34a8; color: #fff; font-size: 1.1rem; padding: 10px;
-    border-radius: 8px; border: none; cursor: pointer; box-shadow: 0 4px 0 #3a1863;
-    margin: 0; font-weight: bold;
-  }
+  .cfg-save-btn { background: #6a34a8; color: #fff; font-size: 1.1rem; padding: 10px; border-radius: 8px; border: none; cursor: pointer; box-shadow: 0 4px 0 #3a1863; margin: 0; font-weight: bold; }
   .cfg-save-btn:hover { background: #7b40bf; }
   .cfg-save-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #3a1863; }
-  .cfg-reset-btn {
-    background: transparent; color: #a48cbfa4; font-size: 0.85rem; padding: 6px;
-    border: 1px dashed #5a3880; border-radius: 6px; cursor: pointer; box-shadow: none; margin: 0;
-  }
+  .cfg-reset-btn { background: transparent; color: #a48cbfa4; font-size: .85rem; padding: 6px; border: 1px dashed #5a3880; border-radius: 6px; cursor: pointer; box-shadow: none; margin: 0; }
   .cfg-reset-btn:hover { color: #ff8080; border-color: #ff8080; }
-
-  /* Timer Row (Bar + Numbered Timer Beside) */
-  .timer-row {
-    position: relative; z-index: 1;
-    display: flex; align-items: center; justify-content: center; gap: 14px;
-    width: 96vw; max-width: 1360px; margin-bottom: 12px;
-  }
-  .timer-wrap {
-    flex: 1; height: 20px; background: #12091d;
-    border-radius: 999px; overflow: hidden; border: 2px solid #533177;
-    box-shadow: inset 0 2px 6px #000;
-  }
-  #timerBar {
-    height: 100%; width: 100%;
-    background: linear-gradient(90deg, #ff3b3b, #ffd23b, #a0ff4d);
-    transition: width 0.1s linear;
-  }
-  .timer-number {
-    font-size: 1.7rem; font-weight: 900; color: #a0ff4d;
-    min-width: 68px; text-align: left;
-    text-shadow: 0 0 12px rgba(160,255,77,0.6);
-    font-variant-numeric: tabular-nums;
-  }
-  .timer-number.urgent {
-    color: #ff3b3b; text-shadow: 0 0 14px #ff1a1a; animation: pulseUrgent .5s infinite alternate;
-  }
+  .timer-row { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 14px; width: 96vw; max-width: 1360px; margin-bottom: 12px; }
+  .timer-wrap { flex: 1; height: 20px; background: #12091d; border-radius: 999px; overflow: hidden; border: 2px solid #533177; box-shadow: inset 0 2px 6px #000; }
+  #timerBar { height: 100%; width: 100%; background: linear-gradient(90deg,#ff3b3b,#ffd23b,#a0ff4d); transition: width .1s linear; }
+  .timer-number { font-size: 1.7rem; font-weight: 900; color: #a0ff4d; min-width: 68px; text-align: left; text-shadow: 0 0 12px rgba(160,255,77,.6); font-variant-numeric: tabular-nums; }
+  .timer-number.urgent { color: #ff3b3b; text-shadow: 0 0 14px #ff1a1a; animation: pulseUrgent .5s infinite alternate; }
   @keyframes pulseUrgent { from { transform: scale(1); } to { transform: scale(1.15); } }
-
-  /* Graveyard Ground (Almost Full Screen 96vw & 64vh) */
-  .cemetery-field {
-    position: relative; z-index: 1;
-    width: 96vw; max-width: 1360px;
-    min-height: 64vh;
-    background: radial-gradient(circle at 50% 20%, #2b1f3d, #1a1228 65%, #100b1a);
-    border: 4px solid #503173;
-    border-radius: 26px;
-    padding: 24px 20px 20px;
-    box-shadow: 0 18px 45px rgba(0,0,0,0.8), inset 0 2px 10px rgba(180,120,255,0.2), 0 0 35px rgba(60,20,90,0.5);
-    display: flex; flex-direction: column; justify-content: center;
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 22px 18px;
-  }
-  @media (max-width: 768px) {
-    .grid { grid-template-columns: repeat(2, 1fr); }
-  }
-
-  /* Grave Plot (Large format for 6 holes) */
-  .grave-plot {
-    aspect-ratio: 1.25;
-    min-height: 200px;
-    position: relative;
-    overflow: hidden;
-    border-radius: 18px;
-    background: transparent;
-  }
-
-  /* Weathered Tombstone behind the grave */
-  .tombstone {
-    position: absolute; top: 0; left: 25%; right: 25%; height: 52%;
-    background: linear-gradient(180deg, #5c556b 0%, #3e384b 65%, #2a2533 100%);
-    border-radius: 24px 24px 0 0;
-    border: 2px solid #6b637c;
-    border-bottom: none;
-    box-shadow: inset 0 3px 5px rgba(255,255,255,0.2), 0 4px 10px rgba(0,0,0,0.6);
-    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-    padding-top: 8px;
-    color: #9f97b5;
-    z-index: 1;
-  }
-  .tombstone::after {
-    content: "R.I.P.";
-    font-size: 1.05rem; font-weight: 900; letter-spacing: 3px;
-    opacity: 0.75; text-shadow: 0 1px 1px #000;
-  }
-  .tombstone .crack {
-    position: absolute; top: 22px; right: 10px; width: 10px; height: 16px;
-    border-left: 2px solid #231e2b; transform: rotate(15deg);
-  }
-
-  /* Grave Hole Pit */
-  .grave-pit {
-    position: absolute; bottom: 8px; left: 8%; right: 8%; height: 46%;
-    background: radial-gradient(ellipse at 50% 40%, #0d0614 0%, #170d24 55%, #2d1844 80%, #3f2260 100%);
-    border-radius: 50% / 46%;
-    box-shadow: inset 0 8px 16px #000, 0 4px 0 #130a20;
-    z-index: 2;
-  }
-
-  /* Undead Mole slot */
-  .mole-slot {
-    position: absolute; inset: 0;
-    overflow: hidden;
-    z-index: 3;
-  }
-
-  .mole {
-    position: absolute;
-    bottom: -110%;
-    left: 14%; right: 14%; height: 86%;
-    transition: bottom 0.16s cubic-bezier(0.18, 0.89, 0.32, 1.25);
-    cursor: pointer;
-    touch-action: manipulation;
-  }
-  .mole.up {
-    bottom: 8%;
-  }
-
-  /* Fresh Grave Soil Mound (front lip) */
-  .grave-dirt {
-    position: absolute; bottom: 0; left: 4%; right: 4%; height: 35%;
-    background: radial-gradient(ellipse at 50% -20%, transparent 48%, #36224c 50%, #261737 82%, #190e25 100%);
-    border-radius: 50% / 55%;
-    z-index: 4;
-    pointer-events: none;
-    box-shadow: 0 6px 0 #0d0714;
-  }
-  /* Creepy weeds / graveyard grass */
-  .grave-dirt::before {
-    content: ""; position: absolute; top: -5px; left: 16%; right: 16%; height: 10px;
-    background: radial-gradient(ellipse, #44802c 0%, transparent 70%);
-    opacity: 0.7;
-  }
-
-  /* Floating Score Tag */
-  .score-float {
-    position: absolute; z-index: 20;
-    font-size: 1.6rem; font-weight: 900;
-    color: #a4ff4f; text-shadow: 0 0 10px #000, 0 0 16px #3bff00;
-    pointer-events: none;
-    animation: floatUp 0.75s ease-out forwards;
-    transform: translate(-50%, -50%);
-  }
-  @keyframes floatUp {
-    0% { opacity: 0; transform: translate(-50%, 0) scale(0.6); }
-    25% { opacity: 1; transform: translate(-50%, -20px) scale(1.2); }
-    100% { opacity: 0; transform: translate(-50%, -55px) scale(0.9); }
-  }
-
-  /* Spooky particles burst */
-  .grave-particle {
-    position: absolute; pointer-events: none; z-index: 20;
-    width: 9px; height: 9px; border-radius: 50%;
-    background: #a4ff4f; box-shadow: 0 0 8px #a4ff4f, 0 0 12px #fff;
-    animation: particleFly 0.55s ease-out forwards;
-  }
-  @keyframes particleFly {
-    0% { transform: translate(0, 0) scale(1); opacity: 1; }
-    100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
-  }
-
-  /* Popups / Landing */
-  #overlay, #landing {
-    position: fixed; inset: 0; z-index: 100; padding: 18px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  #overlay { background: rgba(5, 3, 10, 0.85); }
-  #landing { z-index: 200; background: radial-gradient(ellipse at top, #2b153f 0%, #0c0816 85%); overflow-y: auto; }
+  .cemetery-field { position: relative; z-index: 1; width: 96vw; max-width: 1360px; min-height: 64vh; background: radial-gradient(circle at 50% 20%,#2b1f3d,#1a1228 65%,#100b1a); border: 4px solid #503173; border-radius: 26px; padding: 24px 20px 20px; box-shadow: 0 18px 45px rgba(0,0,0,.8), inset 0 2px 10px rgba(180,120,255,.2), 0 0 35px rgba(60,20,90,.5); display: flex; flex-direction: column; justify-content: center; }
+  .grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px 18px; }
+  .grave-plot { aspect-ratio: 1.25; min-height: 200px; position: relative; overflow: hidden; border-radius: 18px; background: transparent; }
+  .tombstone { position: absolute; top: 0; left: 25%; right: 25%; height: 52%; background: linear-gradient(180deg,#5c556b 0%,#3e384b 65%,#2a2533 100%); border-radius: 24px 24px 0 0; border: 2px solid #6b637c; border-bottom: none; box-shadow: inset 0 3px 5px rgba(255,255,255,.2), 0 4px 10px rgba(0,0,0,.6); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 8px; color: #9f97b5; z-index: 1; }
+  .tombstone::after { content: "R.I.P."; font-size: 1.05rem; font-weight: 900; letter-spacing: 3px; opacity: .75; text-shadow: 0 1px 1px #000; }
+  .tombstone .crack { position: absolute; top: 22px; right: 10px; width: 10px; height: 16px; border-left: 2px solid #231e2b; transform: rotate(15deg); }
+  .grave-pit { position: absolute; bottom: 8px; left: 8%; right: 8%; height: 46%; background: radial-gradient(ellipse at 50% 40%,#0d0614 0%,#170d24 55%,#2d1844 80%,#3f2260 100%); border-radius: 50% / 46%; box-shadow: inset 0 8px 16px #000, 0 4px 0 #130a20; z-index: 2; }
+  .mole-slot { position: absolute; inset: 0; overflow: hidden; z-index: 3; }
+  .mole { position: absolute; bottom: -110%; left: 14%; right: 14%; height: 86%; transition: bottom .16s cubic-bezier(.18,.89,.32,1.25); cursor: pointer; touch-action: manipulation; }
+  .mole.up { bottom: 8%; }
+  .grave-dirt { position: absolute; bottom: 0; left: 4%; right: 4%; height: 35%; background: radial-gradient(ellipse at 50% -20%,transparent 48%,#36224c 50%,#261737 82%,#190e25 100%); border-radius: 50% / 55%; z-index: 4; pointer-events: none; box-shadow: 0 6px 0 #0d0714; }
+  .grave-dirt::before { content: ""; position: absolute; top: -5px; left: 16%; right: 16%; height: 10px; background: radial-gradient(ellipse,#44802c 0%,transparent 70%); opacity: .7; }
+  .hole-key { position: absolute; z-index: 8; top: 8px; left: 8px; min-width: 31px; height: 31px; display: flex; align-items: center; justify-content: center; padding: 0 7px; border-radius: 8px; background: rgba(9,5,16,.86); border: 2px solid #b4ff61; color: #b4ff61; font-weight: 900; font-size: 1rem; text-shadow: 0 0 8px rgba(180,255,97,.6); box-shadow: 0 2px 8px rgba(0,0,0,.5); pointer-events: none; }
+  .score-float { position: absolute; z-index: 20; font-size: 1.6rem; font-weight: 900; color: #a4ff4f; text-shadow: 0 0 10px #000, 0 0 16px #3bff00; pointer-events: none; animation: floatUp .75s ease-out forwards; transform: translate(-50%,-50%); }
+  @keyframes floatUp { 0% { opacity: 0; transform: translate(-50%,0) scale(.6); } 25% { opacity: 1; transform: translate(-50%,-20px) scale(1.2); } 100% { opacity: 0; transform: translate(-50%,-55px) scale(.9); } }
+  .grave-particle { position: absolute; pointer-events: none; z-index: 20; width: 9px; height: 9px; border-radius: 50%; background: #a4ff4f; box-shadow: 0 0 8px #a4ff4f, 0 0 12px #fff; animation: particleFly .55s ease-out forwards; }
+  @keyframes particleFly { 0% { transform: translate(0,0) scale(1); opacity: 1; } 100% { transform: translate(var(--dx),var(--dy)) scale(0); opacity: 0; } }
+  #overlay, #landing { position: fixed; inset: 0; z-index: 100; padding: 18px; display: flex; align-items: center; justify-content: center; }
+  #overlay { background: rgba(5,3,10,.85); }
+  #landing { z-index: 200; background: radial-gradient(ellipse at top,#2b153f 0%,#0c0816 85%); overflow-y: auto; }
   .hidden { display: none !important; }
-
-  .popup {
-    background: linear-gradient(#251636, #120b1c);
-    border: 3px solid #6c3da8; border-radius: 20px;
-    padding: 24px 28px; text-align: center; max-width: 95vw;
-    box-shadow: 0 0 50px rgba(140,50,255,0.35), 0 0 20px rgba(70,255,40,0.2);
-    animation: pop 0.3s ease-out;
-  }
-  @keyframes pop { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .popup { background: linear-gradient(#251636,#120b1c); border: 3px solid #6c3da8; border-radius: 20px; padding: 24px 28px; text-align: center; max-width: 95vw; box-shadow: 0 0 50px rgba(140,50,255,.35), 0 0 20px rgba(70,255,40,.2); animation: pop .3s ease-out; }
+  @keyframes pop { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   .popup h2 { font-size: 2.3rem; color: #b4ff61; margin-bottom: 8px; text-shadow: 0 0 14px #49e810; }
-
-  /* Candy reward display */
   #candyReward { margin: 8px 0 12px; }
-  #candyReward .big {
-    font-size: 6.8rem; font-weight: 900; line-height: 1; color: #ffd23b;
-    text-shadow: 0 0 25px #ff9d00, 0 6px 0 #7e4600;
-    animation: bigPop .55s cubic-bezier(0.2, 1.6, 0.4, 1);
-  }
+  #candyReward .big { font-size: 6.8rem; font-weight: 900; line-height: 1; color: #ffd23b; text-shadow: 0 0 25px #ff9d00, 0 6px 0 #7e4600; animation: bigPop .55s cubic-bezier(.2,1.6,.4,1); }
   #candyReward .label { font-size: 1.5rem; color: #ffe9a8; font-weight: bold; margin-top: 4px; }
   @keyframes bigPop { from { transform: scale(0); } to { transform: scale(1); } }
-
-  /* Guide Cards (1-Page) */
   .guide { width: 920px; }
-  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 12px 0 16px; }
-  @media (max-width: 820px) { .steps { grid-template-columns: repeat(2, 1fr); } }
-  .step {
-    background: rgba(0,0,0,0.45); border: 2px solid #53337a; border-radius: 14px;
-    padding: 12px 10px; display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-  }
+  .steps { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin: 12px 0 16px; }
+  @media (max-width: 820px) { .steps { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 768px) { .grid { grid-template-columns: repeat(2,1fr); gap: 14px 10px; } .grave-plot { min-height: 155px; } h1 { font-size: 1.65rem; letter-spacing: 1px; } .cemetery-field { padding: 14px 10px; } .hud { gap: 10px; padding: 8px 12px; font-size: 1rem; } }
+  .step { background: rgba(0,0,0,.45); border: 2px solid #53337a; border-radius: 14px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
   .step h3 { font-size: 1.15rem; color: #fff; margin-top: 8px; letter-spacing: 1px; }
-  .visual {
-    display: flex; align-items: center; justify-content: center; height: 130px; position: relative; width: 100%;
-  }
+  .visual { display: flex; align-items: center; justify-content: center; height: 130px; position: relative; width: 100%; }
   .result-box { width: 95px; padding: 8px 4px; border-radius: 12px; font-size: 1.4rem; border: 3px solid; }
   .result-box .num { font-size: 1.8rem; font-weight: 900; line-height: 1.1; }
-  .result-box.good { border-color: #3cff00; color: #ffd23b; box-shadow: 0 0 14px rgba(60,255,0,0.4); }
-
-  button {
-    font-size: 1.3rem; padding: 12px 34px; border-radius: 10px; border: none; cursor: pointer;
-    background: #6a34a8; color: #fff; font-weight: bold; letter-spacing: 1px;
-    box-shadow: 0 5px 0 #3a1863; margin-top: 6px;
-    transition: transform 0.08s, box-shadow 0.08s;
-  }
+  .result-box.good { border-color: #3cff00; color: #ffd23b; box-shadow: 0 0 14px rgba(60,255,0,.4); }
+  button { font-size: 1.3rem; padding: 12px 34px; border-radius: 10px; border: none; cursor: pointer; background: #6a34a8; color: #fff; font-weight: bold; letter-spacing: 1px; box-shadow: 0 5px 0 #3a1863; margin-top: 6px; transition: transform .08s, box-shadow .08s; }
   button:hover { background: #7b40bf; }
   button:active { transform: translateY(3px); box-shadow: 0 2px 0 #3a1863; }
-
-  /* Audio control toggle */
-  .audio-btn {
-    background: transparent; border: 1px solid #5a3880; box-shadow: none;
-    font-size: 1rem; padding: 4px 10px; margin: 0; color: #b4ff61; border-radius: 8px;
-  }
-  .audio-btn:hover { background: rgba(255,255,255,0.08); }
+  .audio-btn { background: transparent; border: 1px solid #5a3880; box-shadow: none; font-size: 1rem; padding: 4px 10px; margin: 0; color: #b4ff61; border-radius: 8px; }
+  .audio-btn:hover { background: rgba(255,255,255,.08); }
+  .keypad-hint { position: relative; z-index: 1; color: #c8b2e5; font-size: .95rem; margin: 10px 0 0; text-align: center; }
+  @media (max-width: 480px) { .popup { padding: 18px 14px; } .popup h2 { font-size: 1.65rem; } .steps { gap: 8px; } .step h3 { font-size: .9rem; } .visual { height: 100px; } .timer-number { font-size: 1.4rem; min-width: 48px; } }
 </style>
 </head>
 <body class="custom-cursor">
-
-  <!-- Background graveyard atmosphere -->
   <div class="cemetery-sky">
     <div class="moon"></div>
-    <div class="bat" style="top: 18%; animation-delay: 0s;">🦇</div>
-    <div class="bat" style="top: 36%; animation-delay: 6s;">🦇</div>
-    <div class="bat" style="top: 10%; animation-delay: 11s;">🦇</div>
+    <div class="bat" style="top:18%;animation-delay:0s;">🦇</div>
+    <div class="bat" style="top:36%;animation-delay:6s;">🦇</div>
+    <div class="bat" style="top:10%;animation-delay:11s;">🦇</div>
   </div>
 
-  <!-- Custom Grave Shovel Cursor -->
-  <svg id="mallet" viewBox="0 0 100 100">
-    <!-- Shaft -->
+  <svg id="mallet" viewBox="0 0 100 100" aria-hidden="true">
     <rect x="45" y="28" width="10" height="64" rx="4" fill="#6d4c28" stroke="#36210f" stroke-width="2.5"/>
-    <!-- Handle grip (D-grip) -->
-    <path d="M 40 86 L 60 86 L 60 96 L 40 96 Z" fill="#4d3215" stroke="#36210f" stroke-width="2"/>
+    <path d="M40 86 L60 86 L60 96 L40 96 Z" fill="#4d3215" stroke="#36210f" stroke-width="2"/>
     <rect x="46" y="88" width="8" height="6" rx="2" fill="#885b2e"/>
-    <!-- Metal Shovel Blade -->
-    <path d="M 28 8 L 72 8 L 68 36 Q 50 48 32 36 Z" fill="#9da4b0" stroke="#393e46" stroke-width="3"/>
-    <path d="M 33 12 L 67 12 L 64 33 Q 50 43 36 33 Z" fill="#bac2cf"/>
-    <!-- Highlight shine -->
-    <line x1="38" y1="14" x2="42" y2="34" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+    <path d="M28 8 L72 8 L68 36 Q50 48 32 36 Z" fill="#9da4b0" stroke="#393e46" stroke-width="3"/>
+    <path d="M33 12 L67 12 L64 33 Q50 43 36 33 Z" fill="#bac2cf"/>
+    <line x1="38" y1="14" x2="42" y2="34" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".6"/>
   </svg>
 
-  <header>
-    <h1>🪦 GRAVEYARD WHACK 🪦</h1>
-  </header>
+  <header><h1>🪦 GRAVEYARD WHACK 🪦</h1></header>
 
   <div class="hud">
     <div class="hud-item">⭐ Score: <b id="scoreVal">0</b></div>
@@ -389,419 +127,156 @@
     <button id="soundToggle" class="audio-btn">🔊 Sound: ON</button>
   </div>
 
-  <!-- Hideable Config Drawer (Points to Rewards) -->
   <div id="configDrawer">
-    <h3>
-      <span>⚙️ Points & Candy Settings</span>
-      <button id="closeConfigBtn" class="close-cfg-btn" title="Hide Settings">✕</button>
-    </h3>
-    
+    <h3><span>⚙️ Points & Candy Settings</span><button id="closeConfigBtn" class="close-cfg-btn" title="Hide Settings">✕</button></h3>
     <div class="cfg-group">
-      <label>🥇 Gold Tier (High Score) 🍬</label>
-      <div class="cfg-sub">Points needed & candy reward range</div>
-      <div class="cfg-input-row">
-        <input type="number" id="cfgTier3Pts" class="cfg-input" min="50" max="99900" step="50" value="2000" title="Gold Points">
-        <span style="color:#b4ff61; font-size:0.85rem; white-space:nowrap;">pts ➜</span>
-        <input type="number" id="cfgTier3Min" class="cfg-input" min="1" max="999" value="8" title="Min Candy">
-        <span style="color:#ffd23b;">–</span>
-        <input type="number" id="cfgTier3Max" class="cfg-input" min="1" max="999" value="10" title="Max Candy">
-      </div>
+      <label>🥇 Gold Tier (High Score) 🍬</label><div class="cfg-sub">Points needed & candy reward range</div>
+      <div class="cfg-input-row"><input type="number" id="cfgTier3Pts" class="cfg-input" min="50" max="99900" step="50" value="2000" title="Gold Points"><span style="color:#b4ff61;font-size:.85rem;white-space:nowrap;">pts ➜</span><input type="number" id="cfgTier3Min" class="cfg-input" min="1" max="999" value="8" title="Min Candy"><span style="color:#ffd23b;">–</span><input type="number" id="cfgTier3Max" class="cfg-input" min="1" max="999" value="10" title="Max Candy"></div>
     </div>
-
     <div class="cfg-group">
-      <label>🥈 Silver Tier (Medium Score) 🍬</label>
-      <div class="cfg-sub">Points needed & candy reward range</div>
-      <div class="cfg-input-row">
-        <input type="number" id="cfgTier2Pts" class="cfg-input" min="50" max="99900" step="50" value="1200" title="Silver Points">
-        <span style="color:#b4ff61; font-size:0.85rem; white-space:nowrap;">pts ➜</span>
-        <input type="number" id="cfgTier2Min" class="cfg-input" min="1" max="999" value="5" title="Min Candy">
-        <span style="color:#ffd23b;">–</span>
-        <input type="number" id="cfgTier2Max" class="cfg-input" min="1" max="999" value="7" title="Max Candy">
-      </div>
+      <label>🥈 Silver Tier (Medium Score) 🍬</label><div class="cfg-sub">Points needed & candy reward range</div>
+      <div class="cfg-input-row"><input type="number" id="cfgTier2Pts" class="cfg-input" min="50" max="99900" step="50" value="1200" title="Silver Points"><span style="color:#b4ff61;font-size:.85rem;white-space:nowrap;">pts ➜</span><input type="number" id="cfgTier2Min" class="cfg-input" min="1" max="999" value="5" title="Min Candy"><span style="color:#ffd23b;">–</span><input type="number" id="cfgTier2Max" class="cfg-input" min="1" max="999" value="7" title="Max Candy"></div>
     </div>
-
     <div class="cfg-group">
-      <label>🥉 Bronze Tier (Base Score) 🍬</label>
-      <div class="cfg-sub">Points needed & candy reward range</div>
-      <div class="cfg-input-row">
-        <input type="number" id="cfgTier1Pts" class="cfg-input" min="50" max="99900" step="50" value="500" title="Bronze Points">
-        <span style="color:#b4ff61; font-size:0.85rem; white-space:nowrap;">pts ➜</span>
-        <input type="number" id="cfgTier1Min" class="cfg-input" min="1" max="999" value="2" title="Min Candy">
-        <span style="color:#ffd23b;">–</span>
-        <input type="number" id="cfgTier1Max" class="cfg-input" min="1" max="999" value="4" title="Max Candy">
-      </div>
+      <label>🥉 Bronze Tier (Base Score) 🍬</label><div class="cfg-sub">Points needed & candy reward range</div>
+      <div class="cfg-input-row"><input type="number" id="cfgTier1Pts" class="cfg-input" min="50" max="99900" step="50" value="500" title="Bronze Points"><span style="color:#b4ff61;font-size:.85rem;white-space:nowrap;">pts ➜</span><input type="number" id="cfgTier1Min" class="cfg-input" min="1" max="999" value="2" title="Min Candy"><span style="color:#ffd23b;">–</span><input type="number" id="cfgTier1Max" class="cfg-input" min="1" max="999" value="4" title="Max Candy"></div>
     </div>
-
     <div class="cfg-group">
-      <label>⚰️ Below Bronze Score 🍬</label>
-      <div class="cfg-sub">Consolation prize if score is below Bronze tier</div>
-      <div class="cfg-input-row">
-        <input type="number" id="cfgConsolation" class="cfg-input" min="0" max="999" value="1" title="Consolation Candy">
-        <span style="color:#d6beff; font-size:0.9rem;">candy</span>
-      </div>
+      <label>⚰️ Below Bronze Score 🍬</label><div class="cfg-sub">Consolation prize if score is below Bronze tier</div>
+      <div class="cfg-input-row"><input type="number" id="cfgConsolation" class="cfg-input" min="0" max="999" value="1" title="Consolation Candy"><span style="color:#d6beff;font-size:.9rem;">candy</span></div>
     </div>
-
-    <div class="cfg-actions">
-      <button id="saveConfigBtn" class="cfg-save-btn">Save & Hide</button>
-      <button id="resetConfigBtn" class="cfg-reset-btn">Reset Defaults</button>
-    </div>
+    <div class="cfg-actions"><button id="saveConfigBtn" class="cfg-save-btn">Save & Hide</button><button id="resetConfigBtn" class="cfg-reset-btn">Reset Defaults</button></div>
   </div>
 
-  <!-- Numbered Timer beside the Bar Timer -->
-  <div class="timer-row">
-    <div class="timer-wrap">
-      <div id="timerBar"></div>
-    </div>
-    <div id="timerNumber" class="timer-number">30s</div>
-  </div>
+  <div class="timer-row"><div class="timer-wrap"><div id="timerBar"></div></div><div id="timerNumber" class="timer-number">30s</div></div>
+  <div class="cemetery-field" id="field"><div class="grid" id="grid"></div></div>
+  <p class="keypad-hint">⌨️ Numpad controls: 4 · 5 · 6 (top row) &nbsp; / &nbsp; 1 · 2 · 3 (bottom row)</p>
 
-  <div class="cemetery-field" id="field">
-    <div class="grid" id="grid">
-      <!-- 6 grave plots generated via JS -->
-    </div>
-  </div>
-
-  <!-- Landing Tutorial (One-Page Picture Guide) -->
   <div id="landing">
     <div class="popup guide">
       <h2>🪦 How to Play 🪦</h2>
       <div class="steps">
-        <div class="step">
-          <div class="visual">
-            <svg viewBox="0 0 80 80" width="85" height="85">
-              <!-- Mini tombstone -->
-              <path d="M 24 20 C 24 8 56 8 56 20 L 56 65 L 24 65 Z" fill="#4f485c" stroke="#6f6780" stroke-width="2"/>
-              <text x="40" y="32" font-size="9" font-weight="bold" fill="#8e85a0" text-anchor="middle">R.I.P.</text>
-              <!-- Grave dirt -->
-              <ellipse cx="40" cy="64" rx="34" ry="14" fill="#2d1c3d"/>
-              <text x="40" y="48" font-size="24" text-anchor="middle">👀</text>
-            </svg>
-          </div>
-          <h3>1 · WATCH GRAVES</h3>
-        </div>
-        <div class="step">
-          <div class="visual">
-            <svg viewBox="0 0 80 80" width="85" height="85">
-              <!-- Zombie popping -->
-              <ellipse cx="40" cy="50" rx="26" ry="24" fill="#58853b"/>
-              <circle cx="32" cy="42" r="4.5" fill="#ffd700"/>
-              <circle cx="48" cy="42" r="3" fill="#ff4d4d"/>
-              <!-- Stitches -->
-              <line x1="38" y1="28" x2="44" y2="38" stroke="#1f3b0e" stroke-width="2"/>
-              <!-- Shovel striking -->
-              <g transform="rotate(-35 40 20)">
-                <rect x="36" y="2" width="8" height="34" rx="2" fill="#6d4c28"/>
-                <path d="M 24 0 L 56 0 L 52 18 Q 40 24 28 18 Z" fill="#bac2cf" stroke="#393e46" stroke-width="2"/>
-              </g>
-            </svg>
-          </div>
-          <h3>2 · SMACK ZOMBIES</h3>
-        </div>
-        <div class="step">
-          <div class="visual">
-            <svg viewBox="0 0 80 80" width="85" height="85">
-              <!-- Golden Ghost Mole -->
-              <path d="M 22 55 C 18 25 62 25 58 55 Q 50 64 42 55 Q 32 64 22 55 Z" fill="#ffd747" stroke="#e09c07" stroke-width="2.5"/>
-              <!-- Sunglasses -->
-              <rect x="27" y="35" width="11" height="8" rx="2" fill="#1b120c"/>
-              <rect x="43" y="35" width="11" height="8" rx="2" fill="#1b120c"/>
-              <line x1="38" y1="38" x2="43" y2="38" stroke="#1b120c" stroke-width="2"/>
-              <!-- Ghostly glow -->
-              <circle cx="40" cy="40" r="32" fill="none" stroke="#fffb99" stroke-width="1.5" stroke-dasharray="3 3"/>
-              <text x="40" y="74" font-size="14" font-weight="900" fill="#ffd23b" text-anchor="middle">+300 pts</text>
-            </svg>
-          </div>
-          <h3>3 · GOLD GHOST 👻</h3>
-        </div>
-        <div class="step">
-          <div class="visual" style="flex-direction:column; gap:4px;">
-            <div style="font-size:1.15rem; color:#ffd23b; font-weight:bold;">POINTS ➜ CANDY</div>
-            <div id="guideTierBox" style="font-size:0.85rem; line-height:1.45; color:#d6c7f0; text-align:center;">
-              🥇 2000+ pts ➜ 8–10 🍬<br>
-              🥈 1200+ pts ➜ 5–7 🍬<br>
-              🥉 500+ pts ➜ 2–4 🍬
-            </div>
-          </div>
-          <h3>4 · WIN CANDY</h3>
-        </div>
+        <div class="step"><div class="visual">
+          <svg viewBox="0 0 80 80" width="85" height="85"><path d="M24 20 C24 8 56 8 56 20 L56 65 L24 65 Z" fill="#4f485c" stroke="#6f6780" stroke-width="2"/><text x="40" y="32" font-size="9" font-weight="bold" fill="#8e85a0" text-anchor="middle">R.I.P.</text><ellipse cx="40" cy="64" rx="34" ry="14" fill="#2d1c3d"/><text x="40" y="48" font-size="24" text-anchor="middle">👀</text></svg>
+        </div><h3>1 · WATCH GRAVES</h3></div>
+        <div class="step"><div class="visual">
+          <svg viewBox="0 0 80 80" width="85" height="85"><ellipse cx="40" cy="50" rx="26" ry="24" fill="#58853b"/><circle cx="32" cy="42" r="4.5" fill="#ffd700"/><circle cx="48" cy="42" r="3" fill="#ff4d4d"/><line x1="38" y1="28" x2="44" y2="38" stroke="#1f3b0e" stroke-width="2"/><g transform="rotate(-35 40 20)"><rect x="36" y="2" width="8" height="34" rx="2" fill="#6d4c28"/><path d="M24 0 L56 0 L52 18 Q40 24 28 18 Z" fill="#bac2cf" stroke="#393e46" stroke-width="2"/></g></svg>
+        </div><h3>2 · SMACK ZOMBIES</h3></div>
+        <div class="step"><div class="visual">
+          <svg viewBox="0 0 80 80" width="85" height="85"><path d="M22 55 C18 25 62 25 58 55 Q50 64 42 55 Q32 64 22 55 Z" fill="#ffd747" stroke="#e09c07" stroke-width="2.5"/><rect x="27" y="35" width="11" height="8" rx="2" fill="#1b120c"/><rect x="43" y="35" width="11" height="8" rx="2" fill="#1b120c"/><line x1="38" y1="38" x2="43" y2="38" stroke="#1b120c" stroke-width="2"/><circle cx="40" cy="40" r="32" fill="none" stroke="#fffb99" stroke-width="1.5" stroke-dasharray="3 3"/><text x="40" y="74" font-size="14" font-weight="900" fill="#ffd23b" text-anchor="middle">+300 pts</text></svg>
+        </div><h3>3 · GOLD GHOST 👻</h3></div>
+        <div class="step"><div class="visual" style="flex-direction:column;gap:4px;"><div style="font-size:1.15rem;color:#ffd23b;font-weight:bold;">POINTS ➜ CANDY</div><div id="guideTierBox" style="font-size:.85rem;line-height:1.45;color:#d6c7f0;text-align:center;">🥇 2000+ pts ➜ 8–10 🍬<br>🥈 1200+ pts ➜ 5–7 🍬<br>🥉 500+ pts ➜ 2–4 🍬</div></div><h3>4 · WIN CANDY</h3></div>
       </div>
+      <p style="color:#d6beff;margin-bottom:10px;">Use the Numpad keys shown on the graves, or click/tap a zombie.</p>
       <button id="startGuideBtn">START GAME</button>
     </div>
   </div>
 
-  <!-- End Game Popup -->
-  <div id="overlay" class="hidden">
-    <div class="popup">
-      <h2 id="ovTitle">⚰️ GRAVEYARD CLEARED! ⚰️</h2>
-      <div id="candyReward"></div>
-      <p id="ovSummary" style="font-size: 1.2rem; margin-bottom: 12px;"></p>
-      <button id="playAgainBtn">START GAME</button>
-    </div>
-  </div>
+  <div id="overlay" class="hidden"><div class="popup"><h2 id="ovTitle">⚰️ GRAVEYARD CLEARED! ⚰️</h2><div id="candyReward"></div><p id="ovSummary" style="font-size:1.2rem;margin-bottom:12px;"></p><button id="playAgainBtn">START GAME</button></div></div>
 
 <script>
-  // ---------- Spooky Sound Synthesizer (Web Audio API) ----------
+  // ---------- Spooky Sound Synthesizer ----------
   let audioCtx = null;
   let soundEnabled = true;
-
   function initAudio() {
     if (!audioCtx) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (AudioContext) audioCtx = new AudioContext();
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) audioCtx = new AudioContextClass();
     }
-    if (audioCtx && audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
   }
-
   function playTone(freq, duration, type = 'sine', decay = true) {
     if (!soundEnabled || !audioCtx) return;
     try {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-      if (decay) {
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-      }
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + duration);
+      const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+      osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(.25, audioCtx.currentTime);
+      if (decay) gain.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + duration);
+      osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
     } catch(e) {}
   }
-
-  // Spooky grave rise sound (eerie slide up)
   function sfxPop() {
     if (!soundEnabled || !audioCtx) return;
     try {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(110, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(260, audioCtx.currentTime + 0.14);
-      gain.gain.setValueAtTime(0.14, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.14);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.14);
+      const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+      osc.type = 'sawtooth'; osc.frequency.setValueAtTime(110, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(260, audioCtx.currentTime + .14);
+      gain.gain.setValueAtTime(.14, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(.01, audioCtx.currentTime + .14);
+      osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + .14);
     } catch(e) {}
   }
-
-  // Heavy shovel thud / bone smack
   function sfxWhack() {
     if (!soundEnabled || !audioCtx) return;
     try {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(160, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(45, audioCtx.currentTime + 0.15);
-      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.15);
-
-      // Clanging metallic metallic punch
-      const osc2 = audioCtx.createOscillator();
-      const gain2 = audioCtx.createGain();
-      osc2.type = 'triangle';
-      osc2.frequency.setValueAtTime(420, audioCtx.currentTime);
-      osc2.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.08);
-      gain2.gain.setValueAtTime(0.25, audioCtx.currentTime);
-      gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
-      osc2.connect(gain2);
-      gain2.connect(audioCtx.destination);
-      osc2.start();
-      osc2.stop(audioCtx.currentTime + 0.08);
+      const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+      osc.type = 'square'; osc.frequency.setValueAtTime(160, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(45, audioCtx.currentTime + .15);
+      gain.gain.setValueAtTime(.3, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + .15);
+      osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + .15);
+      const osc2 = audioCtx.createOscillator(), gain2 = audioCtx.createGain();
+      osc2.type = 'triangle'; osc2.frequency.setValueAtTime(420, audioCtx.currentTime); osc2.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + .08);
+      gain2.gain.setValueAtTime(.25, audioCtx.currentTime); gain2.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + .08);
+      osc2.connect(gain2); gain2.connect(audioCtx.destination); osc2.start(); osc2.stop(audioCtx.currentTime + .08);
     } catch(e) {}
   }
+  function sfxGold() { if (!soundEnabled || !audioCtx) return; [440,587,740,880,1174].forEach((f,i) => setTimeout(() => playTone(f,.18,'sine'),i*45)); }
+  function sfxWin() { if (!soundEnabled || !audioCtx) return; [261,329,392,523,659].forEach((f,i) => setTimeout(() => playTone(f,.28,'triangle'),i*85)); }
 
-  // Eerie ghost chime
-  function sfxGold() {
-    if (!soundEnabled || !audioCtx) return;
-    [440, 587, 740, 880, 1174].forEach((f, idx) => {
-      setTimeout(() => playTone(f, 0.18, 'sine'), idx * 45);
-    });
-  }
-
-  // Spooky victory graveyard fanfare
-  function sfxWin() {
-    if (!soundEnabled || !audioCtx) return;
-    [261, 329, 392, 523, 659].forEach((f, idx) => {
-      setTimeout(() => playTone(f, 0.28, 'triangle'), idx * 85);
-    });
-  }
-
-  // Toggle sound
   const soundToggle = document.getElementById('soundToggle');
-  soundToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    initAudio();
-    soundEnabled = !soundEnabled;
-    soundToggle.textContent = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
-  });
+  soundToggle.addEventListener('click', e => { e.stopPropagation(); initAudio(); soundEnabled = !soundEnabled; soundToggle.textContent = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF'; });
 
-  // ---------- Custom Shovel Mallet Cursor ----------
+  // ---------- Custom Shovel Cursor ----------
   const mallet = document.getElementById('mallet');
   let hasPointer = false;
-
-  window.addEventListener('mousemove', (e) => {
-    if (!hasPointer) {
-      hasPointer = true;
-      mallet.style.display = 'block';
-    }
-    mallet.style.left = e.clientX + 'px';
-    mallet.style.top = e.clientY + 'px';
+  window.addEventListener('mousemove', e => {
+    if (!hasPointer) { hasPointer = true; mallet.style.display = 'block'; }
+    mallet.style.left = e.clientX + 'px'; mallet.style.top = e.clientY + 'px';
   });
+  function triggerWhackAnim() { mallet.classList.add('whack'); setTimeout(() => mallet.classList.remove('whack'),100); }
+  window.addEventListener('mousedown', () => { initAudio(); triggerWhackAnim(); });
+  window.addEventListener('touchstart', initAudio, {passive:true});
 
-  function triggerWhackAnim() {
-    mallet.classList.add('whack');
-    setTimeout(() => mallet.classList.remove('whack'), 100);
-  }
-
-  window.addEventListener('mousedown', (e) => {
-    initAudio();
-    triggerWhackAnim();
-  });
-
-  window.addEventListener('touchstart', (e) => {
-    initAudio();
-  }, { passive: true });
-
-  // ---------- SVG Undead Zombie Mole Graphics ----------
+  // ---------- Zombie Mole Graphics ----------
   function getZombieMoleSVG() {
-    return `
-      <svg viewBox="0 0 100 110" width="100%" height="100%">
-        <!-- Tattered Grave Shroud -->
-        <path d="M 12 90 Q 50 78 88 90 L 84 105 L 16 105 Z" fill="#39244d" stroke="#221430" stroke-width="2"/>
-        <!-- Undead Body -->
-        <ellipse cx="50" cy="78" rx="38" ry="30" fill="#4d7532" stroke="#2a4519" stroke-width="3"/>
-        <ellipse cx="50" cy="80" rx="24" ry="18" fill="#699946"/>
-        <!-- Undead Head -->
-        <ellipse cx="50" cy="50" rx="34" ry="28" fill="#5c8a3c" stroke="#2a4519" stroke-width="3"/>
-        <!-- Zombie Head Scar & Stitches -->
-        <line x1="32" y1="28" x2="42" y2="38" stroke="#1f3b0e" stroke-width="2.5"/>
-        <line x1="33" y1="35" x2="39" y2="31" stroke="#1f3b0e" stroke-width="2"/>
-        <line x1="37" y1="38" x2="43" y2="34" stroke="#1f3b0e" stroke-width="2"/>
-        <!-- Rotting Snout -->
-        <ellipse cx="50" cy="58" rx="19" ry="13" fill="#7ba856"/>
-        <ellipse cx="50" cy="52" rx="7" ry="5" fill="#3a1c22" stroke="#1a0b0e" stroke-width="1.5"/>
-        <!-- Zombie Crooked Teeth -->
-        <rect x="44" y="62" width="5" height="7" rx="1" fill="#fff" stroke="#1a0b0e" stroke-width="1"/>
-        <rect x="52" y="62" width="5" height="5" rx="1" fill="#ddd599" stroke="#1a0b0e" stroke-width="1"/>
-        <!-- Mismatched Undead Eyes -->
-        <!-- Left eye: glowing amber -->
-        <circle cx="36" cy="42" r="6" fill="#ffd700" stroke="#1a2e0c" stroke-width="2"/>
-        <circle cx="37" cy="41" r="2.5" fill="#1b120c"/>
-        <circle cx="38" cy="40" r="1" fill="#fff"/>
-        <!-- Right eye: bloodshot small pupil -->
-        <circle cx="64" cy="43" r="5" fill="#e8d7d7" stroke="#1a2e0c" stroke-width="2"/>
-        <circle cx="64" cy="43" r="1.8" fill="#aa1111"/>
-        <!-- Paws with claws -->
-        <ellipse cx="26" cy="84" rx="8" ry="6" fill="#7ba856" stroke="#2a4519" stroke-width="2"/>
-        <ellipse cx="74" cy="84" rx="8" ry="6" fill="#7ba856" stroke="#2a4519" stroke-width="2"/>
-      </svg>
-    `;
+    return `<svg viewBox="0 0 100 110" width="100%" height="100%">
+      <path d="M12 90 Q50 78 88 90 L84 105 L16 105 Z" fill="#39244d" stroke="#221430" stroke-width="2"/>
+      <ellipse cx="50" cy="78" rx="38" ry="30" fill="#4d7532" stroke="#2a4519" stroke-width="3"/><ellipse cx="50" cy="80" rx="24" ry="18" fill="#699946"/>
+      <ellipse cx="50" cy="50" rx="34" ry="28" fill="#5c8a3c" stroke="#2a4519" stroke-width="3"/>
+      <line x1="32" y1="28" x2="42" y2="38" stroke="#1f3b0e" stroke-width="2.5"/><line x1="33" y1="35" x2="39" y2="31" stroke="#1f3b0e" stroke-width="2"/><line x1="37" y1="38" x2="43" y2="34" stroke="#1f3b0e" stroke-width="2"/>
+      <ellipse cx="50" cy="58" rx="19" ry="13" fill="#7ba856"/><ellipse cx="50" cy="52" rx="7" ry="5" fill="#3a1c22" stroke="#1a0b0e" stroke-width="1.5"/>
+      <rect x="44" y="62" width="5" height="7" rx="1" fill="#fff" stroke="#1a0b0e" stroke-width="1"/><rect x="52" y="62" width="5" height="5" rx="1" fill="#ddd599" stroke="#1a0b0e" stroke-width="1"/>
+      <circle cx="36" cy="42" r="6" fill="#ffd700" stroke="#1a2e0c" stroke-width="2"/><circle cx="37" cy="41" r="2.5" fill="#1b120c"/><circle cx="38" cy="40" r="1" fill="#fff"/>
+      <circle cx="64" cy="43" r="5" fill="#e8d7d7" stroke="#1a2e0c" stroke-width="2"/><circle cx="64" cy="43" r="1.8" fill="#aa1111"/>
+      <ellipse cx="26" cy="84" rx="8" ry="6" fill="#7ba856" stroke="#2a4519" stroke-width="2"/><ellipse cx="74" cy="84" rx="8" ry="6" fill="#7ba856" stroke="#2a4519" stroke-width="2"/>
+    </svg>`;
   }
-
   function getHitZombieSVG() {
-    return `
-      <svg viewBox="0 0 100 110" width="100%" height="100%">
-        <!-- Body -->
-        <ellipse cx="50" cy="78" rx="38" ry="30" fill="#4d7532" stroke="#2a4519" stroke-width="3"/>
-        <!-- Head -->
-        <ellipse cx="50" cy="52" rx="34" ry="26" fill="#5c8a3c" stroke="#2a4519" stroke-width="3"/>
-        <!-- Comical Bone / Skull Bump -->
-        <circle cx="34" cy="27" r="10" fill="#9f40ff" stroke="#2a4519" stroke-width="2"/>
-        <rect x="29" y="25" width="10" height="4" rx="1" fill="#fff" transform="rotate(25 34 27)"/>
-        <!-- Snout -->
-        <ellipse cx="50" cy="60" rx="19" ry="13" fill="#7ba856"/>
-        <ellipse cx="50" cy="55" rx="7" ry="5" fill="#3a1c22" stroke="#1a0b0e" stroke-width="1.5"/>
-        <!-- Dazed Wobbly mouth -->
-        <path d="M 43 65 Q 50 70 57 65" fill="none" stroke="#1a0b0e" stroke-width="2.5"/>
-        <ellipse cx="54" cy="69" rx="3.5" ry="4" fill="#a82828"/>
-        <!-- Spinning X Eyes -->
-        <g stroke="#1a0b0e" stroke-width="2.8" stroke-linecap="round">
-          <line x1="32" y1="39" x2="40" y2="47"/><line x1="40" y1="39" x2="32" y2="47"/>
-          <line x1="60" y1="39" x2="68" y2="47"/><line x1="68" y1="39" x2="60" y2="47"/>
-        </g>
-        <!-- Flying Bones / Spirits -->
-        <text x="18" y="24" font-size="16">🦴</text>
-        <text x="66" y="22" font-size="16">⭐</text>
-      </svg>
-    `;
+    return `<svg viewBox="0 0 100 110" width="100%" height="100%">
+      <ellipse cx="50" cy="78" rx="38" ry="30" fill="#4d7532" stroke="#2a4519" stroke-width="3"/><ellipse cx="50" cy="52" rx="34" ry="26" fill="#5c8a3c" stroke="#2a4519" stroke-width="3"/>
+      <circle cx="34" cy="27" r="10" fill="#9f40ff" stroke="#2a4519" stroke-width="2"/><rect x="29" y="25" width="10" height="4" rx="1" fill="#fff" transform="rotate(25 34 27)"/>
+      <ellipse cx="50" cy="60" rx="19" ry="13" fill="#7ba856"/><ellipse cx="50" cy="55" rx="7" ry="5" fill="#3a1c22" stroke="#1a0b0e" stroke-width="1.5"/><path d="M43 65 Q50 70 57 65" fill="none" stroke="#1a0b0e" stroke-width="2.5"/><ellipse cx="54" cy="69" rx="3.5" ry="4" fill="#a82828"/>
+      <g stroke="#1a0b0e" stroke-width="2.8" stroke-linecap="round"><line x1="32" y1="39" x2="40" y2="47"/><line x1="40" y1="39" x2="32" y2="47"/><line x1="60" y1="39" x2="68" y2="47"/><line x1="68" y1="39" x2="60" y2="47"/></g><text x="18" y="24" font-size="16">🦴</text><text x="66" y="22" font-size="16">⭐</text>
+    </svg>`;
   }
-
   function getGoldenGhostSVG() {
-    return `
-      <svg viewBox="0 0 100 110" width="100%" height="100%">
-        <!-- Ectoplasmic Ghost Aura -->
-        <circle cx="50" cy="50" r="42" fill="none" stroke="#fff975" stroke-width="2" stroke-dasharray="4 4" opacity="0.8"/>
-        <!-- Golden Ghost Body -->
-        <path d="M 20 86 Q 16 30 50 20 Q 84 30 80 86 Q 70 76 60 86 Q 50 76 40 86 Q 30 76 20 86 Z"
-              fill="url(#goldGrad)" stroke="#b57e07" stroke-width="3"/>
-        <defs>
-          <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#fff580"/>
-            <stop offset="60%" stop-color="#e5aa1c"/>
-            <stop offset="100%" stop-color="#ab7508"/>
-          </linearGradient>
-        </defs>
-        <!-- Cool Tombstone Sunglasses -->
-        <rect x="26" y="40" width="20" height="13" rx="3" fill="#150d1f" stroke="#fff" stroke-width="1.5"/>
-        <rect x="54" y="40" width="20" height="13" rx="3" fill="#150d1f" stroke="#fff" stroke-width="1.5"/>
-        <line x1="46" y1="44" x2="54" y2="44" stroke="#fff" stroke-width="2"/>
-        <!-- Snout -->
-        <ellipse cx="50" cy="60" rx="14" ry="9" fill="#ffe994"/>
-        <ellipse cx="50" cy="56" rx="5" ry="4" fill="#6d3f00"/>
-        <!-- Golden Sparkles -->
-        <circle cx="16" cy="30" r="3" fill="#fff"/>
-        <circle cx="84" cy="32" r="3" fill="#fff"/>
-      </svg>
-    `;
+    return `<svg viewBox="0 0 100 110" width="100%" height="100%">
+      <circle cx="50" cy="50" r="42" fill="none" stroke="#fff975" stroke-width="2" stroke-dasharray="4 4" opacity=".8"/>
+      <defs><linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff580"/><stop offset="60%" stop-color="#e5aa1c"/><stop offset="100%" stop-color="#ab7508"/></linearGradient></defs>
+      <path d="M20 86 Q16 30 50 20 Q84 30 80 86 Q70 76 60 86 Q50 76 40 86 Q30 76 20 86 Z" fill="url(#goldGrad)" stroke="#b57e07" stroke-width="3"/>
+      <rect x="26" y="40" width="20" height="13" rx="3" fill="#150d1f" stroke="#fff" stroke-width="1.5"/><rect x="54" y="40" width="20" height="13" rx="3" fill="#150d1f" stroke="#fff" stroke-width="1.5"/><line x1="46" y1="44" x2="54" y2="44" stroke="#fff" stroke-width="2"/>
+      <ellipse cx="50" cy="60" rx="14" ry="9" fill="#ffe994"/><ellipse cx="50" cy="56" rx="5" ry="4" fill="#6d3f00"/><circle cx="16" cy="30" r="3" fill="#fff"/><circle cx="84" cy="32" r="3" fill="#fff"/>
+    </svg>`;
   }
 
-  // ---------- Reward Configuration (Points to Candy) ----------
-  const DEFAULT_CONFIG = {
-    tier3Pts: 2000,
-    tier3Min: 8,
-    tier3Max: 10,
-
-    tier2Pts: 1200,
-    tier2Min: 5,
-    tier2Max: 7,
-
-    tier1Pts: 500,
-    tier1Min: 2,
-    tier1Max: 4,
-
-    consolation: 1
-  };
-  let config = { ...DEFAULT_CONFIG };
-
+  // ---------- Reward Configuration ----------
+  const DEFAULT_CONFIG = { tier3Pts:2000, tier3Min:8, tier3Max:10, tier2Pts:1200, tier2Min:5, tier2Max:7, tier1Pts:500, tier1Min:2, tier1Max:4, consolation:1 };
+  let config = {...DEFAULT_CONFIG};
   const configDrawer = document.getElementById('configDrawer');
   const openConfigBtn = document.getElementById('openConfigBtn');
   const closeConfigBtn = document.getElementById('closeConfigBtn');
   const saveConfigBtn = document.getElementById('saveConfigBtn');
   const resetConfigBtn = document.getElementById('resetConfigBtn');
-
-  const cfgTier3Pts = document.getElementById('cfgTier3Pts');
-  const cfgTier3Min = document.getElementById('cfgTier3Min');
-  const cfgTier3Max = document.getElementById('cfgTier3Max');
-
-  const cfgTier2Pts = document.getElementById('cfgTier2Pts');
-  const cfgTier2Min = document.getElementById('cfgTier2Min');
-  const cfgTier2Max = document.getElementById('cfgTier2Max');
-
-  const cfgTier1Pts = document.getElementById('cfgTier1Pts');
-  const cfgTier1Min = document.getElementById('cfgTier1Min');
-  const cfgTier1Max = document.getElementById('cfgTier1Max');
-
+  const cfgTier3Pts = document.getElementById('cfgTier3Pts'), cfgTier3Min = document.getElementById('cfgTier3Min'), cfgTier3Max = document.getElementById('cfgTier3Max');
+  const cfgTier2Pts = document.getElementById('cfgTier2Pts'), cfgTier2Min = document.getElementById('cfgTier2Min'), cfgTier2Max = document.getElementById('cfgTier2Max');
+  const cfgTier1Pts = document.getElementById('cfgTier1Pts'), cfgTier1Min = document.getElementById('cfgTier1Min'), cfgTier1Max = document.getElementById('cfgTier1Max');
   const cfgConsolation = document.getElementById('cfgConsolation');
 
   function loadConfig() {
@@ -809,374 +284,147 @@
       const saved = localStorage.getItem('wackAMoleConfig');
       if (saved) {
         const p = JSON.parse(saved);
-        if (Number.isFinite(p.tier3Pts)) config.tier3Pts = Math.max(10, p.tier3Pts);
-        if (Number.isFinite(p.tier3Min)) config.tier3Min = Math.max(1, p.tier3Min);
-        if (Number.isFinite(p.tier3Max)) config.tier3Max = Math.max(config.tier3Min, p.tier3Max);
-
-        if (Number.isFinite(p.tier2Pts)) config.tier2Pts = Math.max(10, p.tier2Pts);
-        if (Number.isFinite(p.tier2Min)) config.tier2Min = Math.max(1, p.tier2Min);
-        if (Number.isFinite(p.tier2Max)) config.tier2Max = Math.max(config.tier2Min, p.tier2Max);
-
-        if (Number.isFinite(p.tier1Pts)) config.tier1Pts = Math.max(10, p.tier1Pts);
-        if (Number.isFinite(p.tier1Min)) config.tier1Min = Math.max(1, p.tier1Min);
-        if (Number.isFinite(p.tier1Max)) config.tier1Max = Math.max(config.tier1Min, p.tier1Max);
-
-        if (Number.isFinite(p.consolation)) config.consolation = Math.max(0, p.consolation);
+        for (const k of ['tier3Pts','tier3Min','tier3Max','tier2Pts','tier2Min','tier2Max','tier1Pts','tier1Min','tier1Max','consolation']) {
+          if (Number.isFinite(p[k])) config[k] = p[k];
+        }
+        config.tier3Pts = Math.max(10,config.tier3Pts); config.tier3Min = Math.max(1,config.tier3Min); config.tier3Max = Math.max(config.tier3Min,config.tier3Max);
+        config.tier2Pts = Math.max(10,config.tier2Pts); config.tier2Min = Math.max(1,config.tier2Min); config.tier2Max = Math.max(config.tier2Min,config.tier2Max);
+        config.tier1Pts = Math.max(10,config.tier1Pts); config.tier1Min = Math.max(1,config.tier1Min); config.tier1Max = Math.max(config.tier1Min,config.tier1Max);
+        config.consolation = Math.max(0,config.consolation);
       }
     } catch(e) {}
     applyConfigToUI();
   }
-
   function saveConfig() {
-    const t3p = Math.max(10, parseInt(cfgTier3Pts.value, 10) || 2000);
-    const t3min = Math.max(1, parseInt(cfgTier3Min.value, 10) || 8);
-    const t3max = Math.max(t3min, parseInt(cfgTier3Max.value, 10) || 10);
-
-    const t2p = Math.max(10, parseInt(cfgTier2Pts.value, 10) || 1200);
-    const t2min = Math.max(1, parseInt(cfgTier2Min.value, 10) || 5);
-    const t2max = Math.max(t2min, parseInt(cfgTier2Max.value, 10) || 7);
-
-    const t1p = Math.max(10, parseInt(cfgTier1Pts.value, 10) || 500);
-    const t1min = Math.max(1, parseInt(cfgTier1Min.value, 10) || 2);
-    const t1max = Math.max(t1min, parseInt(cfgTier1Max.value, 10) || 4);
-
-    const cons = Math.max(0, parseInt(cfgConsolation.value, 10) || 0);
-
-    config = {
-      tier3Pts: t3p, tier3Min: t3min, tier3Max: t3max,
-      tier2Pts: t2p, tier2Min: t2min, tier2Max: t2max,
-      tier1Pts: t1p, tier1Min: t1min, tier1Max: t1max,
-      consolation: cons
-    };
-
-    try {
-      localStorage.setItem('wackAMoleConfig', JSON.stringify(config));
-    } catch(e) {}
-
-    applyConfigToUI();
-    closeConfig();
+    const t3p = Math.max(10,parseInt(cfgTier3Pts.value,10)||2000), t3min = Math.max(1,parseInt(cfgTier3Min.value,10)||8), t3max = Math.max(t3min,parseInt(cfgTier3Max.value,10)||10);
+    const t2p = Math.max(10,parseInt(cfgTier2Pts.value,10)||1200), t2min = Math.max(1,parseInt(cfgTier2Min.value,10)||5), t2max = Math.max(t2min,parseInt(cfgTier2Max.value,10)||7);
+    const t1p = Math.max(10,parseInt(cfgTier1Pts.value,10)||500), t1min = Math.max(1,parseInt(cfgTier1Min.value,10)||2), t1max = Math.max(t1min,parseInt(cfgTier1Max.value,10)||4);
+    const cons = Math.max(0,parseInt(cfgConsolation.value,10)||0);
+    config = {tier3Pts:t3p,tier3Min:t3min,tier3Max:t3max,tier2Pts:t2p,tier2Min:t2min,tier2Max:t2max,tier1Pts:t1p,tier1Min:t1min,tier1Max:t1max,consolation:cons};
+    try { localStorage.setItem('wackAMoleConfig',JSON.stringify(config)); } catch(e) {}
+    applyConfigToUI(); closeConfig();
   }
-
   function applyConfigToUI() {
-    cfgTier3Pts.value = config.tier3Pts;
-    cfgTier3Min.value = config.tier3Min;
-    cfgTier3Max.value = config.tier3Max;
-
-    cfgTier2Pts.value = config.tier2Pts;
-    cfgTier2Min.value = config.tier2Min;
-    cfgTier2Max.value = config.tier2Max;
-
-    cfgTier1Pts.value = config.tier1Pts;
-    cfgTier1Min.value = config.tier1Min;
-    cfgTier1Max.value = config.tier1Max;
-
-    cfgConsolation.value = config.consolation;
-
-    // Update tutorial step 4 text
-    const guideBox = document.getElementById('guideTierBox');
-    if (guideBox) {
-      guideBox.innerHTML = `
-        🥇 ${config.tier3Pts}+ pts ➜ ${config.tier3Min}–${config.tier3Max} 🍬<br>
-        🥈 ${config.tier2Pts}+ pts ➜ ${config.tier2Min}–${config.tier2Max} 🍬<br>
-        🥉 ${config.tier1Pts}+ pts ➜ ${config.tier1Min}–${config.tier1Max} 🍬<br>
-        <span style="opacity:0.75; font-size:0.78rem;">Below ${config.tier1Pts} pts ➜ ${config.consolation} 🍬 prize</span>
-      `;
-    }
+    cfgTier3Pts.value=config.tier3Pts; cfgTier3Min.value=config.tier3Min; cfgTier3Max.value=config.tier3Max;
+    cfgTier2Pts.value=config.tier2Pts; cfgTier2Min.value=config.tier2Min; cfgTier2Max.value=config.tier2Max;
+    cfgTier1Pts.value=config.tier1Pts; cfgTier1Min.value=config.tier1Min; cfgTier1Max.value=config.tier1Max; cfgConsolation.value=config.consolation;
+    const guideBox=document.getElementById('guideTierBox');
+    if (guideBox) guideBox.innerHTML=`🥇 ${config.tier3Pts}+ pts ➜ ${config.tier3Min}–${config.tier3Max} 🍬<br>🥈 ${config.tier2Pts}+ pts ➜ ${config.tier2Min}–${config.tier2Max} 🍬<br>🥉 ${config.tier1Pts}+ pts ➜ ${config.tier1Min}–${config.tier1Max} 🍬<br><span style="opacity:.75;font-size:.78rem;">Below ${config.tier1Pts} pts ➜ ${config.consolation} 🍬 prize</span>`;
   }
-
-  function openConfig() {
-    applyConfigToUI();
-    configDrawer.classList.add('open');
-  }
-
-  function closeConfig() {
-    configDrawer.classList.remove('open');
-  }
-
-  openConfigBtn.addEventListener('click', openConfig);
-  closeConfigBtn.addEventListener('click', closeConfig);
-  saveConfigBtn.addEventListener('click', saveConfig);
-  resetConfigBtn.addEventListener('click', () => {
-    config = { ...DEFAULT_CONFIG };
-    try { localStorage.removeItem('wackAMoleConfig'); } catch(e) {}
-    applyConfigToUI();
-  });
-
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeConfig();
-  });
+  function openConfig() { applyConfigToUI(); configDrawer.classList.add('open'); }
+  function closeConfig() { configDrawer.classList.remove('open'); }
+  openConfigBtn.addEventListener('click',openConfig);
+  closeConfigBtn.addEventListener('click',closeConfig);
+  saveConfigBtn.addEventListener('click',saveConfig);
+  resetConfigBtn.addEventListener('click',()=>{config={...DEFAULT_CONFIG};try{localStorage.removeItem('wackAMoleConfig')}catch(e){}applyConfigToUI();});
+  window.addEventListener('keydown',e=>{if(e.key==='Escape')closeConfig();});
 
   // ---------- Game Engine ----------
-  const ROUND_TIME = 30; // seconds
-  let timeLeft = ROUND_TIME;
-  let score = 0;
-  let whacks = 0;
-  let totalCandy = 0;
-  let isPlaying = false;
-  let timerInterval = null;
-  let spawnTimeout = null;
+  const ROUND_TIME=30;
+  let timeLeft=ROUND_TIME, score=0, whacks=0, totalCandy=0, isPlaying=false, timerInterval=null, spawnTimeout=null;
+  const gridEl=document.getElementById('grid'), fieldEl=document.getElementById('field');
+  const scoreValEl=document.getElementById('scoreVal'), whacksValEl=document.getElementById('whacksVal'), totalCandyEl=document.getElementById('totalCandy');
+  const timerBar=document.getElementById('timerBar'), timerNumber=document.getElementById('timerNumber');
+  const overlay=document.getElementById('overlay'), landing=document.getElementById('landing'), ovTitle=document.getElementById('ovTitle'), ovSummary=document.getElementById('ovSummary'), candyReward=document.getElementById('candyReward');
+  const startGuideBtn=document.getElementById('startGuideBtn'), playAgainBtn=document.getElementById('playAgainBtn');
 
-  const gridEl = document.getElementById('grid');
-  const fieldEl = document.getElementById('field');
-  const scoreValEl = document.getElementById('scoreVal');
-  const whacksValEl = document.getElementById('whacksVal');
-  const totalCandyEl = document.getElementById('totalCandy');
-  const timerBar = document.getElementById('timerBar');
-  const timerNumber = document.getElementById('timerNumber');
-
-  const overlay = document.getElementById('overlay');
-  const landing = document.getElementById('landing');
-  const ovTitle = document.getElementById('ovTitle');
-  const ovSummary = document.getElementById('ovSummary');
-  const candyReward = document.getElementById('candyReward');
-  const startGuideBtn = document.getElementById('startGuideBtn');
-  const playAgainBtn = document.getElementById('playAgainBtn');
-
-  // Build exactly 6 grave plots (3x2 grid)
-  const holes = [];
-  gridEl.innerHTML = '';
-  for (let i = 0; i < 6; i++) {
-    const graveWrap = document.createElement('div');
-    graveWrap.className = 'grave-plot';
-    graveWrap.innerHTML = `
-      <div class="tombstone">
-        <div class="crack"></div>
-      </div>
-      <div class="grave-pit"></div>
-      <div class="mole-slot">
-        <div class="mole" data-index="${i}"></div>
-      </div>
-      <div class="grave-dirt"></div>
-    `;
+  // Grave index mapping: 0 1 2 = top row; 3 4 5 = bottom row.
+  // Numpad 4 5 6 = top row; Numpad 1 2 3 = bottom row.
+  const NUMPAD_HOLE_MAP = { Numpad4:0, Numpad5:1, Numpad6:2, Numpad1:3, Numpad2:4, Numpad3:5 };
+  const holes=[];
+  gridEl.innerHTML='';
+  for(let i=0;i<6;i++) {
+    const graveWrap=document.createElement('div');
+    graveWrap.className='grave-plot';
+    graveWrap.innerHTML=`<div class="tombstone"><div class="crack"></div></div><div class="grave-pit"></div><div class="mole-slot"><div class="mole" data-index="${i}"></div></div><div class="grave-dirt"></div><span class="hole-key" aria-label="Numpad ${['4','5','6','1','2','3'][i]}">${['4','5','6','1','2','3'][i]}</span>`;
     gridEl.appendChild(graveWrap);
-
-    const moleEl = graveWrap.querySelector('.mole');
-    holes.push({
-      index: i,
-      container: graveWrap,
-      mole: moleEl,
-      isUp: false,
-      isGolden: false,
-      isHit: false,
-      hideTimeout: null
-    });
-
-    // Whack handler (supports click & touch)
-    const handleHit = (e) => {
-      e.preventDefault();
-      whackHole(i, e);
-    };
-    moleEl.addEventListener('mousedown', handleHit);
-    moleEl.addEventListener('touchstart', handleHit, { passive: false });
+    const moleEl=graveWrap.querySelector('.mole');
+    holes.push({index:i,container:graveWrap,mole:moleEl,isUp:false,isGolden:false,isHit:false,hideTimeout:null});
+    const handleHit=e=>{e.preventDefault();whackHole(i,e);};
+    moleEl.addEventListener('mousedown',handleHit);
+    moleEl.addEventListener('touchstart',handleHit,{passive:false});
   }
 
-  function whackHole(index, event) {
-    if (!isPlaying) return;
-    const h = holes[index];
-    if (!h.isUp || h.isHit) return;
-
-    h.isHit = true;
-    whacks++;
-    whacksValEl.textContent = whacks;
-
-    clearTimeout(h.hideTimeout);
-
-    // Score & Sound
-    let pts = 100;
-    if (h.isGolden) {
-      pts = 300;
-      sfxGold();
-    } else {
-      sfxWhack();
-    }
-    score += pts;
-    scoreValEl.textContent = score;
-
-    // Hit graphics
-    h.mole.innerHTML = getHitZombieSVG();
-
-    // Floating score tag & particles
-    const rect = h.mole.getBoundingClientRect();
-    const fieldRect = fieldEl.getBoundingClientRect();
-    const spawnX = rect.left + rect.width / 2 - fieldRect.left;
-    const spawnY = rect.top + rect.height / 3 - fieldRect.top;
-    createScoreFloat(spawnX, spawnY, `+${pts}`);
-    createBurst(spawnX, spawnY, h.isGolden);
-
-    // Retract zombie mole back into grave
-    setTimeout(() => {
-      h.mole.classList.remove('up');
-      setTimeout(() => {
-        h.isUp = false;
-        h.isHit = false;
-      }, 160);
-    }, 280);
+  function whackHole(index,event) {
+    if(!isPlaying)return;
+    const h=holes[index];
+    if(!h||!h.isUp||h.isHit)return;
+    h.isHit=true; whacks++; whacksValEl.textContent=whacks; clearTimeout(h.hideTimeout);
+    const pts=h.isGolden?300:100;
+    if(h.isGolden)sfxGold();else sfxWhack();
+    score+=pts; scoreValEl.textContent=score; h.mole.innerHTML=getHitZombieSVG();
+    const rect=h.mole.getBoundingClientRect(), fieldRect=fieldEl.getBoundingClientRect();
+    const spawnX=rect.left+rect.width/2-fieldRect.left, spawnY=rect.top+rect.height/3-fieldRect.top;
+    createScoreFloat(spawnX,spawnY,`+${pts}`); createBurst(spawnX,spawnY,h.isGolden);
+    setTimeout(()=>{h.mole.classList.remove('up');setTimeout(()=>{h.isUp=false;h.isHit=false;},160);},280);
   }
-
-  function createScoreFloat(x, y, text) {
-    const el = document.createElement('div');
-    el.className = 'score-float';
-    el.style.left = x + 'px';
-    el.style.top = y + 'px';
-    el.textContent = text;
-    fieldEl.appendChild(el);
-    setTimeout(() => el.remove(), 750);
+  function createScoreFloat(x,y,textValue) {
+    const el=document.createElement('div');el.className='score-float';el.style.left=x+'px';el.style.top=y+'px';el.textContent=textValue;fieldEl.appendChild(el);setTimeout(()=>el.remove(),750);
   }
-
-  function createBurst(x, y, isGold) {
-    for (let i = 0; i < 9; i++) {
-      const p = document.createElement('div');
-      p.className = 'grave-particle';
-      if (isGold) {
-        p.style.background = '#ffd747';
-        p.style.boxShadow = '0 0 10px #ffd747, 0 0 14px #fff';
-      }
-      p.style.left = x + 'px';
-      p.style.top = y + 'px';
-      const angle = (Math.PI * 2 * i) / 9;
-      const dist = 26 + Math.random() * 22;
-      p.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
-      p.style.setProperty('--dy', `${Math.sin(angle) * dist}px`);
-      fieldEl.appendChild(p);
-      setTimeout(() => p.remove(), 550);
+  function createBurst(x,y,isGold) {
+    for(let i=0;i<9;i++) {
+      const p=document.createElement('div');p.className='grave-particle';
+      if(isGold){p.style.background='#ffd747';p.style.boxShadow='0 0 10px #ffd747, 0 0 14px #fff';}
+      p.style.left=x+'px';p.style.top=y+'px';
+      const angle=Math.PI*2*i/9,dist=26+Math.random()*22;
+      p.style.setProperty('--dx',`${Math.cos(angle)*dist}px`);p.style.setProperty('--dy',`${Math.sin(angle)*dist}px`);
+      fieldEl.appendChild(p);setTimeout(()=>p.remove(),550);
     }
   }
-
-  // Zombie Mole rise logic
   function popRandomMole() {
-    if (!isPlaying) return;
-
-    const available = holes.filter(h => !h.isUp);
-    if (available.length > 0) {
-      const h = available[Math.floor(Math.random() * available.length)];
-      h.isUp = true;
-      h.isHit = false;
-
-      // 20% chance of golden ghost mole
-      h.isGolden = Math.random() < 0.20;
-      h.mole.innerHTML = h.isGolden ? getGoldenGhostSVG() : getZombieMoleSVG();
-      h.mole.classList.add('up');
-      sfxPop();
-
-      // Time zombie stays up from grave (speeds up as round progresses)
-      const elapsed = ROUND_TIME - timeLeft;
-      const stayDuration = Math.max(520, 1060 - elapsed * 17);
-
-      h.hideTimeout = setTimeout(() => {
-        if (h.isUp && !h.isHit) {
-          h.mole.classList.remove('up');
-          setTimeout(() => {
-            h.isUp = false;
-          }, 160);
-        }
-      }, stayDuration);
+    if(!isPlaying)return;
+    const available=holes.filter(h=>!h.isUp);
+    if(available.length) {
+      const h=available[Math.floor(Math.random()*available.length)];
+      h.isUp=true;h.isHit=false;h.isGolden=Math.random()<.20;
+      h.mole.innerHTML=h.isGolden?getGoldenGhostSVG():getZombieMoleSVG();h.mole.classList.add('up');sfxPop();
+      const elapsed=ROUND_TIME-timeLeft,stayDuration=Math.max(520,1060-elapsed*17);
+      h.hideTimeout=setTimeout(()=>{if(h.isUp&&!h.isHit){h.mole.classList.remove('up');setTimeout(()=>{h.isUp=false;},160);}},stayDuration);
     }
-
-    // Schedule next grave spawn
-    const elapsed = ROUND_TIME - timeLeft;
-    const nextSpawnDelay = Math.max(360, 820 - elapsed * 14);
-    spawnTimeout = setTimeout(popRandomMole, nextSpawnDelay);
+    const elapsed=ROUND_TIME-timeLeft,nextSpawnDelay=Math.max(360,820-elapsed*14);
+    spawnTimeout=setTimeout(popRandomMole,nextSpawnDelay);
   }
-
-  // Start game session
   function startGame() {
-    initAudio();
-    landing.classList.add('hidden');
-    overlay.classList.add('hidden');
-    closeConfig();
-
-    // Fresh round reset
-    score = 0;
-    whacks = 0;
-    totalCandy = 0;
-    timeLeft = ROUND_TIME;
-
-    scoreValEl.textContent = '0';
-    whacksValEl.textContent = '0';
-    totalCandyEl.textContent = '0';
-    timerNumber.textContent = `${ROUND_TIME}s`;
-    timerNumber.classList.remove('urgent');
-    timerBar.style.width = '100%';
-
-    // Clear any active graves
-    holes.forEach(h => {
-      clearTimeout(h.hideTimeout);
-      h.isUp = false;
-      h.isHit = false;
-      h.mole.classList.remove('up');
-    });
-
-    isPlaying = true;
-    popRandomMole();
-
-    const startTimestamp = performance.now();
-    clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-      const elapsedSec = (performance.now() - startTimestamp) / 1000;
-      timeLeft = Math.max(0, ROUND_TIME - elapsedSec);
-
-      const secondsDisplay = Math.ceil(timeLeft);
-      timerNumber.textContent = `${secondsDisplay}s`;
-      timerNumber.classList.toggle('urgent', timeLeft <= 5);
-      timerBar.style.width = `${(timeLeft / ROUND_TIME) * 100}%`;
-
-      if (timeLeft <= 0) {
-        endGame();
-      }
-    }, 100);
+    initAudio();landing.classList.add('hidden');overlay.classList.add('hidden');closeConfig();
+    score=0;whacks=0;totalCandy=0;timeLeft=ROUND_TIME;
+    scoreValEl.textContent='0';whacksValEl.textContent='0';totalCandyEl.textContent='0';timerNumber.textContent=`${ROUND_TIME}s`;timerNumber.classList.remove('urgent');timerBar.style.width='100%';
+    clearTimeout(spawnTimeout);clearInterval(timerInterval);
+    holes.forEach(h=>{clearTimeout(h.hideTimeout);h.isUp=false;h.isHit=false;h.mole.classList.remove('up');h.mole.innerHTML='';});
+    isPlaying=true;popRandomMole();
+    const startTimestamp=performance.now();
+    timerInterval=setInterval(()=>{
+      const elapsedSec=(performance.now()-startTimestamp)/1000;timeLeft=Math.max(0,ROUND_TIME-elapsedSec);
+      timerNumber.textContent=`${Math.ceil(timeLeft)}s`;timerNumber.classList.toggle('urgent',timeLeft<=5);timerBar.style.width=`${timeLeft/ROUND_TIME*100}%`;
+      if(timeLeft<=0)endGame();
+    },100);
   }
-
   function endGame() {
-    isPlaying = false;
-    clearInterval(timerInterval);
-    clearTimeout(spawnTimeout);
-
-    holes.forEach(h => {
-      clearTimeout(h.hideTimeout);
-      h.mole.classList.remove('up');
-      h.isUp = false;
-    });
-
+    isPlaying=false;clearInterval(timerInterval);clearTimeout(spawnTimeout);
+    holes.forEach(h=>{clearTimeout(h.hideTimeout);h.mole.classList.remove('up');h.isUp=false;});
     sfxWin();
-
-    // Reward calculation based on points configuration
-    let earnedCandy = 0;
-    let tierTitle = '';
-
-    if (score >= config.tier3Pts) {
-      const min = Math.min(config.tier3Min, config.tier3Max);
-      const max = Math.max(config.tier3Min, config.tier3Max);
-      earnedCandy = Math.floor(Math.random() * (max - min + 1)) + min;
-      tierTitle = '🥇 GOLD TIER REWARD!';
-    } else if (score >= config.tier2Pts) {
-      const min = Math.min(config.tier2Min, config.tier2Max);
-      const max = Math.max(config.tier2Min, config.tier2Max);
-      earnedCandy = Math.floor(Math.random() * (max - min + 1)) + min;
-      tierTitle = '🥈 SILVER TIER REWARD!';
-    } else if (score >= config.tier1Pts) {
-      const min = Math.min(config.tier1Min, config.tier1Max);
-      const max = Math.max(config.tier1Min, config.tier1Max);
-      earnedCandy = Math.floor(Math.random() * (max - min + 1)) + min;
-      tierTitle = '🥉 BRONZE TIER REWARD!';
-    } else {
-      earnedCandy = config.consolation;
-      tierTitle = earnedCandy > 0 ? '⚰️ CONSOLATION PRIZE!' : '⚰️ ROUND COMPLETE!';
-    }
-
-    totalCandy = earnedCandy;
-    totalCandyEl.textContent = totalCandy;
-
-    ovTitle.textContent = tierTitle;
-    candyReward.innerHTML = `<div class="big">${earnedCandy}</div><div class="label">🍬 CANDY EARNED 🍬</div>`;
-    ovSummary.innerHTML = `You whacked <b>${whacks}</b> ghouls for <b>${score}</b> points!`;
-
+    let earnedCandy=0,tierTitle='';
+    if(score>=config.tier3Pts){const min=Math.min(config.tier3Min,config.tier3Max),max=Math.max(config.tier3Min,config.tier3Max);earnedCandy=Math.floor(Math.random()*(max-min+1))+min;tierTitle='🥇 GOLD TIER REWARD!';}
+    else if(score>=config.tier2Pts){const min=Math.min(config.tier2Min,config.tier2Max),max=Math.max(config.tier2Min,config.tier2Max);earnedCandy=Math.floor(Math.random()*(max-min+1))+min;tierTitle='🥈 SILVER TIER REWARD!';}
+    else if(score>=config.tier1Pts){const min=Math.min(config.tier1Min,config.tier1Max),max=Math.max(config.tier1Min,config.tier1Max);earnedCandy=Math.floor(Math.random()*(max-min+1))+min;tierTitle='🥉 BRONZE TIER REWARD!';}
+    else {earnedCandy=config.consolation;tierTitle=earnedCandy>0?'⚰️ CONSOLATION PRIZE!':'⚰️ ROUND COMPLETE!';}
+    totalCandy=earnedCandy;totalCandyEl.textContent=totalCandy;ovTitle.textContent=tierTitle;
+    candyReward.innerHTML=`<div class="big">${earnedCandy}</div><div class="label">🍬 CANDY EARNED 🍬</div>`;
+    ovSummary.innerHTML=`You whacked <b>${whacks}</b> ghouls for <b>${score}</b> points!`;
     overlay.classList.remove('hidden');
   }
 
-  // Buttons
-  startGuideBtn.addEventListener('click', startGame);
-  playAgainBtn.addEventListener('click', startGame);
+  // Numpad input: only whack the grave mapped to the pressed keypad key.
+  // Ignore typing fields and modifier shortcuts. e.code distinguishes the numpad.
+  window.addEventListener('keydown',e=>{
+    if(e.target.matches('input, textarea, select, button') || e.ctrlKey || e.altKey || e.metaKey)return;
+    const holeIndex=NUMPAD_HOLE_MAP[e.code];
+    if(holeIndex===undefined)return;
+    e.preventDefault();
+    if(isPlaying){initAudio();whackHole(holeIndex,e);}
+  });
 
+  startGuideBtn.addEventListener('click',startGame);
+  playAgainBtn.addEventListener('click',startGame);
   loadConfig();
 </script>
 </body>
