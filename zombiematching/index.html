@@ -481,7 +481,7 @@
   // Numpad mapping follows each card's current screen position:
   // Card 1 = 4, Card 2 = 5, Card 3 = 6,
   // Card 4 = 1, Card 5 = 2, Card 6 = 3.
-  const NUMPAD_KEYS = ['Numpad4', 'Numpad5', 'Numpad6', 'Numpad1', 'Numpad2', 'Numpad3'];
+  const CARD_KEY_MAP = { Numpad4:0, Numpad5:1, Numpad6:2, Numpad1:3, Numpad2:4, Numpad3:5, KeyW:0, KeyE:1, KeyD:2, KeyA:3, KeyS:4, Space:5 };
   const NUMPAD_LABELS = ['4', '5', '6', '1', '2', '3'];
 
   function buildGrid() {
@@ -573,8 +573,8 @@
   document.addEventListener('keydown', (e) => {
     if (!accepting || e.repeat) return;
 
-    const position = NUMPAD_KEYS.indexOf(e.code);
-    if (position === -1) return;
+    const position = CARD_KEY_MAP[e.code];
+    if (position === undefined) return;
 
     const card = grid.querySelector(`.card[data-position="${position}"]`);
     if (card) {
@@ -647,6 +647,7 @@
 
   loadConfig();
   buildGrid();
+  const arduinoScript = document.createElement('script'); arduinoScript.src = '../arduino-controller.js'; document.body.append(arduinoScript);
 </script>
 </body>
 </html>

@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -7,89 +8,401 @@
   <title>Scare-o-lette | Halloween Roulette</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = { theme: { extend: { colors: { night: "#100b1b", pumpkin: "#ffb34d", lilac: "#c8bdd2" } } } };
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            night: "#100b1b",
+            pumpkin: "#ffb34d",
+            lilac: "#c8bdd2"
+          }
+        }
+      }
+    };
   </script>
   <style>
     :root { color-scheme: dark; }
     body { position: relative; isolation: isolate; }
-    body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(rgba(12, 11, 22, .48), rgba(12, 11, 22, .68)), url("./images/bgroulette.webp") center 42% / cover no-repeat; }
-    .wheel-wrap { position:relative; aspect-ratio:1; display:grid; place-items:center; }
-    .pointer { position:absolute; z-index:3; top:-3px; left:50%; width:0; height:0; transform:translateX(-50%); border-left:17px solid transparent; border-right:17px solid transparent; border-top:34px solid #fff0bd; filter:drop-shadow(0 4px 3px #0009); }
-    .wheel { position:absolute; inset:8px; overflow:hidden; border:8px solid #4a344d; border-radius:50%; background:conic-gradient(from -15deg,#a84d32 0deg 30deg,#48345f 30deg 60deg,#315f5b 60deg 90deg,#8b5a31 90deg 120deg,#513a68 120deg 150deg,#924250 150deg 180deg,#384c67 180deg 210deg,#88552e 210deg 240deg,#425e52 240deg 270deg,#6b456f 270deg 300deg,#e4ad2f 300deg 330deg,#414261 330deg 360deg); box-shadow:inset 0 0 0 3px #f6d69a66,0 10px 25px #0008; transition:transform 5s cubic-bezier(.12,.78,.12,1); }
-    .wheel::before { content:""; position:absolute; inset:0; border-radius:50%; background:repeating-conic-gradient(from -15deg,#f8e1ae88 0deg 1deg,transparent 1deg 30deg); }
-    .wheel-label { position:absolute; left:50%; top:50%; width:42px; height:42px; display:grid; place-items:center; margin:-21px; font-size:clamp(1.25rem,4vw,2rem); filter:drop-shadow(0 2px 2px #0008); transform:rotate(calc(var(--i)*30deg)) translateY(clamp(-190px,-16vw,-115px)) rotate(calc(var(--i)*-30deg)); }
-    .wheel-label.jackpot-label { font-size:clamp(1.7rem,5vw,2.5rem); filter:drop-shadow(0 0 8px #fff0a8) drop-shadow(0 2px 3px #000b); }
-    .jackpot-near-miss { animation: jackpot-tease .55s ease-in-out 3; }
-    @keyframes jackpot-tease { 50% { filter:drop-shadow(0 0 18px #fff4a8) drop-shadow(0 0 28px #ffc43d); } }
-    .jackpot-amount { color:#fff4c4; font-size:.5rem; font-weight:1000; line-height:1; text-shadow:0 1px 3px #38210c; }
-    .hub { position:absolute; z-index:2; width:23%; aspect-ratio:1; display:grid; place-items:center; border:5px solid #f5d897; border-radius:50%; background:radial-gradient(circle at 35% 30%,#755481,#24182e 75%); box-shadow:0 5px 14px #000b,inset 0 2px 4px #ffffff55; font-size:clamp(1.6rem,5vw,2.7rem); }
-    .spin { box-shadow:0 5px 0 #9c511e,0 12px 24px #0006; transition:transform .15s,filter .15s; }
-    .spin:hover:not(:disabled) { transform:translateY(-2px); filter:brightness(1.08); }
-    .spin:active:not(:disabled) { transform:translateY(3px); box-shadow:0 2px 0 #9c511e; }
-    .spin:disabled { cursor:wait; opacity:.72; }
-    @media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition:none!important; } .jackpot-near-miss { animation:none!important; } }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(12, 11, 22, .48), rgba(12, 11, 22, .68)),
+        url("./images/bgroulette.webp") center 42% / cover no-repeat;
+    }
+
+    .wheel-wrap {
+      position: relative;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+    }
+
+    .pointer {
+      position: absolute;
+      z-index: 3;
+      top: -3px;
+      left: 50%;
+      width: 0;
+      height: 0;
+      transform: translateX(-50%);
+      border-left: 17px solid transparent;
+      border-right: 17px solid transparent;
+      border-top: 34px solid #fff0bd;
+      filter: drop-shadow(0 4px 3px #0009);
+    }
+
+    .wheel {
+      position: absolute;
+      inset: 8px;
+      overflow: hidden;
+      border: 8px solid #4a344d;
+      border-radius: 50%;
+      background: conic-gradient(
+        from -15deg,
+        #a84d32 0deg 30deg,
+        #48345f 30deg 60deg,
+        #315f5b 60deg 90deg,
+        #8b5a31 90deg 120deg,
+        #513a68 120deg 150deg,
+        #924250 150deg 180deg,
+        #384c67 180deg 210deg,
+        #88552e 210deg 240deg,
+        #425e52 240deg 270deg,
+        #6b456f 270deg 300deg,
+        #e4ad2f 300deg 330deg,
+        #414261 330deg 360deg
+      );
+      box-shadow: inset 0 0 0 3px #f6d69a66, 0 10px 25px #0008;
+      transition: transform 5s cubic-bezier(.12,.78,.12,1);
+    }
+
+    .wheel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: repeating-conic-gradient(
+        from -15deg,
+        #f8e1ae88 0deg 1deg,
+        transparent 1deg 30deg
+      );
+    }
+
+    .wheel-label {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      margin: -21px;
+      font-size: clamp(1.25rem,4vw,2rem);
+      filter: drop-shadow(0 2px 2px #0008);
+      transform:
+        rotate(calc(var(--i)*30deg))
+        translateY(clamp(-190px,-16vw,-115px))
+        rotate(calc(var(--i)*-30deg));
+    }
+
+    .wheel-label.jackpot-label {
+      font-size: clamp(1.7rem,5vw,2.5rem);
+      filter:
+        drop-shadow(0 0 8px #fff0a8)
+        drop-shadow(0 2px 3px #000b);
+    }
+
+    .jackpot-near-miss {
+      animation: jackpot-tease .55s ease-in-out 3;
+    }
+
+    @keyframes jackpot-tease {
+      50% {
+        filter:
+          drop-shadow(0 0 18px #fff4a8)
+          drop-shadow(0 0 28px #ffc43d);
+      }
+    }
+
+    .jackpot-amount {
+      color: #fff4c4;
+      font-size: .5rem;
+      font-weight: 1000;
+      line-height: 1;
+      text-shadow: 0 1px 3px #38210c;
+    }
+
+    .hub {
+      position: absolute;
+      z-index: 2;
+      width: 23%;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border: 5px solid #f5d897;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%,#755481,#24182e 75%);
+      box-shadow: 0 5px 14px #000b, inset 0 2px 4px #ffffff55;
+      font-size: clamp(1.6rem,5vw,2.7rem);
+    }
+
+    .spin {
+      box-shadow: 0 5px 0 #9c511e, 0 12px 24px #0006;
+      transition: transform .15s, filter .15s;
+    }
+
+    .spin:hover:not(:disabled) {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    .spin:active:not(:disabled) {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #9c511e;
+    }
+
+    .spin:disabled {
+      cursor: wait;
+      opacity: .72;
+    }
+
+    /* Keyboard shortcut styling */
+    .key-hint {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 72px;
+      padding: 6px 12px;
+      border: 1px solid #fcd98b55;
+      border-bottom: 4px solid #9c511e;
+      border-radius: 9px;
+      background: #100b1b;
+      color: #fff0bd;
+      font-size: .75rem;
+      font-weight: 900;
+      letter-spacing: .08em;
+      box-shadow: 0 4px 10px #0004;
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+      }
+
+      .jackpot-near-miss {
+        animation: none !important;
+      }
+    }
   </style>
 </head>
+
 <body class="min-h-screen overflow-x-hidden bg-[radial-gradient(ellipse_at_50%_0%,#452d57_0%,#21172e_38%,#0c0b16_100%)] px-3 py-6 font-sans text-[#fff5df] sm:px-6 sm:py-10">
-  <a href="../index.html" aria-label="Back to Graveyard Arcade" title="Back to Graveyard Arcade" style="position:fixed;top:12px;left:12px;z-index:100000;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid #ffd76b88;border-radius:12px;background:#171321ee;color:#fff0d1;font:800 14px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 4px 16px #0009;cursor:pointer;">&#8592; Graveyard Arcade</a>
+
+  <a
+    href="../index.html"
+    aria-label="Back to Graveyard Arcade"
+    title="Back to Graveyard Arcade"
+    style="position:fixed;top:12px;left:12px;z-index:100000;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid #ffd76b88;border-radius:12px;background:#171321ee;color:#fff0d1;font:800 14px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 4px 16px #0009;cursor:pointer;"
+  >&#8592; Graveyard Arcade</a>
+
   <main class="relative mx-auto w-full max-w-6xl">
+
     <header class="relative mb-8 text-center sm:mb-10">
       <div class="pointer-events-none absolute -left-2 top-0 hidden text-5xl opacity-30 sm:block" aria-hidden="true">🦇</div>
       <div class="pointer-events-none absolute -right-2 top-0 hidden text-5xl opacity-30 sm:block" aria-hidden="true">🕸️</div>
-      <div class="inline-flex items-center gap-2 rounded-full border border-amber-200/20 bg-black/20 px-4 py-2 text-[.68rem] font-black uppercase tracking-[.22em] text-pumpkin shadow-lg"><span aria-hidden="true">✦</span>Halloween night · spin for treats<span aria-hidden="true">✦</span></div>
-      <h1 class="my-3 text-5xl font-black leading-none tracking-[-.055em] drop-shadow-[0_5px_0_#542b69] sm:text-7xl">Scare-o-lette</h1>
-      <p class="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-lilac sm:text-base">Give the haunted wheel a spin. Win a mountain of candy, or get at least 1 consolation candy!</p>
+
+      <div class="inline-flex items-center gap-2 rounded-full border border-amber-200/20 bg-black/20 px-4 py-2 text-[.68rem] font-black uppercase tracking-[.22em] text-pumpkin shadow-lg">
+        <span aria-hidden="true">✦</span>
+        Halloween night · spin for treats
+        <span aria-hidden="true">✦</span>
+      </div>
+
+      <h1 class="my-3 text-5xl font-black leading-none tracking-[-.055em] drop-shadow-[0_5px_0_#542b69] sm:text-7xl">
+        Scare-o-lette
+      </h1>
+
+      <p class="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-lilac sm:text-base">
+        Give the haunted wheel a spin. Win a mountain of candy, or get at least 1 consolation candy!
+      </p>
     </header>
+
     <details class="mb-5 overflow-hidden rounded-2xl border border-white/10 bg-[#21182d]/90 shadow-xl backdrop-blur-sm">
-      <summary class="cursor-pointer px-5 py-4 font-black text-amber-100 marker:text-pumpkin focus:outline-none focus:ring-2 focus:ring-amber-200">⚙️ Roulette settings</summary>
+      <summary class="cursor-pointer px-5 py-4 font-black text-amber-100 marker:text-pumpkin focus:outline-none focus:ring-2 focus:ring-amber-200">
+        ⚙️ Roulette settings
+      </summary>
+
       <form id="prize-settings" class="border-t border-white/10 p-4 sm:p-5">
-        <p class="mb-4 text-sm text-lilac">Change the jackpot odds and candy payouts. Every result awards at least 1 candy.</p>
+        <p class="mb-4 text-sm text-lilac">
+          Change the jackpot odds and candy payouts. Every result awards at least 1 candy.
+        </p>
+
         <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <label class="rounded-xl border border-amber-200/15 bg-black/20 p-3 text-sm font-bold text-amber-100">Jackpot chance (%)<input id="setting-jackpot-chance" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="0" max="50" step="1" value="2"></label>
-          <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">Tier 1 · Small treat<input id="setting-tier-1" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="5"></label>
-          <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">Tier 2 · Sweet treat<input id="setting-tier-2" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="10"></label>
-          <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">Tier 3 · Candy stash<input id="setting-tier-3" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="15"></label>
-          <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">Tier 4 · Big treat<input id="setting-tier-4" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="20"></label>
-          <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">Tier 5 · Rare treat<input id="setting-tier-5" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="25"></label>
-          <label class="rounded-xl border border-amber-200/20 bg-black/20 p-3 text-sm font-bold text-amber-100">Jackpot candies<input id="setting-tier-jackpot" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="100"></label>
+
+          <label class="rounded-xl border border-amber-200/15 bg-black/20 p-3 text-sm font-bold text-amber-100">
+            Jackpot chance (%)
+            <input id="setting-jackpot-chance" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="0" max="50" step="1" value="2">
+          </label>
+
+          <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">
+            Tier 1 · Small treat
+            <input id="setting-tier-1" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="5">
+          </label>
+
+          <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">
+            Tier 2 · Sweet treat
+            <input id="setting-tier-2" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="10">
+          </label>
+
+          <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">
+            Tier 3 · Candy stash
+            <input id="setting-tier-3" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="15">
+          </label>
+
+          <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">
+            Tier 4 · Big treat
+            <input id="setting-tier-4" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="20">
+          </label>
+
+          <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">
+            Tier 5 · Rare treat
+            <input id="setting-tier-5" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="25">
+          </label>
+
+          <label class="rounded-xl border border-amber-200/20 bg-black/20 p-3 text-sm font-bold text-amber-100">
+            Jackpot candies
+            <input id="setting-tier-jackpot" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="100">
+          </label>
+
         </div>
-        <div class="mt-4 flex flex-wrap items-center gap-3"><button class="rounded-xl bg-gradient-to-b from-amber-200 to-pumpkin px-5 py-2.5 font-black text-[#25182d] shadow-[0_4px_0_#9c511e]" type="submit">Apply settings</button><span id="settings-status" class="text-sm text-lilac" role="status" aria-live="polite">Current settings apply to your next spin.</span></div>
+
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+          <button class="rounded-xl bg-gradient-to-b from-amber-200 to-pumpkin px-5 py-2.5 font-black text-[#25182d] shadow-[0_4px_0_#9c511e]" type="submit">
+            Apply settings
+          </button>
+          <span id="settings-status" class="text-sm text-lilac" role="status" aria-live="polite">
+            Current settings apply to your next spin.
+          </span>
+        </div>
       </form>
     </details>
+
     <section class="flex justify-center" aria-label="Halloween roulette game">
       <div class="relative flex w-full max-w-2xl flex-col items-center overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#2a2038]/80 via-[#1d172a]/82 to-[#151221]/85 p-4 shadow-[0_24px_70px_#0009,inset_0_1px_0_#ffffff1c] backdrop-blur-sm sm:p-7">
+
         <div class="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-purple-400/10 blur-3xl"></div>
+
         <div class="relative z-10 mb-1 text-center">
           <p class="text-[.65rem] font-black uppercase tracking-[.2em] text-purple-200">Step right up</p>
           <h2 class="mt-1 text-xl font-extrabold sm:text-2xl">The Haunted Wheel</h2>
         </div>
+
         <div class="wheel-wrap mx-auto my-4 w-full max-w-[480px]">
           <div class="pointer" aria-hidden="true"></div>
-          <div id="wheel" class="wheel" role="img" aria-label="Roulette wheel with twelve spooky prizes, including a 100-candy jackpot">
-            <span class="wheel-label" style="--i:0" aria-hidden="true">🎃</span><span class="wheel-label" style="--i:1" aria-hidden="true">👻</span>
-            <span class="wheel-label" style="--i:2" aria-hidden="true">🍬</span><span class="wheel-label" style="--i:3" aria-hidden="true">🦇</span>
-            <span class="wheel-label" style="--i:4" aria-hidden="true">🧙</span><span class="wheel-label" style="--i:5" aria-hidden="true">🕷️</span>
-            <span class="wheel-label" style="--i:6" aria-hidden="true">💀</span><span class="wheel-label" style="--i:7" aria-hidden="true">🐈‍⬛</span>
-            <span class="wheel-label" style="--i:8" aria-hidden="true">🍭</span><span class="wheel-label" style="--i:9" aria-hidden="true">👻</span>
-            <span class="wheel-label jackpot-label" style="--i:10" aria-hidden="true"><span>💰</span><small class="jackpot-amount">100</small></span><span class="wheel-label" style="--i:11" aria-hidden="true">🕸️</span>
+
+          <div
+            id="wheel"
+            class="wheel"
+            role="img"
+            aria-label="Roulette wheel with twelve spooky prizes, including a 100-candy jackpot"
+          >
+            <span class="wheel-label" style="--i:0" aria-hidden="true">🎃</span>
+            <span class="wheel-label" style="--i:1" aria-hidden="true">👻</span>
+            <span class="wheel-label" style="--i:2" aria-hidden="true">🍬</span>
+            <span class="wheel-label" style="--i:3" aria-hidden="true">🦇</span>
+            <span class="wheel-label" style="--i:4" aria-hidden="true">🧙</span>
+            <span class="wheel-label" style="--i:5" aria-hidden="true">🕷️</span>
+            <span class="wheel-label" style="--i:6" aria-hidden="true">💀</span>
+            <span class="wheel-label" style="--i:7" aria-hidden="true">🐈‍⬛</span>
+            <span class="wheel-label" style="--i:8" aria-hidden="true">🍭</span>
+            <span class="wheel-label" style="--i:9" aria-hidden="true">👻</span>
+
+            <span class="wheel-label jackpot-label" style="--i:10" aria-hidden="true">
+              <span>💰</span>
+              <small class="jackpot-amount">100</small>
+            </span>
+
+            <span class="wheel-label" style="--i:11" aria-hidden="true">🕸️</span>
           </div>
+
           <div class="hub" aria-hidden="true">🕸️</div>
         </div>
-        <button id="spin" class="spin relative z-10 w-full max-w-[300px] min-h-[58px] rounded-2xl border border-amber-100/50 bg-gradient-to-b from-amber-200 via-amber-300 to-pumpkin px-6 text-base font-black uppercase tracking-[.12em] text-[#25182d] focus:outline-none focus:ring-4 focus:ring-amber-200/40" type="button"><span class="mr-2" aria-hidden="true">✦</span>Spin the wheel<span class="ml-2" aria-hidden="true">✦</span></button>
+
+        <button
+          id="spin"
+          class="spin relative z-10 w-full max-w-[300px] min-h-[58px] rounded-2xl border border-amber-100/50 bg-gradient-to-b from-amber-200 via-amber-300 to-pumpkin px-6 text-base font-black uppercase tracking-[.12em] text-[#25182d] focus:outline-none focus:ring-4 focus:ring-amber-200/40"
+          type="button"
+        >
+          <span class="mr-2" aria-hidden="true">✦</span>
+          Spin the wheel
+          <span class="ml-2" aria-hidden="true">✦</span>
+        </button>
+
+        <!-- Keyboard shortcut keymap -->
+        <div class="relative z-10 mt-5 flex flex-wrap items-center justify-center gap-2 text-xs font-bold text-lilac">
+          <span class="mr-1 uppercase tracking-[.18em] opacity-70">Controls</span>
+          <kbd class="key-hint">SPACE</kbd>
+          <span>Spin the wheel</span>
+        </div>
+
+        <p class="mt-2 text-center text-[.7rem] text-lilac/60">
+          Or click the button to play.
+        </p>
+
       </div>
     </section>
+
     <p id="spin-status" class="sr-only" aria-live="polite"></p>
   </main>
-  <div id="win-popup" class="fixed inset-0 z-50 hidden items-center justify-center bg-[#09040d]/80 p-5 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="win-popup-title" aria-hidden="true">
+
+  <div
+    id="win-popup"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-[#09040d]/80 p-5 backdrop-blur-sm"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="win-popup-title"
+    aria-hidden="true"
+  >
     <div class="relative w-full max-w-sm overflow-hidden rounded-[2rem] border border-amber-200/30 bg-gradient-to-br from-[#49334e] via-[#2a2038] to-[#171326] p-7 text-center shadow-[0_25px_100px_#000c,0_0_50px_#fbbf2440]">
+
       <div class="pointer-events-none absolute -right-8 -top-12 h-36 w-36 rounded-full bg-amber-300/20 blur-3xl"></div>
+
       <div id="win-popup-icon" class="relative text-6xl" aria-hidden="true">🍬</div>
-      <p class="relative mt-3 text-[.68rem] font-black uppercase tracking-[.2em] text-purple-200">The wheel chose you</p>
-      <h2 id="win-popup-title" class="relative mt-2 text-3xl font-black text-amber-200">You won!</h2>
-      <p id="win-popup-copy" class="relative mt-3 text-lilac">Candy found!</p>
-      <button id="win-popup-close" class="relative mt-6 w-full rounded-xl bg-gradient-to-b from-amber-200 to-pumpkin px-6 py-3 font-black uppercase tracking-wider text-[#25182d] shadow-[0_4px_0_#9c511e] transition hover:-translate-y-0.5 hover:brightness-110 focus:outline-none focus:ring-4 focus:ring-amber-200/40" type="button">Start Spin Again</button>
+
+      <p class="relative mt-3 text-[.68rem] font-black uppercase tracking-[.2em] text-purple-200">
+        The wheel chose you
+      </p>
+
+      <h2 id="win-popup-title" class="relative mt-2 text-3xl font-black text-amber-200">
+        You won!
+      </h2>
+
+      <p id="win-popup-copy" class="relative mt-3 text-lilac">
+        Candy found!
+      </p>
+
+      <button
+        id="win-popup-close"
+        class="relative mt-6 w-full rounded-xl bg-gradient-to-b from-amber-200 to-pumpkin px-6 py-3 font-black uppercase tracking-wider text-[#25182d] shadow-[0_4px_0_#9c511e] transition hover:-translate-y-0.5 hover:brightness-110 focus:outline-none focus:ring-4 focus:ring-amber-200/40"
+        type="button"
+      >
+        Start Spin Again
+      </button>
+
+      <p class="relative mt-3 text-xs text-lilac/70">
+        Press SPACE to spin again
+      </p>
+
     </div>
   </div>
+
   <script>
     const prizes = [
       { icon: "🎃", name: "Pumpkin Patch", candy: 5 },
@@ -105,28 +418,66 @@
       { icon: "💰", name: "Jackpot", candy: 100 },
       { icon: "🕸️", name: "Caught in a Web", candy: 1 }
     ];
+
     const jackpotIndex = prizes.findIndex(prize => prize.name === "Jackpot");
+
     const prizeTiers = {
-      "Pumpkin Patch": "tier1", "Friendly Ghost": "tier2", "Candy Stash": "tier3",
-      "Witch's Cauldron": "tier4", "Lucky Black Cat": "tier5", "Lollipop Lane": "tier2",
-      "Ghostly Goodie": "tier1", Jackpot: "jackpot"
+      "Pumpkin Patch": "tier1",
+      "Friendly Ghost": "tier2",
+      "Candy Stash": "tier3",
+      "Witch's Cauldron": "tier4",
+      "Lucky Black Cat": "tier5",
+      "Lollipop Lane": "tier2",
+      "Ghostly Goodie": "tier1",
+      Jackpot: "jackpot"
     };
-    const defaultPayoutTiers = { tier1: 5, tier2: 10, tier3: 15, tier4: 20, tier5: 25, jackpot: 100 };
+
+    const defaultPayoutTiers = {
+      tier1: 5,
+      tier2: 10,
+      tier3: 15,
+      tier4: 20,
+      tier5: 25,
+      jackpot: 100
+    };
+
     let savedSettings = {};
+
     try {
-      const parsedSettings = JSON.parse(localStorage.getItem("scareRouletteSettings") || "{}");
-      if (parsedSettings && typeof parsedSettings === "object") savedSettings = parsedSettings;
+      const parsedSettings = JSON.parse(
+        localStorage.getItem("scareRouletteSettings") || "{}"
+      );
+
+      if (parsedSettings && typeof parsedSettings === "object") {
+        savedSettings = parsedSettings;
+      }
     } catch {}
-    const payoutTiers = { ...defaultPayoutTiers, ...(savedSettings.payoutTiers || {}) };
+
+    const payoutTiers = {
+      ...defaultPayoutTiers,
+      ...(savedSettings.payoutTiers || {})
+    };
+
     Object.keys(payoutTiers).forEach(tier => {
       const value = Number(payoutTiers[tier]);
-      payoutTiers[tier] = Number.isFinite(value) ? Math.max(1, Math.min(9999, Math.floor(value))) : defaultPayoutTiers[tier];
+
+      payoutTiers[tier] = Number.isFinite(value)
+        ? Math.max(1, Math.min(9999, Math.floor(value)))
+        : defaultPayoutTiers[tier];
     });
+
     let jackpotChance = Number.isFinite(Number(savedSettings.jackpotChance))
       ? Math.max(0, Math.min(0.5, Number(savedSettings.jackpotChance)))
       : 0.02;
-    prizes.forEach(prize => { if (prizeTiers[prize.name]) prize.candy = payoutTiers[prizeTiers[prize.name]]; });
+
+    prizes.forEach(prize => {
+      if (prizeTiers[prize.name]) {
+        prize.candy = payoutTiers[prizeTiers[prize.name]];
+      }
+    });
+
     const nearMissChance = 0.50;
+
     const wheel = document.querySelector("#wheel");
     const spinButton = document.querySelector("#spin");
     const statusEl = document.querySelector("#spin-status");
@@ -138,48 +489,93 @@
     const winPopupTitleEl = document.querySelector("#win-popup-title");
     const winPopupCopyEl = document.querySelector("#win-popup-copy");
     const winPopupIconEl = document.querySelector("#win-popup-icon");
+
     let rotation = 0;
     let isSpinning = false;
 
     function updateSettingsDisplay() {
-      document.querySelector("#setting-jackpot-chance").value = Math.round(jackpotChance * 100);
+      document.querySelector("#setting-jackpot-chance").value =
+        Math.round(jackpotChance * 100);
+
       Object.entries(payoutTiers).forEach(([tier, amount], index) => {
-        const id = tier === "jackpot" ? "setting-tier-jackpot" : `setting-tier-${index + 1}`;
+        const id = tier === "jackpot"
+          ? "setting-tier-jackpot"
+          : `setting-tier-${index + 1}`;
+
         document.querySelector(`#${id}`).value = amount;
       });
+
       jackpotAmountEl.textContent = payoutTiers.jackpot;
-      wheel.setAttribute("aria-label", `Roulette wheel with twelve spooky prizes, including a ${payoutTiers.jackpot}-candy jackpot`);
+
+      wheel.setAttribute(
+        "aria-label",
+        `Roulette wheel with twelve spooky prizes, including a ${payoutTiers.jackpot}-candy jackpot`
+      );
     }
 
     settingsForm.addEventListener("submit", event => {
       event.preventDefault();
+
       if (isSpinning) {
-        settingsStatusEl.textContent = "Wait until the wheel stops before changing settings.";
+        settingsStatusEl.textContent =
+          "Wait until the wheel stops before changing settings.";
         return;
       }
+
       if (!settingsForm.reportValidity()) return;
-      jackpotChance = Number(document.querySelector("#setting-jackpot-chance").value) / 100;
-      ["tier1", "tier2", "tier3", "tier4", "tier5", "jackpot"].forEach((tier, index) => {
-        const id = tier === "jackpot" ? "setting-tier-jackpot" : `setting-tier-${index + 1}`;
-        payoutTiers[tier] = Number(document.querySelector(`#${id}`).value);
+
+      jackpotChance =
+        Number(document.querySelector("#setting-jackpot-chance").value) / 100;
+
+      ["tier1", "tier2", "tier3", "tier4", "tier5", "jackpot"]
+        .forEach((tier, index) => {
+          const id = tier === "jackpot"
+            ? "setting-tier-jackpot"
+            : `setting-tier-${index + 1}`;
+
+          payoutTiers[tier] =
+            Number(document.querySelector(`#${id}`).value);
+        });
+
+      prizes.forEach(prize => {
+        if (prizeTiers[prize.name]) {
+          prize.candy = payoutTiers[prizeTiers[prize.name]];
+        }
       });
-      prizes.forEach(prize => { if (prizeTiers[prize.name]) prize.candy = payoutTiers[prizeTiers[prize.name]]; });
-      try { localStorage.setItem("scareRouletteSettings", JSON.stringify({ jackpotChance, payoutTiers })); } catch {}
+
+      try {
+        localStorage.setItem(
+          "scareRouletteSettings",
+          JSON.stringify({ jackpotChance, payoutTiers })
+        );
+      } catch {}
+
       updateSettingsDisplay();
-      settingsStatusEl.textContent = "Settings saved. They will be used on your next spin.";
+
+      settingsStatusEl.textContent =
+        "Settings saved. They will be used on your next spin.";
     });
+
     updateSettingsDisplay();
 
-    spinButton.addEventListener("click", () => {
+    function spinWheel() {
       if (isSpinning) return;
+
+      // Do not start a new spin while the result popup is open.
+      if (!winPopupEl.classList.contains("hidden")) return;
+
       isSpinning = true;
       spinButton.disabled = true;
+
       statusEl.textContent = "The haunted wheel is spinning.";
       jackpotLabelEl.classList.remove("jackpot-near-miss");
+
       const spinRoll = Math.random();
       const winsJackpot = spinRoll < jackpotChance;
       const nearMissSpin = !winsJackpot && Math.random() < nearMissChance;
+
       let prizeIndex;
+
       if (winsJackpot) {
         prizeIndex = jackpotIndex;
       } else if (nearMissSpin) {
@@ -193,13 +589,23 @@
           (jackpotIndex + 1) % prizes.length,
           (jackpotIndex - 1 + prizes.length) % prizes.length
         ]);
-        const regularIndexes = prizes.map((_, index) => index).filter(index => !adjacentIndexes.has(index));
-        prizeIndex = regularIndexes[Math.floor(Math.random() * regularIndexes.length)];
+
+        const regularIndexes = prizes
+          .map((_, index) => index)
+          .filter(index => !adjacentIndexes.has(index));
+
+        prizeIndex =
+          regularIndexes[Math.floor(Math.random() * regularIndexes.length)];
       }
+
       const prize = prizes[prizeIndex];
-      // Near misses stop several degrees inside the neighboring slice, not on its border.
-      const clockwiseDistanceToJackpot = (prizeIndex - jackpotIndex + prizes.length) % prizes.length;
+
+      // Near misses stop several degrees inside the neighboring slice.
+      const clockwiseDistanceToJackpot =
+        (prizeIndex - jackpotIndex + prizes.length) % prizes.length;
+
       const isJackpot = prizeIndex === jackpotIndex;
+
       const stopOffset = isJackpot
         ? Math.random() * 26 - 13
         : nearMissSpin
@@ -207,36 +613,68 @@
             ? 9.5 + Math.random() * 1.5
             : -9.5 - Math.random() * 1.5
           : Math.random() * 26 - 13;
-      const desiredAngle = (360 - prizeIndex * (360 / prizes.length) + stopOffset + 360) % 360;
+
+      const desiredAngle = (
+        360 - prizeIndex * (360 / prizes.length) + stopOffset + 360
+      ) % 360;
+
       const currentAngle = ((rotation % 360) + 360) % 360;
-      rotation += 5 * 360 + ((desiredAngle - currentAngle + 360) % 360);
+
+      rotation +=
+        5 * 360 + ((desiredAngle - currentAngle + 360) % 360);
+
       wheel.style.transform = `rotate(${rotation}deg)`;
 
       window.setTimeout(() => {
-        const clockwiseDistance = (prizeIndex - jackpotIndex + prizes.length) % prizes.length;
-        const counterClockwiseDistance = (jackpotIndex - prizeIndex + prizes.length) % prizes.length;
-        const nearMiss = (clockwiseDistance === 1 && stopOffset > 9)
-          || (counterClockwiseDistance === 1 && stopOffset < -9);
-        if (nearMiss) jackpotLabelEl.classList.add("jackpot-near-miss");
-        statusEl.textContent = `${nearMiss ? "So close to the jackpot. " : ""}${prize.name}. You won ${prize.candy} ${prize.candy === 1 ? "candy" : "candies"}.`;
+        const clockwiseDistance =
+          (prizeIndex - jackpotIndex + prizes.length) % prizes.length;
+
+        const counterClockwiseDistance =
+          (jackpotIndex - prizeIndex + prizes.length) % prizes.length;
+
+        const nearMiss =
+          (clockwiseDistance === 1 && stopOffset > 9) ||
+          (counterClockwiseDistance === 1 && stopOffset < -9);
+
+        if (nearMiss) {
+          jackpotLabelEl.classList.add("jackpot-near-miss");
+        }
+
+        statusEl.textContent =
+          `${nearMiss ? "So close to the jackpot. " : ""}` +
+          `${prize.name}. You won ${prize.candy} ` +
+          `${prize.candy === 1 ? "candy" : "candies"}.`;
+
         isSpinning = false;
         spinButton.disabled = false;
+
         showWinPopup(prize, nearMiss);
       }, 5100);
-    });
+    }
+
+    spinButton.addEventListener("click", spinWheel);
 
     function showWinPopup(prize, nearMiss) {
       const jackpot = prize.name === "Jackpot";
+
       winPopupIconEl.textContent = jackpot ? "💰" : prize.icon;
+
       winPopupTitleEl.textContent = jackpot
         ? `JACKPOT! ${prize.candy} candies!`
-        : `${nearMiss ? "So close! " : ""}${prize.candy} ${prize.candy === 1 ? "candy" : "candies"}!`;
+        : `${nearMiss ? "So close! " : ""}${prize.candy} ${
+            prize.candy === 1 ? "candy" : "candies"
+          }!`;
+
       winPopupCopyEl.textContent = jackpot
         ? `You hit the jackpot and won ${prize.candy} candies!`
-        : `${prize.name}: you won ${prize.candy} ${prize.candy === 1 ? "candy" : "candies"}!`;
+        : `${prize.name}: you won ${prize.candy} ${
+            prize.candy === 1 ? "candy" : "candies"
+          }!`;
+
       winPopupEl.classList.remove("hidden");
       winPopupEl.classList.add("flex");
       winPopupEl.setAttribute("aria-hidden", "false");
+
       document.querySelector("#win-popup-close").focus();
     }
 
@@ -244,10 +682,46 @@
       winPopupEl.classList.add("hidden");
       winPopupEl.classList.remove("flex");
       winPopupEl.setAttribute("aria-hidden", "true");
+
       spinButton.focus();
     }
 
-    document.querySelector("#win-popup-close").addEventListener("click", closeWinPopup);
+    document
+      .querySelector("#win-popup-close")
+      .addEventListener("click", closeWinPopup);
+
+    // Keyboard controls: Spacebar spins the wheel.
+    document.addEventListener("keydown", event => {
+      if (event.code !== "Space") return;
+
+      const target = event.target;
+
+      // Let users type normally in settings fields.
+      if (
+        target instanceof HTMLElement &&
+        (
+          target.isContentEditable ||
+          ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)
+        )
+      ) {
+        return;
+      }
+
+      // Prevent Spacebar from scrolling the page or activating
+      // a focused button a second time through its default behavior.
+      event.preventDefault();
+
+      // Ignore held-down/repeated Spacebar presses.
+      if (event.repeat || isSpinning) return;
+
+      // If the result popup is open, Spacebar starts the next spin.
+      if (!winPopupEl.classList.contains("hidden")) {
+        closeWinPopup();
+      }
+
+      spinWheel();
+    });
   </script>
+  <script src="../arduino-controller.js"></script>
 </body>
 </html>

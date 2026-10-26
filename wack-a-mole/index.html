@@ -333,7 +333,7 @@
 
   // Grave index mapping: 0 1 2 = top row; 3 4 5 = bottom row.
   // Numpad 4 5 6 = top row; Numpad 1 2 3 = bottom row.
-  const NUMPAD_HOLE_MAP = { Numpad4:0, Numpad5:1, Numpad6:2, Numpad1:3, Numpad2:4, Numpad3:5 };
+  const NUMPAD_HOLE_MAP = { Numpad4:0, Numpad5:1, Numpad6:2, Numpad1:3, Numpad2:4, Numpad3:5, KeyW:0, KeyE:1, KeyD:2, KeyA:3, KeyS:4, Space:5 };
   const holes=[];
   gridEl.innerHTML='';
   for(let i=0;i<6;i++) {
@@ -429,6 +429,7 @@
   startGuideBtn.addEventListener('click',startGame);
   playAgainBtn.addEventListener('click',startGame);
   loadConfig();
+  const arduinoScript = document.createElement('script'); arduinoScript.src = '../arduino-controller.js'; document.body.append(arduinoScript);
 </script>
 </body>
 </html>
