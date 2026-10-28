@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#100b1b">
   <title>Scare-o-lette | Halloween Roulette</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -23,6 +26,7 @@
   <style>
     :root { color-scheme: dark; }
     body { position: relative; isolation: isolate; }
+    #roulette-title { font-family: "Creepster", cursive; font-weight: 400; letter-spacing: .04em; }
 
     body::before {
       content: "";
@@ -40,7 +44,10 @@
       aspect-ratio: 1;
       display: grid;
       place-items: center;
+      filter: drop-shadow(0 14px 24px #0009);
     }
+
+    #roulette-game-section .wheel-wrap { max-width: 640px; }
 
     .pointer {
       position: absolute;
@@ -60,7 +67,7 @@
       position: absolute;
       inset: 8px;
       overflow: hidden;
-      border: 8px solid #4a344d;
+      border: 11px solid #c69a5b;
       border-radius: 50%;
       background: conic-gradient(
         from -15deg,
@@ -77,13 +84,16 @@
         #e4ad2f 300deg 330deg,
         #414261 330deg 360deg
       );
-      box-shadow: inset 0 0 0 3px #f6d69a66, 0 10px 25px #0008;
+      box-shadow: inset 0 0 0 4px #fff0bd77, inset 0 0 24px #120b1d88, 0 0 0 5px #3a2945, 0 10px 25px #0008;
       transition: transform 5s cubic-bezier(.12,.78,.12,1);
     }
+
+    .wheel::after { content: ""; position: absolute; inset: 12px; border: 1px solid #fff0bd66; border-radius: 50%; pointer-events: none; }
 
     .wheel::before {
       content: "";
       position: absolute;
+      z-index: 0;
       inset: 0;
       border-radius: 50%;
       background: repeating-conic-gradient(
@@ -95,20 +105,27 @@
 
     .wheel-label {
       position: absolute;
+      z-index: 1;
       left: 50%;
       top: 50%;
-      width: 42px;
-      height: 42px;
+      width: 48px;
+      height: 48px;
       display: grid;
       place-items: center;
-      margin: -21px;
-      font-size: clamp(1.25rem,4vw,2rem);
+      margin: -24px;
+      border: 1px solid #fff0bd88;
+      border-radius: 50%;
+      background: #17101dcc;
+      box-shadow: 0 2px 8px #0009, inset 0 1px 2px #fff4;
+      font-size: clamp(1rem,2.5vw,1.5rem);
       filter: drop-shadow(0 2px 2px #0008);
       transform:
         rotate(calc(var(--i)*30deg))
         translateY(clamp(-190px,-16vw,-115px))
         rotate(calc(var(--i)*-30deg));
     }
+
+    .wheel-amount { color: #fff4c4; font-size: clamp(.8rem,2vw,1.2rem); font-weight: 1000; line-height: 1; text-shadow: 0 2px 4px #120b18; }
 
     .wheel-label.jackpot-label {
       font-size: clamp(1.7rem,5vw,2.5rem);
@@ -131,7 +148,7 @@
 
     .jackpot-amount {
       color: #fff4c4;
-      font-size: .5rem;
+      font-size: clamp(.9rem,2.4vw,1.4rem);
       font-weight: 1000;
       line-height: 1;
       text-shadow: 0 1px 3px #38210c;
@@ -171,6 +188,17 @@
       opacity: .72;
     }
 
+    #play-mode { position: fixed; top: 12px; right: 12px; z-index: 100000; display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #ffd76b88; border-radius: 12px; background: #171321ee; color: #fff0d1; font-size: 22px; box-shadow: 0 4px 16px #0009; cursor: pointer; }
+    body.play-mode { height: 100vh; height: 100dvh; overflow: hidden; padding: 0; }
+    body.play-mode main { display: flex; width: 100vw; max-width: none; height: 100vh; height: 100dvh; align-items: stretch; }
+    body.play-mode main > :not(#roulette-game-section) { display: none !important; }
+    body.play-mode #back-link { display: none !important; }
+    body.play-mode #roulette-game-section { width: 100%; height: 100%; }
+    body.play-mode #roulette-game-section > div { width: 100%; max-width: none; height: 100%; justify-content: center; border: 0; border-radius: 0; padding: 1rem; }
+    body.play-mode .wheel-wrap { width: min(82vmin, 72vh, 760px); max-width: none; flex: 0 0 auto; margin: .5rem auto; }
+    body.play-mode .wheel-label { transform: rotate(calc(var(--i)*30deg)) translateY(clamp(-210px,-20vh,-105px)) rotate(calc(var(--i)*-30deg)); }
+    body.play-mode .wheel-label.jackpot-label { transform: rotate(calc(var(--i)*30deg)) translateY(clamp(-210px,-20vh,-105px)) rotate(calc(var(--i)*-30deg)); }
+
     /* Keyboard shortcut styling */
     .key-hint {
       display: inline-flex;
@@ -206,12 +234,14 @@
 
 <body class="min-h-screen overflow-x-hidden bg-[radial-gradient(ellipse_at_50%_0%,#452d57_0%,#21172e_38%,#0c0b16_100%)] px-3 py-6 font-sans text-[#fff5df] sm:px-6 sm:py-10">
 
-  <a
+  <a id="back-link"
     href="../index.html"
     aria-label="Back to Graveyard Arcade"
     title="Back to Graveyard Arcade"
     style="position:fixed;top:12px;left:12px;z-index:100000;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid #ffd76b88;border-radius:12px;background:#171321ee;color:#fff0d1;font:800 14px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 4px 16px #0009;cursor:pointer;"
   >&#8592; Graveyard Arcade</a>
+
+  <button id="play-mode" type="button" aria-label="Maximize roulette" title="Maximize roulette">&#x26F6;</button>
 
   <main class="relative mx-auto w-full max-w-6xl">
 
@@ -294,14 +324,13 @@
       </form>
     </details>
 
-    <section class="flex justify-center" aria-label="Halloween roulette game">
-      <div class="relative flex w-full max-w-2xl flex-col items-center overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#2a2038]/80 via-[#1d172a]/82 to-[#151221]/85 p-4 shadow-[0_24px_70px_#0009,inset_0_1px_0_#ffffff1c] backdrop-blur-sm sm:p-7">
+    <section id="roulette-game-section" class="flex justify-center" aria-label="Halloween roulette game">
+      <div class="relative flex w-full max-w-2xl flex-col items-center overflow-hidden rounded-[2rem] border border-white/10 bg-transparent p-4 sm:p-7">
 
         <div class="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-purple-400/10 blur-3xl"></div>
 
         <div class="relative z-10 mb-1 text-center">
-          <p class="text-[.65rem] font-black uppercase tracking-[.2em] text-purple-200">Step right up</p>
-          <h2 class="mt-1 text-xl font-extrabold sm:text-2xl">The Haunted Wheel</h2>
+          <h1 id="roulette-title" class="mt-1 text-4xl font-black leading-none tracking-tight drop-shadow-[0_4px_0_#542b69] sm:text-6xl">Scare-o-lette</h1>
         </div>
 
         <div class="wheel-wrap mx-auto my-4 w-full max-w-[480px]">
@@ -313,23 +342,20 @@
             role="img"
             aria-label="Roulette wheel with twelve spooky prizes, including a 100-candy jackpot"
           >
-            <span class="wheel-label" style="--i:0" aria-hidden="true">🎃</span>
-            <span class="wheel-label" style="--i:1" aria-hidden="true">👻</span>
-            <span class="wheel-label" style="--i:2" aria-hidden="true">🍬</span>
-            <span class="wheel-label" style="--i:3" aria-hidden="true">🦇</span>
-            <span class="wheel-label" style="--i:4" aria-hidden="true">🧙</span>
-            <span class="wheel-label" style="--i:5" aria-hidden="true">🕷️</span>
-            <span class="wheel-label" style="--i:6" aria-hidden="true">💀</span>
-            <span class="wheel-label" style="--i:7" aria-hidden="true">🐈‍⬛</span>
-            <span class="wheel-label" style="--i:8" aria-hidden="true">🍭</span>
-            <span class="wheel-label" style="--i:9" aria-hidden="true">👻</span>
+            <span class="wheel-label" style="--i:0" aria-hidden="true"><span class="wheel-amount" data-prize-index="0">5</span></span>
+            <span class="wheel-label" style="--i:1" aria-hidden="true"><span class="wheel-amount" data-prize-index="1">10</span></span>
+            <span class="wheel-label" style="--i:2" aria-hidden="true"><span class="wheel-amount" data-prize-index="2">15</span></span>
+            <span class="wheel-label" style="--i:3" aria-hidden="true"><span class="wheel-amount" data-prize-index="3">1</span></span>
+            <span class="wheel-label" style="--i:4" aria-hidden="true"><span class="wheel-amount" data-prize-index="4">20</span></span>
+            <span class="wheel-label" style="--i:5" aria-hidden="true"><span class="wheel-amount" data-prize-index="5">1</span></span>
+            <span class="wheel-label" style="--i:6" aria-hidden="true"><span class="wheel-amount" data-prize-index="6">1</span></span>
+            <span class="wheel-label" style="--i:7" aria-hidden="true"><span class="wheel-amount" data-prize-index="7">25</span></span>
+            <span class="wheel-label" style="--i:8" aria-hidden="true"><span class="wheel-amount" data-prize-index="8">10</span></span>
+            <span class="wheel-label" style="--i:9" aria-hidden="true"><span class="wheel-amount" data-prize-index="9">5</span></span>
 
-            <span class="wheel-label jackpot-label" style="--i:10" aria-hidden="true">
-              <span>💰</span>
-              <small class="jackpot-amount">100</small>
-            </span>
+            <span class="wheel-label jackpot-label" style="--i:10" aria-hidden="true"><small class="wheel-amount jackpot-amount" data-prize-index="10">100</small></span>
 
-            <span class="wheel-label" style="--i:11" aria-hidden="true">🕸️</span>
+            <span class="wheel-label" style="--i:11" aria-hidden="true"><span class="wheel-amount" data-prize-index="11">1</span></span>
           </div>
 
           <div class="hub" aria-hidden="true">🕸️</div>
@@ -345,17 +371,6 @@
           <span class="ml-2" aria-hidden="true">✦</span>
         </button>
 
-        <!-- Keyboard shortcut keymap -->
-        <div class="relative z-10 mt-5 flex flex-wrap items-center justify-center gap-2 text-xs font-bold text-lilac">
-          <span class="mr-1 uppercase tracking-[.18em] opacity-70">Controls</span>
-          <kbd class="key-hint">SPACE</kbd>
-          <span>Spin the wheel</span>
-        </div>
-
-        <p class="mt-2 text-center text-[.7rem] text-lilac/60">
-          Or click the button to play.
-        </p>
-
       </div>
     </section>
 
@@ -364,10 +379,11 @@
 
   <div
     id="win-popup"
-    class="fixed inset-0 z-50 hidden items-center justify-center bg-[#09040d]/80 p-5 backdrop-blur-sm"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-[#09040d]/80 p-5"
     role="dialog"
     aria-modal="true"
     aria-labelledby="win-popup-title"
+    tabindex="-1"
     aria-hidden="true"
   >
     <div class="relative w-full max-w-sm overflow-hidden rounded-[2rem] border border-amber-200/30 bg-gradient-to-br from-[#49334e] via-[#2a2038] to-[#171326] p-7 text-center shadow-[0_25px_100px_#000c,0_0_50px_#fbbf2440]">
@@ -386,18 +402,6 @@
 
       <p id="win-popup-copy" class="relative mt-3 text-lilac">
         Candy found!
-      </p>
-
-      <button
-        id="win-popup-close"
-        class="relative mt-6 w-full rounded-xl bg-gradient-to-b from-amber-200 to-pumpkin px-6 py-3 font-black uppercase tracking-wider text-[#25182d] shadow-[0_4px_0_#9c511e] transition hover:-translate-y-0.5 hover:brightness-110 focus:outline-none focus:ring-4 focus:ring-amber-200/40"
-        type="button"
-      >
-        Start Spin Again
-      </button>
-
-      <p class="relative mt-3 text-xs text-lilac/70">
-        Press SPACE to spin again
       </p>
 
     </div>
@@ -506,6 +510,10 @@
       });
 
       jackpotAmountEl.textContent = payoutTiers.jackpot;
+      document.querySelectorAll(".wheel-amount[data-prize-index]").forEach(label => {
+        const prize = prizes[Number(label.dataset.prizeIndex)];
+        if (prize) label.textContent = prize.candy;
+      });
 
       wheel.setAttribute(
         "aria-label",
@@ -675,7 +683,8 @@
       winPopupEl.classList.add("flex");
       winPopupEl.setAttribute("aria-hidden", "false");
 
-      document.querySelector("#win-popup-close").focus();
+      winPopupEl.focus();
+      window.setTimeout(closeWinPopup, 3000);
     }
 
     function closeWinPopup() {
@@ -686,9 +695,40 @@
       spinButton.focus();
     }
 
-    document
-      .querySelector("#win-popup-close")
-      .addEventListener("click", closeWinPopup);
+    const playModeButton = document.querySelector("#play-mode");
+    function syncPlayMode() {
+      const active = Boolean(document.fullscreenElement) || document.body.classList.contains("play-mode");
+      playModeButton.innerHTML = active ? "&#x2922;" : "&#x26F6;";
+      playModeButton.setAttribute("aria-label", active ? "Exit fullscreen" : "Maximize roulette");
+      playModeButton.title = active ? "Exit fullscreen" : "Maximize roulette";
+    }
+    playModeButton.addEventListener("click", async () => {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen().catch(() => {});
+        document.body.classList.remove("play-mode");
+      } else if (document.body.classList.contains("play-mode")) {
+        document.body.classList.remove("play-mode");
+      } else if (document.documentElement.requestFullscreen) {
+        try {
+          await document.documentElement.requestFullscreen();
+        } catch {
+          document.body.classList.add("play-mode");
+        }
+      } else {
+        document.body.classList.add("play-mode");
+      }
+      syncPlayMode();
+    });
+    document.addEventListener("fullscreenchange", () => {
+      document.body.classList.toggle("play-mode", Boolean(document.fullscreenElement));
+      syncPlayMode();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && !document.fullscreenElement) {
+        document.body.classList.remove("play-mode");
+        syncPlayMode();
+      }
+    });
 
     // Keyboard controls: Spacebar spins the wheel.
     document.addEventListener("keydown", event => {
