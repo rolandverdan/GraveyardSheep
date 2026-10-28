@@ -26,22 +26,14 @@
   }
   .hud b { color: #fff; }
 
-  /* Config button & drawer */
-  .config-btn {
-    background: #253d1e; color: #a4f85e; border: 1px solid #4c7a36;
-    padding: 6px 14px; font-size: 0.95rem; border-radius: 8px; cursor: pointer;
-    box-shadow: none; margin: 0; font-weight: bold; transition: all .15s;
-    display: inline-flex; align-items: center; gap: 6px;
-  }
-  .config-btn:hover { background: #35572b; color: #fff; }
-  .config-btn:active { transform: translateY(1px); }
+  /* Config drawer */
 
   #configDrawer {
     position: fixed; top: 0; right: 0; width: 340px; max-width: 90vw; height: 100vh;
     background: linear-gradient(180deg, #182813 0%, #0c1409 100%);
     border-left: 3px solid #4c7a36;
     box-shadow: -10px 0 35px rgba(0,0,0,0.85);
-    z-index: 50; padding: 22px 20px;
+    z-index: 100001; padding: 22px 20px; overflow-y: auto;
     display: flex; flex-direction: column; gap: 16px;
     transform: translateX(100%);
     transition: transform .25s ease-in-out;
@@ -85,6 +77,55 @@
     border: 1px dashed #3a5a2a; border-radius: 6px; cursor: pointer; box-shadow: none; margin: 0;
   }
   .cfg-reset-btn:hover { color: #ff8080; border-color: #ff8080; }
+  .cfg-arduino-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; margin-top: 4px; }
+  #arduinoStatus { border-radius: 999px; background: rgba(255,255,255,.1); color: #ffe9a8; padding: 4px 12px; font-size: .8rem; font-weight: bold; }
+  #arduinoStatus.connected { background: rgba(139,255,90,.15); color: #8bff5a; }
+  .cfg-small-btn {
+    background: #8bff5a; color: #10200c; font-size: .9rem; padding: 7px 14px;
+    border-radius: 8px; box-shadow: none; margin: 0; letter-spacing: 0;
+  }
+  .cfg-small-btn.secondary { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.3); }
+  .cfg-small-btn:disabled { opacity: .6; cursor: wait; }
+  #arduinoLog { max-height: 4.5em; overflow: auto; white-space: pre-wrap; word-break: break-all; font-size: .75rem; color: #a4f85e; }
+  .cfg-check { display: flex; align-items: center; gap: 8px; justify-content: flex-start !important; cursor: pointer; }
+  .cfg-check input { width: 16px; height: 16px; accent-color: #8bff5a; }
+
+  /* Fixed toolbar (same layout as trickyhouse) */
+  .corner-btn {
+    position: fixed; top: 12px; z-index: 100000; display: grid; place-items: center;
+    width: 44px; height: 44px; padding: 0; margin: 0; border: 1px solid #ffd76b88; border-radius: 12px;
+    background: #171321ee; color: #fff0d1; font-size: 22px; letter-spacing: 0; box-shadow: 0 4px 16px #0009;
+  }
+  #settings-open { right: 12px; }
+  #play-mode { right: 64px; }
+  #controller-notice {
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 100000;
+    padding: 10px 16px; border: 1px solid #f87171aa; border-radius: 12px; background: #2a1218f2;
+    color: #fecaca; font: 700 14px/1.3 system-ui, sans-serif; box-shadow: 0 4px 16px #0009; text-align: center;
+  }
+  #controller-notice[hidden] { display: none; }
+  body.play-mode #back-link, body.play-mode #play-mode, body.play-mode #settings-open, body.hide-back-link #back-link { display: none !important; }
+  body.play-mode { justify-content: center; }
+
+  /* Landscape (normal and fullscreen): two columns that fit one screen —
+     coffin & timer on the left, cards on the right */
+  @media (orientation: landscape) {
+    body {
+      display: grid; grid-template-columns: auto auto; column-gap: 5vw;
+      justify-content: center; align-content: center; justify-items: center;
+      height: 100vh; overflow: hidden; padding: 64px 20px 20px;
+    }
+    body.play-mode { padding: 20px; }
+    body > :not(#grid) { grid-column: 1; }
+    body #grid { grid-column: 2; grid-row: 1 / span 7; align-self: center; width: min(46vw, calc((100vh - 100px) * 1.45)); max-width: none; gap: 2vh; }
+    h1 { font-size: clamp(1.4rem, 4vh, 2.6rem); white-space: nowrap; }
+    .coffin-wrap#coffin { --h: clamp(150px, calc(100vh - 380px), 520px); --w: calc(var(--h) * .6875); }
+    /* Lid fades as it slides so it never runs off the left edge */
+    #coffin .lid { transition: transform .45s ease-in-out, opacity .45s ease-in-out; }
+    #coffin.open .lid { opacity: 0; }
+    body .timer-wrap { width: min(40vw, 600px); }
+    body .key-hint { min-width: 4vh; height: 4vh; font-size: 2.4vh; }
+  }
 
   /* ---------- Coffin (the flash screen) ---------- */
   .coffin-wrap {
@@ -205,6 +246,9 @@
   .popup p { font-size: 1.15rem; margin-bottom: 8px; line-height: 1.5; }
 
   #candyReward { margin: 6px 0 10px; }
+  .press-any { animation: pressPulse 1.2s ease-in-out infinite; }
+  @keyframes pressPulse { 50% { filter: brightness(1.3); transform: scale(1.05); } }
+  #newGameBtn.waiting { visibility: hidden; }
   #candyReward .big {
     font-size: 7rem; font-weight: 900; line-height: 1; color: #ffd23b;
     text-shadow: 0 0 25px #ff9d00, 0 6px 0 #8a4b00;
@@ -244,21 +288,39 @@
 </style>
 </head>
 <body>
-  <a href="../index.html" aria-label="Back to Graveyard Arcade" title="Back to Graveyard Arcade" style="position:fixed;top:12px;left:12px;z-index:100000;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid #ffd76b88;border-radius:12px;background:#171321ee;color:#fff0d1;font:800 14px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 4px 16px #0009;cursor:pointer;">&#8592; Graveyard Arcade</a>
+  <a id="back-link" href="../index.html" aria-label="Back to Graveyard Arcade" title="Back to Graveyard Arcade" style="position:fixed;top:12px;left:12px;z-index:100000;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid #ffd76b88;border-radius:12px;background:#171321ee;color:#fff0d1;font:800 14px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 4px 16px #0009;cursor:pointer;">&#8592; Graveyard Arcade</a>
+  <button id="settings-open" class="corner-btn" type="button" aria-label="Settings" title="Settings">&#9881;</button>
+  <button id="play-mode" class="corner-btn" type="button" aria-label="Maximize game" title="Maximize game">&#x26F6;</button>
+  <div id="controller-notice" role="alert">&#127918; Controller not connected. Plug in the Arduino, or click &#9881; to connect.</div>
   <h1>🧟 ZOMBIE MATCHING 🧟</h1>
 
   <div class="hud">
     <div>Total Candy: <b id="totalCandy">0</b> 🍬</div>
-    <button id="openConfigBtn" class="config-btn" title="Candy Reward Settings">⚙️ Config</button>
   </div>
 
   <!-- Hideable Config Drawer -->
   <div id="configDrawer">
     <h3>
-      <span>⚙️ Candy Settings</span>
+      <span>⚙️ Settings</span>
       <button id="closeConfigBtn" class="close-cfg-btn" title="Hide Settings">✕</button>
     </h3>
     
+    <div class="cfg-group">
+      <label>Arduino 🎮</label>
+      <div class="cfg-sub">BUTTON 1 – BUTTON 6 pick cards 1 – 6. Serial speed: 115200 baud.</div>
+      <div class="cfg-arduino-row">
+        <span id="arduinoStatus" role="status" aria-live="polite">Not connected</span>
+        <button id="arduinoConnect" class="cfg-small-btn" type="button">Connect COM port</button>
+        <button id="arduinoDisconnect" class="cfg-small-btn secondary hidden" type="button">Disconnect</button>
+      </div>
+      <div id="arduinoHelp" class="cfg-sub">Choose your Arduino port.</div>
+      <pre id="arduinoLog" aria-live="polite">Arduino log: waiting to connect</pre>
+    </div>
+
+    <div class="cfg-group">
+      <label class="cfg-check"><input id="hideBackLink" type="checkbox"> Hide "Graveyard Arcade" back button</label>
+    </div>
+
     <div class="cfg-group">
       <label>Win Range (Min – Max) 🍬</label>
       <div class="cfg-sub">Candies awarded for picking the correct zombie.</div>
@@ -340,7 +402,7 @@
           <h3>4 · WIN CANDY</h3>
         </div>
       </div>
-      <button id="startBtn">START GAME</button>
+      <button id="startBtn" class="press-any">PRESS ANY BUTTON TO START</button>
     </div>
   </div>
 
@@ -350,7 +412,7 @@
       <h2 id="ovTitle"></h2>
       <div id="candyReward"></div>
       <p id="ovText"></p>
-      <button id="newGameBtn">START GAME</button>
+      <button id="newGameBtn" class="press-any">PRESS ANY BUTTON TO PLAY AGAIN</button>
     </div>
   </div>
 
@@ -412,7 +474,7 @@
 
   // Config Drawer Controls
   const configDrawer = document.getElementById('configDrawer');
-  const openConfigBtn = document.getElementById('openConfigBtn');
+  const openConfigBtn = document.getElementById('settings-open');
   const closeConfigBtn = document.getElementById('closeConfigBtn');
   const saveConfigBtn = document.getElementById('saveConfigBtn');
   const resetConfigBtn = document.getElementById('resetConfigBtn');
@@ -478,11 +540,12 @@
     return a;
   }
 
-  // Numpad mapping follows each card's current screen position:
-  // Card 1 = 4, Card 2 = 5, Card 3 = 6,
-  // Card 4 = 1, Card 5 = 2, Card 6 = 3.
+  // Keyboard mapping follows each card's current screen position:
+  // Card 1 = Numpad4/W, Card 2 = Numpad5/E, Card 3 = Numpad6/D,
+  // Card 4 = Numpad1/A, Card 5 = Numpad2/S, Card 6 = Numpad3/Space.
+  // Arduino BUTTON 1–6 picks card 1–6 (see handleArduinoCommand).
   const CARD_KEY_MAP = { Numpad4:0, Numpad5:1, Numpad6:2, Numpad1:3, Numpad2:4, Numpad3:5, KeyW:0, KeyE:1, KeyD:2, KeyA:3, KeyS:4, Space:5 };
-  const NUMPAD_LABELS = ['4', '5', '6', '1', '2', '3'];
+  const CARD_LABELS = ['1', '2', '3', '4', '5', '6'];
 
   function buildGrid() {
     grid.innerHTML = '';
@@ -493,7 +556,7 @@
       card.dataset.position = position;
       card.innerHTML = `
         <img src="${ZOMBIES[idx]}" alt="Zombie ${idx + 1}">
-        <span class="key-hint">${NUMPAD_LABELS[position]}</span>
+        <span class="key-hint">${CARD_LABELS[position]}</span>
       `;
       card.addEventListener('click', () => pick(card));
       grid.appendChild(card);
@@ -634,20 +697,200 @@
       }
     }
     overlay.classList.remove('hidden');
+    // Ignore input for a moment so a press from the round just played
+    // can't skip the result; then invite the player to go again.
+    readyForNextGame = false;
+    newGameBtn.classList.add('waiting');
+    setTimeout(() => {
+      readyForNextGame = true;
+      newGameBtn.classList.remove('waiting');
+    }, RESULT_LOCK_MS);
   }
 
-  document.getElementById('startBtn').addEventListener('click', () => {
-    document.getElementById('landing').classList.add('hidden');
-    startGame();
+  const landing = document.getElementById('landing');
+  const newGameBtn = document.getElementById('newGameBtn');
+  const RESULT_LOCK_MS = 1500;
+  let readyForNextGame = false;
+
+  // Any keyboard key or Arduino button starts a game from the
+  // how-to-play screen or (once unlocked) the result pop-up.
+  function pressAnyButton() {
+    if (configDrawer.classList.contains('open')) return false;
+    if (!landing.classList.contains('hidden')) {
+      landing.classList.add('hidden');
+      startGame();
+      return true;
+    }
+    if (!overlay.classList.contains('hidden') && readyForNextGame) {
+      readyForNextGame = false;
+      startGame();
+      return true;
+    }
+    return false;
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.repeat || ['Escape', 'Shift', 'Control', 'Alt', 'Meta', 'Tab'].includes(e.key)) return;
+    if (e.target instanceof HTMLInputElement) return;
+    if (pressAnyButton()) e.preventDefault(); // stop Space/Enter also clicking a focused button
   });
-  document.getElementById('newGameBtn').addEventListener('click', startGame);
+
+  document.getElementById('startBtn').addEventListener('click', pressAnyButton);
+  newGameBtn.addEventListener('click', pressAnyButton);
 
   // Fill tutorial pictures with zombies from the folder
   document.querySelectorAll('img[data-z]').forEach(im => { im.src = ZOMBIES[im.dataset.z - 1]; });
 
   loadConfig();
   buildGrid();
-  const arduinoScript = document.createElement('script'); arduinoScript.src = '../arduino-controller.js'; document.body.append(arduinoScript);
+
+  // Remembered per browser so the back button stays hidden after a reload.
+  const hideBackLinkEl = document.getElementById('hideBackLink');
+  function setBackLinkHidden(hidden) {
+    hideBackLinkEl.checked = hidden;
+    document.body.classList.toggle('hide-back-link', hidden);
+    try { localStorage.setItem('zombiematching-hide-back-link', hidden ? '1' : ''); } catch (_) {}
+  }
+  try { setBackLinkHidden(localStorage.getItem('zombiematching-hide-back-link') === '1'); } catch (_) {}
+  hideBackLinkEl.addEventListener('change', () => setBackLinkHidden(hideBackLinkEl.checked));
+
+  // Maximize: fullscreen without the corner buttons.
+  document.getElementById('play-mode').addEventListener('click', (e) => {
+    e.currentTarget.blur();
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen().catch(() => document.body.classList.toggle('play-mode'));
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !document.fullscreenElement) document.body.classList.remove('play-mode');
+  });
+  document.addEventListener('fullscreenchange', () => {
+    document.body.classList.toggle('play-mode', Boolean(document.fullscreenElement));
+  });
+
+  // Arduino Web Serial controller: accepts newline-delimited
+  // BUTTON 1 ... BUTTON 6 messages at 115200 baud.
+  const arduinoConnectBtn = document.getElementById('arduinoConnect');
+  const arduinoDisconnectBtn = document.getElementById('arduinoDisconnect');
+  const arduinoStatus = document.getElementById('arduinoStatus');
+  const arduinoHelp = document.getElementById('arduinoHelp');
+  const arduinoLog = document.getElementById('arduinoLog');
+  let arduinoPort = null;
+  let arduinoReader = null;
+  let arduinoReadTask = null;
+  let arduinoKeepReading = false;
+
+  function logArduino(msg) {
+    console.log(msg);
+    arduinoLog.textContent = `Arduino log: ${msg}`;
+  }
+
+  function setArduinoStatus(label, connected = false) {
+    arduinoStatus.textContent = label;
+    arduinoStatus.classList.toggle('connected', connected);
+    arduinoConnectBtn.classList.toggle('hidden', connected);
+    arduinoDisconnectBtn.classList.toggle('hidden', !connected);
+    document.getElementById('controller-notice').hidden = connected;
+  }
+
+  // Any button starts the game from the tutorial / result pop-up;
+  // during a round, BUTTON n picks card n.
+  function handleArduinoCommand(rawCommand) {
+    const match = rawCommand.trim().toUpperCase().match(/^BUTTON\s*_?([1-6])$/);
+    if (!match) return;
+    if (pressAnyButton()) return;
+    if (accepting && !configDrawer.classList.contains('open')) {
+      const card = grid.querySelector(`.card[data-position="${match[1] - 1}"]`);
+      if (card) pick(card);
+    }
+  }
+
+  async function disconnectArduino() {
+    arduinoKeepReading = false;
+    try { if (arduinoReader) await arduinoReader.cancel(); } catch (_) {}
+    try { if (arduinoReadTask) await arduinoReadTask; } catch (_) {}
+    arduinoReader = null;
+    arduinoReadTask = null;
+    if (arduinoPort) {
+      try { await arduinoPort.close(); } catch (_) {}
+    }
+    arduinoPort = null;
+    setArduinoStatus('Not connected', false);
+    arduinoHelp.textContent = 'Connect your Arduino over USB, choose its port, then send BUTTON 1 – BUTTON 6 over Serial at 115200 baud.';
+  }
+
+  // With no port, asks the user to pick one. Ports picked before can be
+  // passed in directly, which is how auto-connect works.
+  async function connectArduino(port) {
+    if (arduinoPort) return;
+    logArduino('connect requested');
+    if (!('serial' in navigator)) {
+      logArduino('Web Serial unavailable. Use desktop Chrome or Edge on localhost or HTTPS.');
+      setArduinoStatus('Browser unsupported', false);
+      arduinoHelp.textContent = 'Web Serial needs desktop Chrome or Edge and a localhost or HTTPS page.';
+      return;
+    }
+    arduinoConnectBtn.disabled = true;
+    arduinoConnectBtn.textContent = 'Connecting…';
+    try {
+      if (!port) {
+        logArduino('opening browser port picker; select your Arduino COM port');
+        port = await navigator.serial.requestPort();
+      }
+      arduinoPort = port;
+      logArduino('port selected; opening at 115200 baud');
+      await arduinoPort.open({ baudRate: 115200 });
+      logArduino('CONNECTED at 115200 baud; press a controller button to check for input');
+      setArduinoStatus('Connected · 115200', true);
+      arduinoHelp.textContent = 'Connected. BUTTON 1 – 6 pick the matching card; any button starts a game.';
+      arduinoKeepReading = true;
+      const decoder = new TextDecoder();
+      let buffer = '';
+      arduinoReader = arduinoPort.readable.getReader();
+      arduinoReadTask = (async () => {
+        try {
+          while (arduinoKeepReading) {
+            const { value, done } = await arduinoReader.read();
+            if (done) break;
+            const text = decoder.decode(value, { stream: true });
+            logArduino(`received ${JSON.stringify(text)}`);
+            buffer += text;
+            const lines = buffer.split(/\n/);
+            buffer = lines.pop() || '';
+            for (const line of lines) handleArduinoCommand(line);
+            if (buffer.length > 100) buffer = buffer.slice(-100);
+          }
+        } catch (error) {
+          if (arduinoKeepReading) {
+            logArduino(`serial read failed: ${error.message}`);
+            setArduinoStatus('Read error', false);
+            arduinoHelp.textContent = `Serial read failed: ${error.message}. Check the USB connection and baud rate.`;
+          }
+        } finally {
+          try { arduinoReader?.releaseLock(); } catch (_) {}
+        }
+      })();
+    } catch (error) {
+      logArduino(`connection failed: ${error.message}`);
+      arduinoPort = null;
+      setArduinoStatus('Not connected', false);
+      arduinoHelp.textContent = error.name === 'NotFoundError'
+        ? 'No port selected. Click Connect again and select your Arduino USB port.'
+        : `Could not connect: ${error.message}. Close Arduino Serial Monitor if it is using the port, then try again.`;
+    } finally {
+      arduinoConnectBtn.disabled = false;
+      arduinoConnectBtn.textContent = 'Connect COM port';
+    }
+  }
+  arduinoConnectBtn.addEventListener('click', () => connectArduino());
+  arduinoDisconnectBtn.addEventListener('click', disconnectArduino);
+  if ('serial' in navigator) {
+    navigator.serial.addEventListener('disconnect', (e) => {
+      if (arduinoPort && e.target === arduinoPort) disconnectArduino();
+    });
+    // Auto-connect to a port that was picked before: on page load, and when it's plugged in.
+    navigator.serial.addEventListener('connect', (e) => connectArduino(e.target));
+    navigator.serial.getPorts().then(ports => { if (ports[0]) connectArduino(ports[0]); });
+  }
 </script>
 </body>
 </html>
