@@ -34,6 +34,11 @@
     #start-screen { transition: opacity 420ms ease, visibility 420ms ease; }
     #start-screen.start-screen-exit { opacity: 0; visibility: hidden; pointer-events: none; }
     #start-game { animation: start-card-in 850ms 180ms both; }
+    body.play-mode { padding: 0; }
+    body.play-mode main { display: flex; max-width: none; height: 100vh; align-items: center; justify-content: center; }
+    body.play-mode main > :not(#game-section) { display: none; }
+    body.play-mode #back-link, body.play-mode #play-mode, body.play-mode #settings-open, body.hide-back-link #back-link { display: none !important; }
+    body.play-mode #game-section { width: min(100vw, calc((100vh - 60px) * 1.8)); }
     @media (prefers-reduced-motion: reduce) { .scare-pop { animation: none; } }
     @media (prefers-reduced-motion: reduce) {
       .start-card-in, .moon-float, .candy-bump, #start-game { animation: none !important; }
@@ -42,7 +47,27 @@
   </style>
 </head>
 <body data-theme="woods" class="min-h-screen bg-[radial-gradient(ellipse_at_50%_0%,#473064_0%,#1a1630_42%,#090d19_100%)] px-3 pb-12 pt-5 font-sans text-[#fff7e6] sm:px-6 sm:pt-9">
-  <a href="../index.html" aria-label="Back to Graveyard Arcade" title="Back to Graveyard Arcade" style="position:fixed;top:12px;left:12px;z-index:100000;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid #ffd76b88;border-radius:12px;background:#171321ee;color:#fff0d1;font:800 14px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 4px 16px #0009;cursor:pointer;">&#8592; Graveyard Arcade</a>
+  <a id="back-link" href="../index.html" aria-label="Back to Graveyard Arcade" title="Back to Graveyard Arcade" style="position:fixed;top:12px;left:12px;z-index:100000;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid #ffd76b88;border-radius:12px;background:#171321ee;color:#fff0d1;font:800 14px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 4px 16px #0009;cursor:pointer;">&#8592; Graveyard Arcade</a>
+  <button id="settings-open" type="button" aria-label="Arduino settings" title="Arduino settings" style="position:fixed;top:12px;right:12px;z-index:100000;display:grid;place-items:center;width:44px;height:44px;border:1px solid #ffd76b88;border-radius:12px;background:#171321ee;color:#fff0d1;font-size:22px;box-shadow:0 4px 16px #0009;cursor:pointer;">&#9881;</button>
+  <button id="play-mode" type="button" aria-label="Maximize game" title="Maximize game" style="position:fixed;top:12px;right:64px;z-index:100000;display:grid;place-items:center;width:44px;height:44px;border:1px solid #ffd76b88;border-radius:12px;background:#171321ee;color:#fff0d1;font-size:22px;box-shadow:0 4px 16px #0009;cursor:pointer;">&#x26F6;</button>
+  <div id="controller-notice" role="alert" style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:100000;padding:10px 16px;border:1px solid #f87171aa;border-radius:12px;background:#2a1218f2;color:#fecaca;font:700 14px/1.3 system-ui,sans-serif;box-shadow:0 4px 16px #0009;text-align:center;">&#127918; Controller not connected. Plug in the Arduino, or click &#9881; to connect.</div>
+  <dialog id="settings-modal" class="w-[calc(100%-2rem)] max-w-sm rounded-2xl border border-emerald-300/20 bg-[#111c20] p-5 text-center text-white shadow-[0_25px_90px_#000c] backdrop:bg-black/70" aria-labelledby="settings-title">
+    <div class="flex items-center justify-between">
+      <h2 id="settings-title" class="font-black uppercase tracking-wider text-emerald-200">Arduino</h2>
+      <button id="settings-close" type="button" class="rounded-lg px-2 text-xl text-white/70 hover:text-white" aria-label="Close">&times;</button>
+    </div>
+    <div class="mt-3 flex flex-wrap items-center justify-center gap-2">
+      <span id="arduino-status" class="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-amber-100" role="status" aria-live="polite">Not connected</span>
+      <button id="arduino-connect" class="rounded-lg bg-emerald-300 px-4 py-2 text-sm font-black text-[#10201c] transition hover:brightness-110" type="button">Connect COM port</button>
+      <button id="arduino-disconnect" class="hidden rounded-lg border border-white/20 px-3 py-2 text-sm font-bold text-white" type="button">Disconnect</button>
+    </div>
+    <p id="arduino-help" class="mt-2 text-xs text-lilac/80">Choose your Arduino port. Serial speed: 115200 baud.</p>
+    <pre id="arduino-log" class="mt-2 max-h-16 overflow-auto whitespace-pre-wrap break-all text-left text-xs text-emerald-200" aria-live="polite">Arduino log: waiting to connect</pre>
+    <label class="mt-4 flex items-center justify-center gap-2 border-t border-white/10 pt-4 text-sm font-bold text-lilac">
+      <input id="hide-back-link" type="checkbox" class="h-4 w-4 accent-emerald-300">
+      Hide "Graveyard Arcade" back button
+    </label>
+  </dialog>
   <main class="mx-auto w-full max-w-6xl [perspective:1400px]">
     <header class="relative mb-7 overflow-hidden rounded-3xl border border-white/10 bg-[#171326]/80 px-5 py-7 text-center shadow-2xl shadow-black/30 sm:py-9">
       <div class="absolute left-6 top-5 grid h-10 w-10 place-items-center rounded-full border border-amber-100/20 bg-gradient-to-br from-amber-100 to-amber-300 shadow-[0_0_30px_#fcd34d66] sm:left-12 sm:top-8 sm:h-14 sm:w-14"></div>
@@ -82,12 +107,12 @@
       </div>
     </details>
 
-    <section class="overflow-hidden rounded-2xl border border-white/10 bg-[#101526] shadow-[0_28px_70px_#02030b99,0_8px_18px_#0008,inset_0_1px_0_#ffffff1c] ring-1 ring-black/30" aria-label="Trick or treat game">
+    <section id="game-section" class="overflow-hidden rounded-2xl border border-white/10 bg-[#101526] shadow-[0_28px_70px_#02030b99,0_8px_18px_#0008,inset_0_1px_0_#ffffff1c] ring-1 ring-black/30" aria-label="Trick or treat game">
       <div class="zone-toolbar flex items-center justify-between border-b border-white/10 px-4 py-3">
         <div class="flex items-center gap-2"><span class="zone-dot h-2.5 w-2.5 rounded-full"></span><div><span id="zone-name" class="block text-xs font-bold uppercase tracking-[.16em] text-lilac">Whispering Woods</span><span id="zone-detail" class="block text-[.62rem] font-semibold text-lilac/70">Fireflies on the trail</span></div></div>
         <div class="text-right"><span id="zone-stage" class="zone-stage block text-[.65rem] font-black uppercase tracking-wider">Region 1 of 4</span><span class="block text-[.6rem] font-semibold text-lilac/60">Halloween / 8:00 PM</span></div>
       </div>
-      <canvas id="game" class="block w-full touch-none" width="900" height="500" tabindex="0" aria-label="Explore a scrolling pixel-art Halloween world. Use arrow keys or WASD to move, then Space to knock on a nearby house."></canvas>
+      <canvas id="game" class="block w-full touch-none" width="900" height="500" tabindex="0" aria-label="Explore a scrolling pixel-art Halloween world. Use the joystick to move, then press the button to knock on a nearby house."></canvas>
     </section>
     <nav class="mt-3 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-[#171326]/90 p-2 shadow-lg sm:grid-cols-4" aria-label="Adventure regions">
       <div id="region-woods" class="region-chip rounded-xl border border-white/10 bg-black/15 px-2 py-2 text-center text-xs font-bold text-slate-200/70 sm:text-sm" data-region="woods" aria-current="step"><span aria-hidden="true">&#127794;</span><span class="ml-1">Woods</span><span id="region-count-woods" class="region-count mt-0.5 block text-[.62rem] font-black">0 / 8 houses</span></div>
@@ -95,11 +120,10 @@
       <div id="region-city" class="region-chip rounded-xl border border-white/10 bg-black/15 px-2 py-2 text-center text-xs font-bold text-slate-200/70 sm:text-sm" data-region="city" aria-current="false"><span aria-hidden="true">&#127961;</span><span class="ml-1">Abandoned City</span><span id="region-count-city" class="region-count mt-0.5 block text-[.62rem] font-black">0 / 8 houses</span></div>
       <div id="region-marsh" class="region-chip rounded-xl border border-white/10 bg-black/15 px-2 py-2 text-center text-xs font-bold text-slate-200/70 sm:text-sm" data-region="marsh" aria-current="false"><span aria-hidden="true">&#127851;</span><span class="ml-1">Pumpkin Marsh</span><span id="region-count-marsh" class="region-count mt-0.5 block text-[.62rem] font-black">0 / 8 houses</span></div>
     </nav>
-    <div class="my-3 flex flex-wrap items-center justify-center gap-2 rounded-xl border border-amber-200/20 bg-[#171326]/90 px-3 py-3 text-xs font-semibold text-lilac sm:gap-3 sm:px-4 sm:text-sm" aria-label="Keyboard and Arduino controller keymap">
+    <div class="my-3 flex flex-wrap items-center justify-center gap-2 rounded-xl border border-amber-200/20 bg-[#171326]/90 px-3 py-3 text-xs font-semibold text-lilac sm:gap-3 sm:px-4 sm:text-sm" aria-label="Controller keymap">
       <span class="font-black uppercase tracking-wider text-amber-100">Keymap</span>
-      <span>Move: <kbd class="rounded bg-white/10 px-2 py-1 text-white">KEY_W</kbd> <kbd class="rounded bg-white/10 px-2 py-1 text-white">KEY_A</kbd> <kbd class="rounded bg-white/10 px-2 py-1 text-white">KEY_S</kbd> <kbd class="rounded bg-white/10 px-2 py-1 text-white">KEY_D</kbd></span>
-      <span class="text-pumpkin"><kbd class="rounded bg-white/10 px-2 py-1 text-white">KEY_SPACE</kbd> Knock</span>
-      <span class="text-sky-200"><kbd class="rounded bg-white/10 px-2 py-1 text-white">KEY_E</kbd> Skate / Walk</span>
+      <span>Move: <kbd class="rounded bg-white/10 px-2 py-1 text-white">JOYSTICK</kbd></span>
+      <span class="text-pumpkin"><kbd class="rounded bg-white/10 px-2 py-1 text-white">BUTTON</kbd> Knock / Ride</span>
     </div>
     <div class="my-3 grid grid-cols-[1fr_auto] items-center gap-3 sm:hidden" aria-label="Touch movement controls">
       <div class="grid grid-cols-3 grid-rows-2 gap-2 justify-self-center">
@@ -118,7 +142,7 @@
       <button id="reset" class="rounded-xl bg-gradient-to-b from-amber-300 to-pumpkin px-5 py-3 font-bold text-[#20162a] shadow-[0_4px_0_#99541e,0_10px_18px_#0005] transition hover:-translate-y-0.5 hover:brightness-110 active:translate-y-1 active:shadow-none focus:outline-none focus:ring-2 focus:ring-white" type="button">New adventure</button>
       <button id="shuffle" class="rounded-xl border border-white/10 bg-gradient-to-b from-[#514365] to-[#29213d] px-5 py-3 font-bold shadow-[0_4px_0_#100d19,0_10px_18px_#0005] transition hover:-translate-y-0.5 hover:brightness-110 active:translate-y-1 active:shadow-none focus:outline-none focus:ring-2 focus:ring-white" type="button">Mix up the world</button>
     </div>
-    <p class="mt-4 text-center text-sm text-lilac">Walk close to a house and press SPACE or tap Knock! to collect candy.</p>
+    <p class="mt-4 text-center text-sm text-lilac">Walk close to a house and press the button to collect candy.</p>
   </main>
 
   <div id="jumpscare" class="fixed inset-0 z-50 hidden items-center justify-center overflow-hidden bg-black text-center" aria-hidden="true">
@@ -128,12 +152,12 @@
   </div>
 
   <div id="candy-popup" class="fixed inset-0 z-40 hidden items-center justify-center bg-[#09040d]/80 p-5 text-center" role="dialog" aria-modal="true" aria-labelledby="candy-popup-title" aria-hidden="true">
-    <div class="w-full max-w-sm rounded-[2rem] border border-amber-200/30 bg-gradient-to-br from-[#342541] to-[#171326] p-7 shadow-[0_25px_90px_#000c]">
-      <div id="candy-popup-icon" class="text-5xl" aria-hidden="true">&#127852;</div>
-      <p id="candy-popup-house" class="mt-3 text-xs font-extrabold uppercase tracking-[.22em] text-purple-200"></p>
-      <h2 id="candy-popup-title" class="mt-2 text-3xl font-black text-amber-200">You got candy!</h2>
-      <p class="mt-3 text-lilac">You collected <strong id="candy-popup-amount" class="text-2xl text-pumpkin">0</strong> candies from this house.</p>
-      <button id="candy-popup-close" class="mt-6 rounded-xl bg-gradient-to-b from-amber-300 to-pumpkin px-7 py-3 font-black uppercase tracking-wide text-[#20162a] shadow-[0_4px_0_#99541e]" type="button">Next player</button>
+    <div class="w-full max-w-sm rounded-[2rem] border border-amber-200/30 bg-gradient-to-br from-[#342541] to-[#171326] p-7 shadow-[0_25px_90px_#000c] sm:max-w-2xl sm:rounded-[3rem] sm:p-14">
+      <div id="candy-popup-icon" class="text-5xl sm:text-8xl" aria-hidden="true">&#127852;</div>
+      <p id="candy-popup-house" class="mt-3 text-xs font-extrabold uppercase tracking-[.22em] text-purple-200 sm:mt-5 sm:text-xl"></p>
+      <h2 id="candy-popup-title" class="mt-2 text-3xl font-black text-amber-200 sm:mt-3 sm:text-6xl">You got candy!</h2>
+      <p class="mt-3 text-lilac sm:mt-6 sm:text-2xl">You collected <strong id="candy-popup-amount" class="text-2xl text-pumpkin sm:text-6xl">0</strong> candies from this house.</p>
+      <button id="candy-popup-close" class="mt-6 rounded-xl bg-gradient-to-b from-amber-300 to-pumpkin px-7 py-3 font-black uppercase tracking-wide text-[#20162a] shadow-[0_4px_0_#99541e] sm:mt-10 sm:rounded-2xl sm:px-12 sm:py-5 sm:text-2xl sm:shadow-[0_6px_0_#99541e]" type="button">Next player</button>
     </div>
   </div>
 
@@ -147,23 +171,13 @@
           <p class="relative mx-auto mt-4 max-w-md text-base leading-relaxed text-lilac sm:text-lg">Walk the winding roads through four spooky regions. Each player gets one house, then passes the turn!</p>
           <button id="start-game" class="relative mt-6 w-full max-w-sm rounded-xl bg-gradient-to-b from-amber-300 to-pumpkin px-7 py-4 text-lg font-black uppercase tracking-wider text-[#20162a] shadow-[0_5px_0_#99541e,0_14px_30px_#0007] transition hover:-translate-y-1 hover:brightness-110 active:translate-y-1 active:shadow-none focus:outline-none focus:ring-2 focus:ring-white" type="button">Start trick-or-treating</button>
           <p class="relative mt-4 text-xs text-lilac/70">A friendly ghost might pop by. Ready to explore?</p>
-          <section class="relative mx-auto mt-4 w-full max-w-sm rounded-xl border border-emerald-300/20 bg-[#111c20] px-3 py-3 text-center" aria-label="Arduino serial connection">
-            <div class="flex flex-wrap items-center justify-center gap-2">
-              <span class="font-black uppercase tracking-wider text-emerald-200">Arduino</span>
-              <span id="arduino-status" class="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-amber-100" role="status" aria-live="polite">Not connected</span>
-              <button id="arduino-connect" class="rounded-lg bg-emerald-300 px-4 py-2 text-sm font-black text-[#10201c] transition hover:brightness-110" type="button">Connect COM port</button>
-              <button id="arduino-disconnect" class="hidden rounded-lg border border-white/20 px-3 py-2 text-sm font-bold text-white" type="button">Disconnect</button>
-            </div>
-            <p id="arduino-help" class="mt-2 text-xs text-lilac/80">Choose your Arduino port. Serial speed: 115200 baud.</p>
-            <pre id="arduino-log" class="mt-2 max-h-16 overflow-auto whitespace-pre-wrap break-all text-left text-xs text-emerald-200" aria-live="polite">Arduino log: waiting to connect</pre>
-          </section>
         </div>
         <div class="relative mx-auto w-full max-w-xl text-left" aria-label="How to play">
           <h2 class="mb-3 text-center text-xl font-black text-white md:text-left">How to play</h2>
           <div class="grid gap-3">
             <div class="flex items-center gap-3 rounded-2xl border border-sky-200/20 bg-sky-300/10 p-3 sm:p-4">
               <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-sky-200/15 text-3xl" aria-hidden="true">&#128694;</span>
-              <div><h3 class="font-black text-sky-100">1. Walk around</h3><p class="mt-1 text-sm leading-snug text-lilac">Use <kbd class="rounded bg-white/10 px-1 font-bold text-white">W A S D</kbd> or arrow keys. On phones, tap the arrows.</p></div>
+              <div><h3 class="font-black text-sky-100">1. Walk around</h3><p class="mt-1 text-sm leading-snug text-lilac">Move the <kbd class="rounded bg-white/10 px-1 font-bold text-white">JOYSTICK</kbd> up, down, left or right.</p></div>
             </div>
             <div class="flex items-center gap-3 rounded-2xl border border-purple-200/20 bg-purple-300/10 p-3 sm:p-4">
               <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-purple-200/15 text-3xl" aria-hidden="true">&#127984;</span>
@@ -171,7 +185,7 @@
             </div>
             <div class="flex items-center gap-3 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-3 sm:p-4">
               <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-amber-200/15 text-3xl" aria-hidden="true">&#127852;</span>
-              <div><h3 class="font-black text-amber-100">3. Knock for candy</h3><p class="mt-1 text-sm leading-snug text-lilac">Press <kbd class="rounded bg-white/10 px-1 font-bold text-white">SPACE</kbd> or tap <strong class="text-white">Knock!</strong></p></div>
+              <div><h3 class="font-black text-amber-100">3. Knock for candy</h3><p class="mt-1 text-sm leading-snug text-lilac">Press the <kbd class="rounded bg-white/10 px-1 font-bold text-white">BUTTON</kbd> next to a house. Press it by the skateboard to ride.</p></div>
             </div>
           </div>
           <p class="relative mx-auto mt-3 rounded-xl border border-pumpkin/25 bg-pumpkin/10 px-4 py-3 text-center text-sm font-bold text-amber-100"><span aria-hidden="true">&#127853;</span> One house per player. If a gold special house appears, it has the max prize!</p>
@@ -184,7 +198,7 @@
     <div class="relative w-full max-w-2xl rounded-[2rem] border border-white/15 bg-[#171326]/95 px-5 py-8 shadow-[0_30px_100px_#000b] sm:px-10 sm:py-10">
       <p class="text-xs font-extrabold uppercase tracking-[.28em] text-pumpkin">Before you head out</p>
       <h2 id="character-title" class="mt-2 text-3xl font-black sm:text-4xl">Choose your costume</h2>
-      <p class="mt-2 text-sm text-lilac">Use <kbd class="rounded bg-white/10 px-1 font-bold text-white">W A S D</kbd> to move. Press <kbd class="rounded bg-white/10 px-1 font-bold text-white">SPACE</kbd> to choose, then press it again to start.</p>
+      <p class="mt-2 text-sm text-lilac">Move the <kbd class="rounded bg-white/10 px-1 font-bold text-white">JOYSTICK</kbd> to pick a costume, then press the <kbd class="rounded bg-white/10 px-1 font-bold text-white">BUTTON</kbd> to start.</p>
       <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3" role="group" aria-label="Choose a character">
         <button class="character-choice rounded-2xl border-2 border-amber-300 bg-amber-300/10 p-4 text-left transition hover:-translate-y-1" data-character="witch" aria-pressed="true" type="button"><span class="block text-4xl" aria-hidden="true">🧙</span><span class="mt-2 block font-black">Witch</span><span class="mt-1 block text-xs text-lilac">A classic spellcaster</span></button>
         <button class="character-choice rounded-2xl border-2 border-white/10 bg-black/20 p-4 text-left transition hover:-translate-y-1" data-character="vampire" aria-pressed="false" type="button"><span class="block text-4xl" aria-hidden="true">🧛</span><span class="mt-2 block font-black">Vampire</span><span class="mt-1 block text-xs text-lilac">Elegant and mysterious</span></button>
@@ -394,7 +408,7 @@
         ctx.fillText(house.visited ? "YOU VISITED THIS HOUSE" : house.special ? "SPECIAL HOUSE! MAX PRIZE" : "TRICK OR TREAT?", x, promptY - 6, 136);
         ctx.fillStyle = house.visited ? "#baa7c9" : "#ffca70";
         ctx.font = "bold 9px system-ui, sans-serif";
-        ctx.fillText(house.visited ? `You got ${house.reward} candies` : touchDevice ? "TAP KNOCK!" : "PRESS SPACE TO KNOCK", x, promptY + 8, 136);
+        ctx.fillText(house.visited ? `You got ${house.reward} candies` : touchDevice ? "TAP KNOCK!" : "PRESS BUTTON TO KNOCK", x, promptY + 8, 136);
       }
       ctx.restore();
       return;
@@ -474,7 +488,7 @@
       if (near) {
         ctx.fillStyle = "#160e1e"; ctx.beginPath(); ctx.roundRect(x - 49, y - 97, 98, 19, 8); ctx.fill();
         ctx.strokeStyle = "#ffc56b"; ctx.lineWidth = 1; ctx.stroke();
-        ctx.fillStyle = "#ffcf86"; ctx.font = "bold 10px system-ui, sans-serif"; ctx.fillText(touchDevice ? "TAP KNOCK BELOW" : "SPACE TO KNOCK", x, y - 84);
+        ctx.fillStyle = "#ffcf86"; ctx.font = "bold 10px system-ui, sans-serif"; ctx.fillText(touchDevice ? "TAP KNOCK BELOW" : "BUTTON TO KNOCK", x, y - 84);
       }
       ctx.restore();
       }
@@ -688,9 +702,9 @@
       ctx.restore();
       if (canRide && gameStarted) {
         ctx.save(); ctx.textAlign = "center"; ctx.font = "bold 10px system-ui, sans-serif";
-        ctx.fillStyle = "#181222"; ctx.beginPath(); ctx.roundRect(boardX - 43, boardY - 40, 86, 19, 7); ctx.fill();
+        ctx.fillStyle = "#181222"; ctx.beginPath(); ctx.roundRect(boardX - 62, boardY - 40, 124, 19, 7); ctx.fill();
         ctx.strokeStyle = "#ffc56b"; ctx.lineWidth = 1; ctx.stroke();
-        ctx.fillStyle = "#ffdc91"; ctx.fillText(touchDevice ? "SKATE BUTTON" : "E TO SKATE", boardX, boardY - 27);
+        ctx.fillStyle = "#ffdc91"; ctx.fillText(touchDevice ? "SKATE BUTTON" : "PRESS BUTTON TO RIDE", boardX, boardY - 27);
         ctx.restore();
       }
     }
@@ -883,24 +897,25 @@
         skateboard.ridden = false;
         skateboard.x = player.x - 30;
         skateboard.y = player.y;
-        messageEl.textContent = "You stepped off the skateboard. Press E nearby to skate again.";
+        messageEl.textContent = "You stepped off the skateboard. Press the button nearby to ride again.";
         return;
       }
       if (Math.hypot(player.x - skateboard.x, player.y - skateboard.y) > 78) {
-        messageEl.textContent = "Walk over to the skateboard and press E to skate.";
+        messageEl.textContent = "Walk up to a glowing house to knock, or to the skateboard to ride. Press the button.";
         return;
       }
       player.x = skateboard.x;
       player.y = skateboard.y;
       player.riding = true;
       skateboard.ridden = true;
-      messageEl.textContent = "You're skating! Use WASD or the arrow keys to roll around.";
+      messageEl.textContent = "You're skating! Use the joystick to roll around.";
     }
 
     function knock() {
       if (!gameStarted) return;
+      if (!player.riding && Math.hypot(player.x - skateboard.x, player.y - skateboard.y) <= 78) { toggleSkateboard(); return; }
       const house = houses.find(h => !h.visited && Math.hypot(player.x - h.x, player.y - h.y) < 82);
-      if (!house) { messageEl.textContent = "Walk right up to a glowing house, then knock!"; return; }
+      if (!house) { toggleSkateboard(); return; }
       gameStarted = false;
       const gotScared = !house.special && Math.random() < 0.5;
       house.visited = true;
@@ -979,8 +994,35 @@
       });
     }
 
-    // Arduino Web Serial controller: accepts newline-delimited KEY_W / KEY_A /
-    // KEY_S / KEY_D / KEY_E / KEY_SPACE messages at 115200 baud.
+    const settingsModal = document.querySelector("#settings-modal");
+    document.querySelector("#settings-open").addEventListener("click", () => settingsModal.showModal());
+    document.querySelector("#settings-close").addEventListener("click", () => settingsModal.close());
+
+    // Remembered per browser so the back button stays hidden after a reload.
+    const hideBackLinkEl = document.querySelector("#hide-back-link");
+    function setBackLinkHidden(hidden) {
+      hideBackLinkEl.checked = hidden;
+      document.body.classList.toggle("hide-back-link", hidden);
+      try { localStorage.setItem("trickyhouse-hide-back-link", hidden ? "1" : ""); } catch (_) {}
+    }
+    try { setBackLinkHidden(localStorage.getItem("trickyhouse-hide-back-link") === "1"); } catch (_) {}
+    hideBackLinkEl.addEventListener("change", () => setBackLinkHidden(hideBackLinkEl.checked));
+
+    // Maximize: fullscreen with only the game shown, centered.
+    document.querySelector("#play-mode").addEventListener("click", event => {
+      event.currentTarget.blur(); // so Space keeps going to the game
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen().catch(() => document.body.classList.toggle("play-mode"));
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && !document.fullscreenElement) document.body.classList.remove("play-mode");
+    });
+    document.addEventListener("fullscreenchange", () => {
+      document.body.classList.toggle("play-mode", Boolean(document.fullscreenElement));
+    });
+
+    // Arduino Web Serial controller: accepts newline-delimited BUTTON / UP /
+    // DOWN / LEFT / RIGHT messages at 115200 baud.
     const arduinoConnectButton = document.querySelector("#arduino-connect");
     const arduinoDisconnectButton = document.querySelector("#arduino-disconnect");
     const arduinoStatus = document.querySelector("#arduino-status");
@@ -1004,53 +1046,35 @@
       arduinoStatus.className = `rounded-full px-3 py-1 text-xs font-bold ${connected ? "bg-emerald-300/15 text-emerald-200" : "bg-white/10 text-amber-100"}`;
       arduinoConnectButton.classList.toggle("hidden", connected);
       arduinoDisconnectButton.classList.toggle("hidden", !connected);
+      document.querySelector("#controller-notice").hidden = connected;
+    }
+
+    // Arduino sends BUTTON once per press and UP/DOWN/LEFT/RIGHT every 100 ms
+    // while held. BUTTON presses Space; directions hold W/A/S/D.
+    function pressKey(type, key, code) {
+      document.body.dispatchEvent(new KeyboardEvent(type, { key, code, bubbles: true }));
     }
 
     function handleArduinoCommand(rawCommand) {
-      let command = rawCommand.trim().toUpperCase().replace(/[\r\0]/g, "");
-      if (!command) return;
-      let mode = "pulse";
-      const holdMatch = command.match(/^(KEY_)?(W|A|S|D|E|SPACE)_(DOWN|UP|RELEASE)$/);
-      if (holdMatch) {
-        command = `${holdMatch[1] || "KEY_"}${holdMatch[2]}`;
-        mode = holdMatch[3] === "DOWN" ? "down" : "up";
-      }
-      console.log("Arduino:", command);
-      const keyMap = {
-        KEY_W: "w", W: "w", KEY_A: "a", A: "a", KEY_S: "s", S: "s",
-        KEY_D: "d", D: "d", KEY_E: "e", E: "e",
-        KEY_SPACE: " ", SPACE: " ", " ": " "
-      };
-      const key = keyMap[command];
-      if (key === undefined) return;
-      if (["w", "a", "s", "d"].includes(key)) {
-        if (!gameStarted) return;
-        if (mode === "up") {
-          clearTimeout(arduinoMoveTimers.get(key));
-          arduinoMoveTimers.delete(key);
-          keys.delete(key);
-          return;
-        }
-        keys.add(key);
-        clearTimeout(arduinoMoveTimers.get(key));
-        arduinoMoveTimers.set(key, mode === "down" ? null : setTimeout(() => {
-          keys.delete(key);
-          arduinoMoveTimers.delete(key);
-        }, 350));
+      const command = rawCommand.trim().toUpperCase();
+      if (command === "BUTTON") {
+        pressKey("keydown", " ", "Space");
+        pressKey("keyup", " ", "Space");
+        // Synthetic events don't click focused buttons, so do it like a real Space would.
+        if (!startScreenEl.classList.contains("hidden")) document.querySelector("#start-game").click();
+        else if (!characterScreenEl.classList.contains("hidden")) document.querySelector("#begin-adventure").click();
+        else if (!gameStarted && document.activeElement instanceof HTMLButtonElement) document.activeElement.click();
         return;
       }
-      if (!gameStarted) {
-        arduinoHelp.textContent = `Received ${command}. Start the game and choose your character before using the controller.`;
-        return;
-      }
-      if (key === "e") {
-        toggleSkateboard();
-        return;
-      }
-      if (key === " ") {
-        knock();
-        return;
-      }
+      const key = { UP: "w", LEFT: "a", DOWN: "s", RIGHT: "d" }[command];
+      if (!key) return;
+      const code = `Key${key.toUpperCase()}`;
+      if (!arduinoMoveTimers.has(key)) pressKey("keydown", key, code);
+      clearTimeout(arduinoMoveTimers.get(key));
+      arduinoMoveTimers.set(key, setTimeout(() => {
+        pressKey("keyup", key, code);
+        arduinoMoveTimers.delete(key);
+      }, 250));
     }
 
     async function disconnectArduino() {
@@ -1063,14 +1087,19 @@
         try { await arduinoPort.close(); } catch (_) {}
       }
       arduinoPort = null;
-      for (const timer of arduinoMoveTimers.values()) clearTimeout(timer);
+      for (const [key, timer] of arduinoMoveTimers) {
+        clearTimeout(timer);
+        pressKey("keyup", key, `Key${key.toUpperCase()}`);
+      }
       arduinoMoveTimers.clear();
-      ["w", "a", "s", "d"].forEach(key => keys.delete(key));
       setArduinoStatus("Not connected", false);
-      arduinoHelp.textContent = "Connect your Arduino over USB, choose its port, then send KEY_W / KEY_A / KEY_S / KEY_D / KEY_E / KEY_SPACE over Serial at 115200 baud.";
+      arduinoHelp.textContent = "Connect your Arduino over USB, choose its port, then send BUTTON / UP / DOWN / LEFT / RIGHT over Serial at 115200 baud.";
     }
 
-    arduinoConnectButton.addEventListener("click", async () => {
+    // With no port, asks the user to pick one. Ports picked before can be
+    // passed in directly, which is how auto-connect works.
+    async function connectArduino(port) {
+      if (arduinoPort) return;
       logArduino("connect requested");
       if (!("serial" in navigator)) {
         logArduino("Web Serial unavailable. Use desktop Chrome or Edge on localhost or HTTPS.");
@@ -1080,14 +1109,17 @@
       }
       arduinoConnectButton.disabled = true;
       arduinoConnectButton.textContent = "Connecting…";
-      logArduino("opening browser port picker; select your Arduino COM port");
       try {
-        arduinoPort = await navigator.serial.requestPort();
+        if (!port) {
+          logArduino("opening browser port picker; select your Arduino COM port");
+          port = await navigator.serial.requestPort();
+        }
+        arduinoPort = port;
         logArduino("port selected; opening at 115200 baud");
         await arduinoPort.open({ baudRate: 115200 });
         logArduino("CONNECTED at 115200 baud; press a controller button to check for input");
         setArduinoStatus("Connected · 115200", true);
-        arduinoHelp.textContent = "Connected. Hold movement with KEY_W_DOWN, then release with KEY_W_UP; repeated KEY_W also keeps moving.";
+        arduinoHelp.textContent = "Connected. Joystick moves (W/A/S/D), button knocks or rides (Space).";
         arduinoKeepReading = true;
         const decoder = new TextDecoder();
         let buffer = "";
@@ -1128,19 +1160,23 @@
         arduinoConnectButton.disabled = false;
         arduinoConnectButton.textContent = "Connect Arduino · 115200";
       }
-    });
+    }
+    arduinoConnectButton.addEventListener("click", () => connectArduino());
     arduinoDisconnectButton.addEventListener("click", disconnectArduino);
     if ("serial" in navigator) {
       navigator.serial.addEventListener("disconnect", event => {
         if (arduinoPort && event.target === arduinoPort) disconnectArduino();
       });
+      // Auto-connect to a port that was picked before: on page load, and when it's plugged in.
+      navigator.serial.addEventListener("connect", event => connectArduino(event.target));
+      navigator.serial.getPorts().then(ports => { if (ports[0]) connectArduino(ports[0]); });
     }
 
     // Normalize physical keyboard events so a USB-HID Arduino controller works
     // the same way as a regular keyboard.
     function getControlKey(event) {
       const codeMap = {
-        KeyW: "w", KeyA: "a", KeyS: "s", KeyD: "d", KeyE: "e",
+        KeyW: "w", KeyA: "a", KeyS: "s", KeyD: "d",
         Space: " ", ArrowUp: "ArrowUp", ArrowDown: "ArrowDown",
         ArrowLeft: "ArrowLeft", ArrowRight: "ArrowRight"
       };
@@ -1153,7 +1189,7 @@
       if (!gameStarted && !characterScreenEl.classList.contains("hidden") && ["w", "a", "s", "d"].includes(key)) {
         event.preventDefault();
         const choices = [...document.querySelectorAll(".character-choice")];
-        const currentIndex = Math.max(0, choices.indexOf(document.activeElement));
+        const currentIndex = Math.max(0, choices.findIndex(choice => choice.getAttribute("aria-pressed") === "true"));
         const columns = window.matchMedia("(min-width: 640px)").matches ? 3 : 2;
         let nextIndex = currentIndex;
         if (key === "a") nextIndex = (currentIndex + choices.length - 1) % choices.length;
@@ -1165,13 +1201,12 @@
           const nextRow = (row + (key === "w" ? rowCount - 1 : 1)) % rowCount;
           nextIndex = Math.min(nextRow * columns + column, choices.length - 1);
         }
-        choices[nextIndex].focus();
+        choices[nextIndex].click();
         return;
       }
       if (!gameStarted) return;
       if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "].includes(key)) event.preventDefault();
       if (key === " " && !event.repeat) knock();
-      else if (key === "e" && !event.repeat) toggleSkateboard();
       else keys.add(key);
     });
     window.addEventListener("keyup", event => keys.delete(getControlKey(event)));
