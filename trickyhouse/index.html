@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Trick or Treat!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -24,7 +27,8 @@
     .zone-toolbar { border-color: color-mix(in srgb, var(--region-accent), transparent 70%); background: linear-gradient(100deg, #211b35, color-mix(in srgb, var(--region-accent), #211b35 93%), #181528); }
     #progress { background-image: linear-gradient(90deg, var(--region-muted), var(--region-accent), #ffb34d); }
     .region-count { color: var(--region-accent); }
-    .character-choice:focus-visible, #begin-adventure:focus-visible { outline: 3px solid #ffd879; outline-offset: 3px; }
+    .character-choice:focus-visible { outline: none; }
+    #begin-adventure:focus-visible { outline: 3px solid #ffd879; outline-offset: 3px; }
     @keyframes start-card-in { from { opacity: 0; transform: translateY(22px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
     @keyframes moon-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
     @keyframes candy-bump { 0% { transform: scale(1); } 35% { transform: scale(1.35); } 100% { transform: scale(1); } }
@@ -34,6 +38,51 @@
     #start-screen { transition: opacity 420ms ease, visibility 420ms ease; }
     #start-screen.start-screen-exit { opacity: 0; visibility: hidden; pointer-events: none; }
     #start-game { animation: start-card-in 850ms 180ms both; }
+    #start-screen, #character-screen { width: 100vw; height: 100vh; height: 100dvh; padding: 0; }
+    #start-screen { background-image: linear-gradient(90deg, rgb(9 8 20 / 35%), rgb(17 12 30 / 18%), rgb(9 8 20 / 35%)), url("images/trickyhouse.png"); background-position: center; background-size: cover; background-repeat: no-repeat; }
+    #start-screen > .start-card-in { box-sizing: border-box; width: 100%; max-width: none; height: 100%; min-height: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; display: flex; flex-direction: column; justify-content: center; padding: clamp(2rem, 6vh, 5rem); }
+    #start-screen > .start-card-in > .relative.grid { width: 100%; gap: clamp(2rem, 6vw, 6rem); }
+    #start-screen .moon-float { width: clamp(5rem, 10vw, 8rem); height: clamp(5rem, 10vw, 8rem); font-size: clamp(3rem, 6vw, 5rem); }
+    #start-screen #start-title { font-family: "Creepster", cursive; font-size: clamp(3rem, 5.5vw, 4.75rem); line-height: 1.12; letter-spacing: .025em; }
+    #start-screen #start-title { transform-origin: center; animation: title-pulse 2.4s ease-in-out infinite; }
+    @keyframes title-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+    #start-screen p { font-size: clamp(1rem, 1.5vw, 1.35rem); }
+    #start-screen #start-game { max-width: 28rem; padding: 1.25rem 2rem; font-size: clamp(1.1rem, 1.8vw, 1.5rem); }
+    #start-screen #start-game { display: block; margin: 1rem 0 0 auto; }
+    #start-screen > .start-card-in > .relative.grid > div[aria-label="How to play"] #start-game { width: 100%; max-width: none; }
+    #start-screen > .start-card-in > .relative.grid > div[aria-label="How to play"] h2 { margin-bottom: 1rem; font-size: 1.5rem; letter-spacing: .01em; }
+    #start-screen > .start-card-in > .relative.grid > div[aria-label="How to play"] .grid { gap: 1rem; }
+    #start-screen > .start-card-in > .relative.grid > div[aria-label="How to play"] .grid > div { gap: 1.25rem; min-height: 7rem; padding: 1.25rem 1.5rem; border-color: rgb(255 255 255 / 16%); background: rgb(15 18 28 / 76%); box-shadow: 0 8px 24px rgb(0 0 0 / 18%); }
+    #start-screen > .start-card-in > .relative.grid > div[aria-label="How to play"] .grid > div > span { width: 4.5rem; height: 4.5rem; flex: 0 0 4.5rem; border: 1px solid rgb(255 255 255 / 12%); background: rgb(255 255 255 / 8%); font-size: 1.8rem; }
+    #start-screen .guide-icon { color: #ffd27a; font-size: 2.6rem !important; }
+    #start-screen .guide-icon svg { width: 3rem; height: 3rem; }
+    #start-screen .guide-note-icon { display: inline-grid; width: 1.2rem; height: 1.2rem; margin-right: .35rem; vertical-align: -.2rem; color: #ffd27a; }
+    #start-screen .guide-note-icon svg { width: 100%; height: 100%; }
+    #start-screen > .start-card-in > .relative.grid > div[aria-label="How to play"] h3 { color: #ffe7ae; font-size: 1.05rem; }
+    #start-screen > .start-card-in > .relative.grid > div[aria-label="How to play"] .grid p { margin-top: .3rem; color: #e4deeb; font-size: clamp(1.05rem, 1.45vw, 1.25rem); line-height: 1.4; }
+    #start-screen > .start-card-in > .relative.grid > div[aria-label="How to play"] kbd { background: rgb(255 255 255 / 12%); }
+    #start-screen > .start-card-in > .relative.grid > div[aria-label="How to play"] > p { margin-top: .85rem; padding: 1rem 1.25rem; border-color: rgb(255 190 90 / 28%); background: rgb(30 27 29 / 82%); color: #ffe7ae; font-size: 1.05rem; line-height: 1.4; }
+    #start-screen #start-game { padding: 1.2rem 1.75rem; font-size: clamp(1.2rem, 1.8vw, 1.5rem); box-shadow: 0 5px 0 #99541e, 0 12px 26px #0007; }
+    #character-screen > div { box-sizing: border-box; width: 100%; max-width: none; height: 100%; min-height: 0; border-radius: 0; display: flex; flex-direction: column; justify-content: center; padding: clamp(2rem, 6vh, 5rem); }
+    #character-screen #character-title { font-size: clamp(2.5rem, 5vw, 4.5rem); }
+    #character-screen #character-title { font-family: "Creepster", cursive; font-size: clamp(3rem, 5.5vw, 4.75rem); font-weight: 400; letter-spacing: .03em; line-height: 1.05; text-shadow: 0 3px 0 #24172b; }
+    #character-screen .character-instructions { margin-top: .75rem; font-size: clamp(1rem, 1.5vw, 1.25rem); line-height: 1.5; }
+    #character-screen [role="group"] { flex: 1; align-content: stretch; grid-auto-rows: minmax(0, 1fr); gap: clamp(.75rem, 2vw, 1.5rem); }
+    #character-screen .character-choice { position: relative; overflow: hidden; min-height: clamp(9rem, 23vh, 16rem); padding: clamp(1.25rem, 3vw, 3rem); text-align: center; }
+    #character-screen .character-choice[data-character="witch"] { background-image: linear-gradient(rgb(14 12 24 / 42%), rgb(14 12 24 / 66%)), url("images/witchbg.png"); background-position: center; background-size: cover; background-repeat: no-repeat; }
+    #character-screen .character-choice[data-character="vampire"] { background-image: linear-gradient(rgb(14 12 24 / 42%), rgb(14 12 24 / 66%)), url("images/vampirebg.png"); background-position: center; background-size: cover; background-repeat: no-repeat; }
+    #character-screen .character-choice[data-character="pumpkin"] { background-image: linear-gradient(rgb(14 12 24 / 42%), rgb(14 12 24 / 66%)), url("images/pumpkinbg.png"); background-position: center; background-size: cover; background-repeat: no-repeat; }
+    #character-screen .character-choice[data-character="ghost"] { background-image: linear-gradient(rgb(14 12 24 / 42%), rgb(14 12 24 / 66%)), url("images/ghostbg.png"); background-position: center; background-size: cover; background-repeat: no-repeat; }
+    #character-screen .character-choice[data-character="werewolf"] { background-image: linear-gradient(rgb(14 12 24 / 42%), rgb(14 12 24 / 66%)), url("images/werewolfbg.png"); background-position: center; background-size: cover; background-repeat: no-repeat; }
+    #character-screen .character-choice[data-character="skeleton"] { background-image: linear-gradient(rgb(14 12 24 / 42%), rgb(14 12 24 / 66%)), url("images/skeletonbg.png"); background-position: center; background-size: cover; background-repeat: no-repeat; }
+    #character-screen .character-choice > span:first-child { display: none; }
+    #character-screen .character-choice .character-preview { position: static; display: block; width: clamp(4.5rem, 8vw, 6rem); height: clamp(5rem, 9vw, 7rem); margin: 0 auto .5rem; transform: none; image-rendering: pixelated; }
+    #character-screen .character-choice > span:first-child { font-size: clamp(3rem, 6vw, 5rem); }
+    #character-screen .character-choice > span:nth-child(2) { display: block; margin-top: .5rem; font-family: "Creepster", cursive; font-size: clamp(1.5rem, 2.4vw, 2.25rem); font-weight: 400; letter-spacing: .04em; line-height: 1; color: #fff4dc; text-shadow: 0 2px 0 #24172b, 0 0 12px #0009; }
+    #character-screen .character-choice > span:nth-child(3) { font-size: clamp(.8rem, 1.2vw, 1rem); }
+    @media (max-height: 650px) {
+      #start-screen > .start-card-in, #character-screen > div { min-height: 100%; }
+    }
     body.play-mode { padding: 0; }
     body.play-mode main { display: flex; max-width: none; height: 100vh; align-items: center; justify-content: center; }
     body.play-mode main > :not(#game-section) { display: none; }
@@ -42,6 +91,7 @@
     @media (prefers-reduced-motion: reduce) { .scare-pop { animation: none; } }
     @media (prefers-reduced-motion: reduce) {
       .start-card-in, .moon-float, .candy-bump, #start-game { animation: none !important; }
+      #start-screen #start-title { animation: none; }
       #start-screen { transition: none; }
     }
   </style>
@@ -165,30 +215,26 @@
     <div class="start-card-in relative w-full max-w-5xl overflow-hidden rounded-[2rem] border border-white/15 bg-[#171326]/90 px-6 py-8 shadow-[0_30px_100px_#000b] sm:px-10 sm:py-10">
       <div class="absolute -right-12 -top-14 h-40 w-40 rounded-full bg-amber-300/10 blur-3xl"></div>
       <div class="relative grid gap-7 md:grid-cols-2 md:items-center md:gap-12">
-        <div class="text-center">
-          <div class="moon-float relative mx-auto grid h-16 w-16 place-items-center rounded-full border border-amber-100/20 bg-gradient-to-br from-amber-100 to-amber-300 text-4xl shadow-[0_0_40px_#fcd34d55] sm:h-20 sm:w-20" aria-hidden="true">&#127769;</div>
-          <h1 id="start-title" class="relative mt-2 text-5xl font-black tracking-tight drop-shadow-[0_5px_0_#572e79] sm:text-6xl">Trick or Treat!</h1>
-          <p class="relative mx-auto mt-4 max-w-md text-base leading-relaxed text-lilac sm:text-lg">Walk the winding roads through four spooky regions. Each player gets one house, then passes the turn!</p>
-          <button id="start-game" class="relative mt-6 w-full max-w-sm rounded-xl bg-gradient-to-b from-amber-300 to-pumpkin px-7 py-4 text-lg font-black uppercase tracking-wider text-[#20162a] shadow-[0_5px_0_#99541e,0_14px_30px_#0007] transition hover:-translate-y-1 hover:brightness-110 active:translate-y-1 active:shadow-none focus:outline-none focus:ring-2 focus:ring-white" type="button">Start trick-or-treating</button>
-          <p class="relative mt-4 text-xs text-lilac/70">A friendly ghost might pop by. Ready to explore?</p>
-        </div>
+        <div aria-hidden="true"></div>
         <div class="relative mx-auto w-full max-w-xl text-left" aria-label="How to play">
+          <h1 id="start-title" class="relative mb-5 whitespace-nowrap text-center text-sm font-black tracking-tight leading-tight drop-shadow-[0_1px_0_#572e79] sm:text-base">Trick or Treat!</h1>
           <h2 class="mb-3 text-center text-xl font-black text-white md:text-left">How to play</h2>
           <div class="grid gap-3">
             <div class="flex items-center gap-3 rounded-2xl border border-sky-200/20 bg-sky-300/10 p-3 sm:p-4">
-              <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-sky-200/15 text-3xl" aria-hidden="true">&#128694;</span>
-              <div><h3 class="font-black text-sky-100">1. Walk around</h3><p class="mt-1 text-sm leading-snug text-lilac">Move the <kbd class="rounded bg-white/10 px-1 font-bold text-white">JOYSTICK</kbd> up, down, left or right.</p></div>
+              <span class="guide-icon grid h-12 w-12 shrink-0 place-items-center rounded-xl" aria-hidden="true">🚶</span>
+              <div><h3 class="font-black text-sky-100">1. Walk around</h3><p class="mt-1 text-sm leading-snug text-lilac">Move with the <kbd class="rounded bg-white/10 px-1 font-bold text-white">JOYSTICK</kbd>.</p></div>
             </div>
             <div class="flex items-center gap-3 rounded-2xl border border-purple-200/20 bg-purple-300/10 p-3 sm:p-4">
-              <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-purple-200/15 text-3xl" aria-hidden="true">&#127984;</span>
-              <div><h3 class="font-black text-purple-100">2. Find a house</h3><p class="mt-1 text-sm leading-snug text-lilac">Walk close until you see “Trick or Treat?”</p></div>
+              <span class="guide-icon grid h-12 w-12 shrink-0 place-items-center rounded-xl" aria-hidden="true">🏚️</span>
+              <div><h3 class="font-black text-purple-100">2. Find a house</h3><p class="mt-1 text-sm leading-snug text-lilac">Approach a house to visit.</p></div>
             </div>
             <div class="flex items-center gap-3 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-3 sm:p-4">
-              <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-amber-200/15 text-3xl" aria-hidden="true">&#127852;</span>
-              <div><h3 class="font-black text-amber-100">3. Knock for candy</h3><p class="mt-1 text-sm leading-snug text-lilac">Press the <kbd class="rounded bg-white/10 px-1 font-bold text-white">BUTTON</kbd> next to a house. Press it by the skateboard to ride.</p></div>
+              <span class="guide-icon grid h-12 w-12 shrink-0 place-items-center rounded-xl" aria-hidden="true">🍬</span>
+              <div><h3 class="font-black text-amber-100">3. Knock for candy</h3><p class="mt-1 text-sm leading-snug text-lilac">Press <kbd class="rounded bg-white/10 px-1 font-bold text-white">BUTTON</kbd> by a house. Use it by the skateboard to ride.</p></div>
             </div>
           </div>
-          <p class="relative mx-auto mt-3 rounded-xl border border-pumpkin/25 bg-pumpkin/10 px-4 py-3 text-center text-sm font-bold text-amber-100"><span aria-hidden="true">&#127853;</span> One house per player. If a gold special house appears, it has the max prize!</p>
+          <p class="relative mx-auto mt-3 rounded-xl border border-pumpkin/25 bg-pumpkin/10 px-4 py-3 text-center text-sm font-bold text-amber-100"><span class="guide-note-icon" aria-hidden="true">🍭</span> One house per player. If a gold special house appears, it has the max prize!</p>
+          <button id="start-game" class="relative mt-6 w-full max-w-sm rounded-xl bg-gradient-to-b from-amber-300 to-pumpkin px-7 py-4 text-lg font-black uppercase tracking-wider text-[#20162a] shadow-[0_5px_0_#99541e,0_14px_30px_#0007] transition hover:-translate-y-1 hover:brightness-110 active:translate-y-1 active:shadow-none focus:outline-none focus:ring-2 focus:ring-white" type="button">Start trick-or-treating</button>
         </div>
       </div>
     </div>
@@ -198,16 +244,15 @@
     <div class="relative w-full max-w-2xl rounded-[2rem] border border-white/15 bg-[#171326]/95 px-5 py-8 shadow-[0_30px_100px_#000b] sm:px-10 sm:py-10">
       <p class="text-xs font-extrabold uppercase tracking-[.28em] text-pumpkin">Before you head out</p>
       <h2 id="character-title" class="mt-2 text-3xl font-black sm:text-4xl">Choose your costume</h2>
-      <p class="mt-2 text-sm text-lilac">Move the <kbd class="rounded bg-white/10 px-1 font-bold text-white">JOYSTICK</kbd> to pick a costume, then press the <kbd class="rounded bg-white/10 px-1 font-bold text-white">BUTTON</kbd> to start.</p>
+      <p class="character-instructions mt-2 text-sm text-lilac">Move the <kbd class="rounded bg-white/10 px-1 font-bold text-white">JOYSTICK</kbd> to pick a costume, then press the <kbd class="rounded bg-white/10 px-1 font-bold text-white">BUTTON</kbd> to start.</p>
       <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3" role="group" aria-label="Choose a character">
-        <button class="character-choice rounded-2xl border-2 border-amber-300 bg-amber-300/10 p-4 text-left transition hover:-translate-y-1" data-character="witch" aria-pressed="true" type="button"><span class="block text-4xl" aria-hidden="true">🧙</span><span class="mt-2 block font-black">Witch</span><span class="mt-1 block text-xs text-lilac">A classic spellcaster</span></button>
-        <button class="character-choice rounded-2xl border-2 border-white/10 bg-black/20 p-4 text-left transition hover:-translate-y-1" data-character="vampire" aria-pressed="false" type="button"><span class="block text-4xl" aria-hidden="true">🧛</span><span class="mt-2 block font-black">Vampire</span><span class="mt-1 block text-xs text-lilac">Elegant and mysterious</span></button>
-        <button class="character-choice rounded-2xl border-2 border-white/10 bg-black/20 p-4 text-left transition hover:-translate-y-1" data-character="pumpkin" aria-pressed="false" type="button"><span class="block text-4xl" aria-hidden="true">🎃</span><span class="mt-2 block font-black">Pumpkin</span><span class="mt-1 block text-xs text-lilac">A little lantern spirit</span></button>
-        <button class="character-choice rounded-2xl border-2 border-white/10 bg-black/20 p-4 text-left transition hover:-translate-y-1" data-character="ghost" aria-pressed="false" type="button"><span class="block text-4xl" aria-hidden="true">👻</span><span class="mt-2 block font-black">Ghost</span><span class="mt-1 block text-xs text-lilac">A friendly floating phantom</span></button>
-        <button class="character-choice rounded-2xl border-2 border-white/10 bg-black/20 p-4 text-left transition hover:-translate-y-1" data-character="werewolf" aria-pressed="false" type="button"><span class="block text-4xl" aria-hidden="true">🐺</span><span class="mt-2 block font-black">Werewolf</span><span class="mt-1 block text-xs text-lilac">A moonlit neighborhood wolf</span></button>
-        <button class="character-choice rounded-2xl border-2 border-white/10 bg-black/20 p-4 text-left transition hover:-translate-y-1" data-character="skeleton" aria-pressed="false" type="button"><span class="block text-4xl" aria-hidden="true">💀</span><span class="mt-2 block font-black">Skeleton</span><span class="mt-1 block text-xs text-lilac">A bony trick-or-treater</span></button>
+        <button class="character-choice rounded-2xl border-2 border-amber-300 bg-amber-300/10 p-4 text-left transition hover:-translate-y-1" data-character="witch" aria-pressed="true" type="button"><span class="block text-4xl" aria-hidden="true">🧙</span><span class="mt-2 block font-black">Witch</span></button>
+        <button class="character-choice rounded-2xl border-2 border-white/10 bg-black/20 p-4 text-left transition hover:-translate-y-1" data-character="vampire" aria-pressed="false" type="button"><span class="block text-4xl" aria-hidden="true">🧛</span><span class="mt-2 block font-black">Vampire</span></button>
+        <button class="character-choice rounded-2xl border-2 border-white/10 bg-black/20 p-4 text-left transition hover:-translate-y-1" data-character="pumpkin" aria-pressed="false" type="button"><span class="block text-4xl" aria-hidden="true">🎃</span><span class="mt-2 block font-black">Pumpkin</span></button>
+        <button class="character-choice rounded-2xl border-2 border-white/10 bg-black/20 p-4 text-left transition hover:-translate-y-1" data-character="ghost" aria-pressed="false" type="button"><span class="block text-4xl" aria-hidden="true">👻</span><span class="mt-2 block font-black">Ghost</span></button>
+        <button class="character-choice rounded-2xl border-2 border-white/10 bg-black/20 p-4 text-left transition hover:-translate-y-1" data-character="werewolf" aria-pressed="false" type="button"><span class="block text-4xl" aria-hidden="true">🐺</span><span class="mt-2 block font-black">Werewolf</span></button>
+        <button class="character-choice rounded-2xl border-2 border-white/10 bg-black/20 p-4 text-left transition hover:-translate-y-1" data-character="skeleton" aria-pressed="false" type="button"><span class="block text-4xl" aria-hidden="true">💀</span><span class="mt-2 block font-black">Skeleton</span></button>
       </div>
-      <button id="begin-adventure" class="mt-7 w-full max-w-sm rounded-xl bg-gradient-to-b from-amber-300 to-pumpkin px-7 py-4 text-lg font-black uppercase tracking-wider text-[#20162a] shadow-[0_5px_0_#99541e,0_14px_30px_#0007] transition hover:-translate-y-1 hover:brightness-110" type="button">Start adventure</button>
     </div>
   </section>
 
@@ -495,7 +540,7 @@
       }
     }
 
-    function drawPerson() {
+    function drawPerson(previewOnly = false) {
       const costume = characters[player.character];
       const pixel = playerSprite.getContext("2d");
       pixel.clearRect(0, 0, playerSprite.width, playerSprite.height);
@@ -615,6 +660,7 @@
       block("#763447", 15, 19, 3, 1);
       block("#ffd887", 15, 16, 1, 1); block("#ffd887", 17, 17, 1, 1);
 
+      if (previewOnly) return playerSprite;
       ctx.save();
       ctx.imageSmoothingEnabled = false;
       if (player.riding) ctx.drawImage(playerSprite, player.x - cameraX - 24, player.y - 64 - bob, 48, 58);
@@ -1062,7 +1108,7 @@
         pressKey("keyup", " ", "Space");
         // Synthetic events don't click focused buttons, so do it like a real Space would.
         if (!startScreenEl.classList.contains("hidden")) document.querySelector("#start-game").click();
-        else if (!characterScreenEl.classList.contains("hidden")) document.querySelector("#begin-adventure").click();
+        else if (!characterScreenEl.classList.contains("hidden")) beginAdventure();
         else if (!gameStarted && document.activeElement instanceof HTMLButtonElement) document.activeElement.click();
         return;
       }
@@ -1186,6 +1232,11 @@
 
     window.addEventListener("keydown", event => {
       const key = getControlKey(event);
+      if (!gameStarted && !characterScreenEl.classList.contains("hidden") && (key === " " || key === "Enter")) {
+        event.preventDefault();
+        beginAdventure();
+        return;
+      }
       if (!gameStarted && !characterScreenEl.classList.contains("hidden") && ["w", "a", "s", "d"].includes(key)) {
         event.preventDefault();
         const choices = [...document.querySelectorAll(".character-choice")];
@@ -1224,9 +1275,22 @@
       characterScreenEl.classList.add("flex");
       document.querySelector(".character-choice").focus();
     });
+    const previewCharacter = player.character;
     document.querySelectorAll(".character-choice").forEach(button => {
+      const preview = document.createElement("canvas");
+      preview.className = "character-preview";
+      preview.width = 80;
+      preview.height = 88;
+      preview.setAttribute("aria-hidden", "true");
+      player.character = button.dataset.character;
+      const sprite = drawPerson(true);
+      const previewContext = preview.getContext("2d");
+      previewContext.imageSmoothingEnabled = false;
+      previewContext.drawImage(sprite, 0, 0, preview.width, preview.height);
+      button.append(preview);
       button.addEventListener("click", () => {
         player.character = button.dataset.character;
+        button.focus({ preventScroll: true });
         document.querySelectorAll(".character-choice").forEach(choice => {
           const selected = choice === button;
           choice.setAttribute("aria-pressed", String(selected));
@@ -1235,17 +1299,19 @@
           choice.classList.toggle("border-white/10", !selected);
           choice.classList.toggle("bg-black/20", !selected);
         });
-        document.querySelector("#begin-adventure").focus();
       });
     });
-    document.querySelector("#begin-adventure").addEventListener("click", () => {
+    player.character = previewCharacter;
+
+    function beginAdventure() {
+      if (gameStarted || characterScreenEl.classList.contains("hidden")) return;
       randomizeHouseLayout();
       resetGame();
       gameStarted = true;
       characterScreenEl.classList.add("hidden");
       characterScreenEl.classList.remove("flex");
       document.querySelector("#game").focus();
-    });
+    }
 
     function resetGame() {
       candies = 0;
