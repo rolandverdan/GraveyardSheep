@@ -188,11 +188,16 @@
       opacity: .72;
     }
 
-    #play-mode { position: fixed; top: 12px; right: 12px; z-index: 100000; display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #ffd76b88; border-radius: 12px; background: #171321ee; color: #fff0d1; font-size: 22px; box-shadow: 0 4px 16px #0009; cursor: pointer; }
+    #play-mode { position: fixed; top: 12px; right: 64px; z-index: 100000; display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #ffd76b88; border-radius: 12px; background: #171321ee; color: #fff0d1; font-size: 22px; box-shadow: 0 4px 16px #0009; cursor: pointer; }
     body.play-mode { height: 100vh; height: 100dvh; overflow: hidden; padding: 0; }
     body.play-mode main { display: flex; width: 100vw; max-width: none; height: 100vh; height: 100dvh; align-items: stretch; }
     body.play-mode main > :not(#roulette-game-section) { display: none !important; }
-    body.play-mode #back-link { display: none !important; }
+    body.play-mode #back-link, body.play-mode #settings-open, body.hide-back-link #back-link { display: none !important; }
+    #arduinoStatus.connected { background: #6ee7b726; color: #a7f3d0; }
+    #controller-notice[hidden] { display: none; }
+    /* Press feedback for BUTTON 1 / Space (no mouse at the arcade) */
+    .spin.pressed { animation: spin-press .35s ease-out; }
+    @keyframes spin-press { 0% { transform: translateY(5px) scale(.94); filter: brightness(1.35); box-shadow: 0 0 0 6px #fcd34d66, 0 0 40px #fbbf24aa; } 100% { transform: none; } }
     body.play-mode #roulette-game-section { width: 100%; height: 100%; }
     body.play-mode #roulette-game-section > div { width: 100%; max-width: none; height: 100%; justify-content: center; border: 0; border-radius: 0; padding: 1rem; }
     body.play-mode .wheel-wrap { width: min(82vmin, 72vh, 760px); max-width: none; flex: 0 0 auto; margin: .5rem auto; }
@@ -241,8 +246,87 @@
     style="position:fixed;top:12px;left:12px;z-index:100000;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid #ffd76b88;border-radius:12px;background:#171321ee;color:#fff0d1;font:800 14px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 4px 16px #0009;cursor:pointer;"
   >&#8592; Graveyard Arcade</a>
 
+  <button id="settings-open" type="button" aria-label="Settings" title="Settings" style="position:fixed;top:12px;right:12px;z-index:100000;display:grid;place-items:center;width:44px;height:44px;border:1px solid #ffd76b88;border-radius:12px;background:#171321ee;color:#fff0d1;font-size:22px;box-shadow:0 4px 16px #0009;cursor:pointer;">&#9881;</button>
   <button id="play-mode" type="button" aria-label="Maximize roulette" title="Maximize roulette">&#x26F6;</button>
+  <div id="controller-notice" role="alert" style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:100000;padding:10px 16px;border:1px solid #f87171aa;border-radius:12px;background:#2a1218f2;color:#fecaca;font:700 14px/1.3 system-ui,sans-serif;box-shadow:0 4px 16px #0009;text-align:center;">&#127918; Controller not connected. Plug in the Arduino, or click &#9881; to connect.</div>
 
+  <dialog id="settings-modal" class="w-[calc(100%-2rem)] max-w-2xl rounded-2xl border border-amber-200/20 bg-[#1b1426] p-5 text-white shadow-[0_25px_90px_#000c] backdrop:bg-black/70" aria-labelledby="settings-title">
+    <div class="flex items-center justify-between">
+      <h2 id="settings-title" class="font-black uppercase tracking-wider text-amber-100">⚙️ Settings</h2>
+      <button id="settings-close" type="button" class="rounded-lg px-2 text-xl text-white/70 hover:text-white" aria-label="Close">&times;</button>
+    </div>
+    <section class="mt-3 rounded-xl border border-emerald-300/20 bg-[#111c20] p-4 text-center">
+      <h3 class="text-sm font-black uppercase tracking-wider text-emerald-200">Arduino 🎮</h3>
+      <p class="mt-1 text-xs text-lilac/80">BUTTON 1 spins the wheel. Serial speed: 115200 baud.</p>
+      <div class="mt-3 flex flex-wrap items-center justify-center gap-2">
+        <span id="arduinoStatus" class="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-amber-100" role="status" aria-live="polite">Not connected</span>
+        <button id="arduinoConnect" class="rounded-lg bg-emerald-300 px-4 py-2 text-sm font-black text-[#10201c] transition hover:brightness-110" type="button">Connect COM port</button>
+        <button id="arduinoDisconnect" class="hidden rounded-lg border border-white/20 px-3 py-2 text-sm font-bold text-white" type="button">Disconnect</button>
+      </div>
+      <p id="arduinoHelp" class="mt-2 text-xs text-lilac/80">Choose your Arduino port.</p>
+      <pre id="arduinoLog" class="mt-2 max-h-16 overflow-auto whitespace-pre-wrap break-all text-left text-xs text-emerald-200" aria-live="polite">Arduino log: waiting to connect</pre>
+    </section>
+    <label class="mt-4 flex items-center justify-center gap-2 text-sm font-bold text-lilac">
+      <input id="hideBackLink" type="checkbox" class="h-4 w-4 accent-amber-300">
+      Hide "Graveyard Arcade" back button
+    </label>
+    <div class="mt-4 border-t border-white/10 pt-4">
+      <h3 class="font-black text-amber-100">🎡 Roulette settings</h3>
+        <form id="prize-settings" class="mt-2">
+          <p class="mb-4 text-sm text-lilac">
+            Change the jackpot odds and candy payouts. Every result awards at least 1 candy.
+          </p>
+
+          <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+
+            <label class="rounded-xl border border-amber-200/15 bg-black/20 p-3 text-sm font-bold text-amber-100">
+              Jackpot chance (%)
+              <input id="setting-jackpot-chance" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="0" max="50" step="1" value="2">
+            </label>
+
+            <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">
+              Tier 1 · Small treat
+              <input id="setting-tier-1" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="5">
+            </label>
+
+            <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">
+              Tier 2 · Sweet treat
+              <input id="setting-tier-2" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="10">
+            </label>
+
+            <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">
+              Tier 3 · Candy stash
+              <input id="setting-tier-3" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="15">
+            </label>
+
+            <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">
+              Tier 4 · Big treat
+              <input id="setting-tier-4" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="20">
+            </label>
+
+            <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">
+              Tier 5 · Rare treat
+              <input id="setting-tier-5" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="25">
+            </label>
+
+            <label class="rounded-xl border border-amber-200/20 bg-black/20 p-3 text-sm font-bold text-amber-100">
+              Jackpot candies
+              <input id="setting-tier-jackpot" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="100">
+            </label>
+
+          </div>
+
+          <div class="mt-4 flex flex-wrap items-center gap-3">
+            <button class="rounded-xl bg-gradient-to-b from-amber-200 to-pumpkin px-5 py-2.5 font-black text-[#25182d] shadow-[0_4px_0_#9c511e]" type="submit">
+              Apply settings
+            </button>
+            <span id="settings-status" class="text-sm text-lilac" role="status" aria-live="polite">
+              Current settings apply to your next spin.
+            </span>
+          </div>
+        </form>
+    </div>
+  </dialog>
   <main class="relative mx-auto w-full max-w-6xl">
 
     <header class="relative mb-8 text-center sm:mb-10">
@@ -264,65 +348,6 @@
       </p>
     </header>
 
-    <details class="mb-5 overflow-hidden rounded-2xl border border-white/10 bg-[#21182d]/90 shadow-xl backdrop-blur-sm">
-      <summary class="cursor-pointer px-5 py-4 font-black text-amber-100 marker:text-pumpkin focus:outline-none focus:ring-2 focus:ring-amber-200">
-        ⚙️ Roulette settings
-      </summary>
-
-      <form id="prize-settings" class="border-t border-white/10 p-4 sm:p-5">
-        <p class="mb-4 text-sm text-lilac">
-          Change the jackpot odds and candy payouts. Every result awards at least 1 candy.
-        </p>
-
-        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-
-          <label class="rounded-xl border border-amber-200/15 bg-black/20 p-3 text-sm font-bold text-amber-100">
-            Jackpot chance (%)
-            <input id="setting-jackpot-chance" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="0" max="50" step="1" value="2">
-          </label>
-
-          <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">
-            Tier 1 · Small treat
-            <input id="setting-tier-1" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="5">
-          </label>
-
-          <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">
-            Tier 2 · Sweet treat
-            <input id="setting-tier-2" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="10">
-          </label>
-
-          <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">
-            Tier 3 · Candy stash
-            <input id="setting-tier-3" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="15">
-          </label>
-
-          <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">
-            Tier 4 · Big treat
-            <input id="setting-tier-4" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="20">
-          </label>
-
-          <label class="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold text-lilac">
-            Tier 5 · Rare treat
-            <input id="setting-tier-5" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="25">
-          </label>
-
-          <label class="rounded-xl border border-amber-200/20 bg-black/20 p-3 text-sm font-bold text-amber-100">
-            Jackpot candies
-            <input id="setting-tier-jackpot" class="mt-2 w-full rounded-lg border border-white/15 bg-[#100b1b] px-3 py-2 text-white" type="number" min="1" max="9999" step="1" value="100">
-          </label>
-
-        </div>
-
-        <div class="mt-4 flex flex-wrap items-center gap-3">
-          <button class="rounded-xl bg-gradient-to-b from-amber-200 to-pumpkin px-5 py-2.5 font-black text-[#25182d] shadow-[0_4px_0_#9c511e]" type="submit">
-            Apply settings
-          </button>
-          <span id="settings-status" class="text-sm text-lilac" role="status" aria-live="polite">
-            Current settings apply to your next spin.
-          </span>
-        </div>
-      </form>
-    </details>
 
     <section id="roulette-game-section" class="flex justify-center" aria-label="Halloween roulette game">
       <div class="relative flex w-full max-w-2xl flex-col items-center overflow-hidden rounded-[2rem] border border-white/10 bg-transparent p-4 sm:p-7">
@@ -730,9 +755,34 @@
       }
     });
 
+    const settingsModal = document.querySelector("#settings-modal");
+    document.querySelector("#settings-open").addEventListener("click", () => settingsModal.showModal());
+    document.querySelector("#settings-close").addEventListener("click", () => settingsModal.close());
+
+    // Remembered per browser so the back button stays hidden after a reload.
+    const hideBackLinkEl = document.querySelector("#hideBackLink");
+    function setBackLinkHidden(hidden) {
+      hideBackLinkEl.checked = hidden;
+      document.body.classList.toggle("hide-back-link", hidden);
+      try { localStorage.setItem("scaroulette-hide-back-link", hidden ? "1" : ""); } catch {}
+    }
+    try { setBackLinkHidden(localStorage.getItem("scaroulette-hide-back-link") === "1"); } catch {}
+    hideBackLinkEl.addEventListener("change", () => setBackLinkHidden(hideBackLinkEl.checked));
+
+    // Space / Arduino BUTTON 1: animate the spin button so every press is
+    // visible, then spin (closing the result popup first if it is open).
+    function pressSpin() {
+      spinButton.classList.remove("pressed");
+      void spinButton.offsetWidth;
+      spinButton.classList.add("pressed");
+      if (isSpinning) return;
+      if (!winPopupEl.classList.contains("hidden")) closeWinPopup();
+      spinWheel();
+    }
+
     // Keyboard controls: Spacebar spins the wheel.
     document.addEventListener("keydown", event => {
-      if (event.code !== "Space") return;
+      if (event.code !== "Space" || settingsModal.open) return;
 
       const target = event.target;
 
@@ -752,16 +802,130 @@
       event.preventDefault();
 
       // Ignore held-down/repeated Spacebar presses.
-      if (event.repeat || isSpinning) return;
+      if (event.repeat) return;
 
-      // If the result popup is open, Spacebar starts the next spin.
-      if (!winPopupEl.classList.contains("hidden")) {
-        closeWinPopup();
-      }
-
-      spinWheel();
+      pressSpin();
     });
+
+    // Arduino Web Serial controller: accepts newline-delimited
+    // BUTTON 1 ... BUTTON 6 messages at 115200 baud.
+    const arduinoConnectBtn = document.getElementById('arduinoConnect');
+    const arduinoDisconnectBtn = document.getElementById('arduinoDisconnect');
+    const arduinoStatus = document.getElementById('arduinoStatus');
+    const arduinoHelp = document.getElementById('arduinoHelp');
+    const arduinoLog = document.getElementById('arduinoLog');
+    let arduinoPort = null;
+    let arduinoReader = null;
+    let arduinoReadTask = null;
+    let arduinoKeepReading = false;
+
+    function logArduino(msg) {
+      console.log(msg);
+      arduinoLog.textContent = `Arduino log: ${msg}`;
+    }
+
+    function setArduinoStatus(label, connected = false) {
+      arduinoStatus.textContent = label;
+      arduinoStatus.classList.toggle('connected', connected);
+      arduinoConnectBtn.classList.toggle('hidden', connected);
+      arduinoDisconnectBtn.classList.toggle('hidden', !connected);
+      document.getElementById('controller-notice').hidden = connected;
+    }
+
+    // BUTTON 1 spins the wheel (same as Space); other buttons are ignored.
+    function handleArduinoCommand(rawCommand) {
+      const match = rawCommand.trim().toUpperCase().match(/^BUTTON\s*_?([1-6])$/);
+      if (!match || match[1] !== '1' || settingsModal.open) return;
+      pressSpin();
+    }
+
+    async function disconnectArduino() {
+      arduinoKeepReading = false;
+      try { if (arduinoReader) await arduinoReader.cancel(); } catch (_) {}
+      try { if (arduinoReadTask) await arduinoReadTask; } catch (_) {}
+      arduinoReader = null;
+      arduinoReadTask = null;
+      if (arduinoPort) {
+        try { await arduinoPort.close(); } catch (_) {}
+      }
+      arduinoPort = null;
+      setArduinoStatus('Not connected', false);
+      arduinoHelp.textContent = 'Connect your Arduino over USB, choose its port, then send BUTTON 1 over Serial at 115200 baud.';
+    }
+
+    // With no port, asks the user to pick one. Ports picked before can be
+    // passed in directly, which is how auto-connect works.
+    async function connectArduino(port) {
+      if (arduinoPort) return;
+      logArduino('connect requested');
+      if (!('serial' in navigator)) {
+        logArduino('Web Serial unavailable. Use desktop Chrome or Edge on localhost or HTTPS.');
+        setArduinoStatus('Browser unsupported', false);
+        arduinoHelp.textContent = 'Web Serial needs desktop Chrome or Edge and a localhost or HTTPS page.';
+        return;
+      }
+      arduinoConnectBtn.disabled = true;
+      arduinoConnectBtn.textContent = 'Connecting…';
+      try {
+        if (!port) {
+          logArduino('opening browser port picker; select your Arduino COM port');
+          port = await navigator.serial.requestPort();
+        }
+        arduinoPort = port;
+        logArduino('port selected; opening at 115200 baud');
+        await arduinoPort.open({ baudRate: 115200 });
+        logArduino('CONNECTED at 115200 baud; press a controller button to check for input');
+        setArduinoStatus('Connected · 115200', true);
+        arduinoHelp.textContent = 'Connected. BUTTON 1 spins the wheel.';
+        arduinoKeepReading = true;
+        const decoder = new TextDecoder();
+        let buffer = '';
+        arduinoReader = arduinoPort.readable.getReader();
+        arduinoReadTask = (async () => {
+          try {
+            while (arduinoKeepReading) {
+              const { value, done } = await arduinoReader.read();
+              if (done) break;
+              const text = decoder.decode(value, { stream: true });
+              logArduino(`received ${JSON.stringify(text)}`);
+              buffer += text;
+              const lines = buffer.split(/\n/);
+              buffer = lines.pop() || '';
+              for (const line of lines) handleArduinoCommand(line);
+              if (buffer.length > 100) buffer = buffer.slice(-100);
+            }
+          } catch (error) {
+            if (arduinoKeepReading) {
+              logArduino(`serial read failed: ${error.message}`);
+              setArduinoStatus('Read error', false);
+              arduinoHelp.textContent = `Serial read failed: ${error.message}. Check the USB connection and baud rate.`;
+            }
+          } finally {
+            try { arduinoReader?.releaseLock(); } catch (_) {}
+          }
+        })();
+      } catch (error) {
+        logArduino(`connection failed: ${error.message}`);
+        arduinoPort = null;
+        setArduinoStatus('Not connected', false);
+        arduinoHelp.textContent = error.name === 'NotFoundError'
+          ? 'No port selected. Click Connect again and select your Arduino USB port.'
+          : `Could not connect: ${error.message}. Close Arduino Serial Monitor if it is using the port, then try again.`;
+      } finally {
+        arduinoConnectBtn.disabled = false;
+        arduinoConnectBtn.textContent = 'Connect COM port';
+      }
+    }
+    arduinoConnectBtn.addEventListener('click', () => connectArduino());
+    arduinoDisconnectBtn.addEventListener('click', disconnectArduino);
+    if ('serial' in navigator) {
+      navigator.serial.addEventListener('disconnect', (e) => {
+        if (arduinoPort && e.target === arduinoPort) disconnectArduino();
+      });
+      // Auto-connect to a port that was picked before: on page load, and when it's plugged in.
+      navigator.serial.addEventListener('connect', (e) => connectArduino(e.target));
+      navigator.serial.getPorts().then(ports => { if (ports[0]) connectArduino(ports[0]); });
+    }
   </script>
-  <script src="../arduino-controller.js"></script>
 </body>
 </html>
