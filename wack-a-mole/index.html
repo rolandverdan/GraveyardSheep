@@ -21,16 +21,18 @@
   #mallet.whack { transform: translate(-38%,-65%) rotate(-65deg) scale(.9); }
   body.custom-cursor { cursor: none; }
   body.custom-cursor button, body.custom-cursor .guide, body.custom-cursor input { cursor: pointer; }
+  /* The settings drawer sits above the mallet, so use the normal cursor there */
+  body.custom-cursor #configDrawer { cursor: default; }
+  body.custom-cursor #configDrawer button, body.custom-cursor #configDrawer .cfg-check { cursor: pointer; }
+  body.custom-cursor #configDrawer input[type="number"] { cursor: text; }
+  body:has(#configDrawer:hover) #mallet { display: none !important; }
   header { z-index: 1; text-align: center; }
   h1 { font-size: 2.6rem; letter-spacing: 3px; color: #b4ff61; text-shadow: 0 0 18px #49e810, 0 4px 0 #1b380a, 0 0 35px rgba(140,50,255,.6); margin-bottom: 6px; }
   .hud { position: relative; z-index: 1; display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; align-items: center; font-size: 1.15rem; margin-bottom: 12px; background: rgba(18,12,32,.75); padding: 8px 24px; border-radius: 14px; border: 1px solid #5a3880; box-shadow: 0 6px 18px rgba(0,0,0,.5); }
   .hud-item { display: flex; align-items: center; gap: 6px; }
   .hud b { color: #fff; font-size: 1.25rem; }
   .hud .candy-val { color: #ffd23b; font-weight: 900; }
-  .config-btn { background: #442468; color: #b4ff61; border: 1px solid #7c44be; padding: 6px 14px; font-size: .95rem; border-radius: 8px; cursor: pointer; box-shadow: none; margin: 0; font-weight: bold; transition: all .15s; display: inline-flex; align-items: center; gap: 6px; }
-  .config-btn:hover { background: #5a2e8c; color: #fff; }
-  .config-btn:active { transform: translateY(1px); }
-  #configDrawer { position: fixed; top: 0; right: 0; width: 380px; max-width: 92vw; height: 100vh; background: linear-gradient(180deg,#221435 0%,#11091c 100%); border-left: 3px solid #6c3da8; box-shadow: -10px 0 40px rgba(0,0,0,.9); z-index: 500; padding: 22px 18px; display: flex; flex-direction: column; gap: 14px; transform: translateX(100%); transition: transform .25s ease-in-out; overflow-y: auto; }
+  #configDrawer { position: fixed; top: 0; right: 0; width: 380px; max-width: 92vw; height: 100vh; background: linear-gradient(180deg,#221435 0%,#11091c 100%); border-left: 3px solid #6c3da8; box-shadow: -10px 0 40px rgba(0,0,0,.9); z-index: 100001; padding: 22px 18px; display: flex; flex-direction: column; gap: 14px; transform: translateX(100%); transition: transform .25s ease-in-out; overflow-y: auto; }
   #configDrawer.open { transform: translateX(0); }
   #configDrawer h3 { color: #b4ff61; font-size: 1.45rem; text-shadow: 0 0 10px #49e810; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #4a2873; padding-bottom: 10px; }
   .close-cfg-btn { background: transparent; border: none; color: #b79ed4; font-size: 1.5rem; cursor: pointer; padding: 0 6px; margin: 0; box-shadow: none; }
@@ -96,12 +98,45 @@
   button:active { transform: translateY(3px); box-shadow: 0 2px 0 #3a1863; }
   .audio-btn { background: transparent; border: 1px solid #5a3880; box-shadow: none; font-size: 1rem; padding: 4px 10px; margin: 0; color: #b4ff61; border-radius: 8px; }
   .audio-btn:hover { background: rgba(255,255,255,.08); }
+  /* Arduino settings (in the config drawer) */
+  .cfg-arduino-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; margin-top: 4px; }
+  #arduinoStatus { border-radius: 999px; background: rgba(255,255,255,.1); color: #ffe9a8; padding: 4px 12px; font-size: .8rem; font-weight: bold; }
+  #arduinoStatus.connected { background: rgba(180,255,97,.15); color: #b4ff61; }
+  .cfg-small-btn { background: #b4ff61; color: #1a0f26; font-size: .9rem; padding: 7px 14px; border-radius: 8px; box-shadow: none; margin: 0; letter-spacing: 0; }
+  .cfg-small-btn:hover { background: #c8ff8a; }
+  .cfg-small-btn.secondary { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.3); }
+  .cfg-small-btn:disabled { opacity: .6; cursor: wait; }
+  #arduinoLog { max-height: 4.5em; overflow: auto; white-space: pre-wrap; word-break: break-all; font-size: .75rem; color: #b4ff61; }
+  .cfg-check { justify-content: flex-start !important; gap: 8px; cursor: pointer; }
+  .cfg-check input { width: 16px; height: 16px; accent-color: #b4ff61; }
+
+  /* Fixed toolbar (same layout as trickyhouse) */
+  .corner-btn { position: fixed; top: 12px; z-index: 100000; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; margin: 0; border: 1px solid #ffd76b88; border-radius: 12px; background: #171321ee; color: #fff0d1; font-size: 22px; letter-spacing: 0; box-shadow: 0 4px 16px #0009; }
+  .corner-btn:hover { background: #2a1f3d; }
+  #settings-open { right: 12px; }
+  #play-mode { right: 64px; }
+  #controller-notice { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 100000; padding: 10px 16px; border: 1px solid #f87171aa; border-radius: 12px; background: #2a1218f2; color: #fecaca; font: 700 14px/1.3 system-ui, sans-serif; box-shadow: 0 4px 16px #0009; text-align: center; }
+  #controller-notice[hidden] { display: none; }
+  body.play-mode #back-link, body.play-mode #play-mode, body.play-mode #settings-open, body.hide-back-link #back-link { display: none !important; }
+
+  /* Press feedback for button/keyboard play (no mouse at the arcade) */
+  .grave-mallet { position: absolute; z-index: 9; left: 42%; top: -2%; width: 56%; height: 92%; pointer-events: none; opacity: 0; transform-origin: 50% 95%; filter: drop-shadow(3px 8px 10px rgba(0,0,0,.65)); }
+  .grave-mallet.swing { animation: malletSwing .36s ease-out; }
+  @keyframes malletSwing { 0% { opacity: 1; transform: rotate(35deg); } 40% { opacity: 1; transform: rotate(-58deg); } 55% { transform: rotate(-50deg); } 80% { opacity: 1; transform: rotate(-54deg); } 100% { opacity: 0; transform: rotate(-54deg); } }
+  .hole-key.pressed { animation: keyPress .3s ease-out; }
+  @keyframes keyPress { 0% { background: #b4ff61; color: #1a0f26; transform: scale(1.3); } 100% { transform: scale(1); } }
+  .grave-plot.thud { animation: graveThud .22s ease-out; }
+  @keyframes graveThud { 30% { transform: translateY(4px) scale(.985); } }
+  .score-float.miss { color: #c8b2e5; font-size: 1.2rem; text-shadow: 0 0 10px #000; }
+  .press-any { animation: pressPulse 1.2s ease-in-out infinite; }
+  @keyframes pressPulse { 50% { filter: brightness(1.3); transform: scale(1.05); } }
+  #playAgainBtn.waiting { visibility: hidden; }
   .keypad-hint { position: relative; z-index: 1; color: #c8b2e5; font-size: .95rem; margin: 10px 0 0; text-align: center; }
   @media (max-width: 480px) { .popup { padding: 18px 14px; } .popup h2 { font-size: 1.65rem; } .steps { gap: 8px; } .step h3 { font-size: .9rem; } .visual { height: 100px; } .timer-number { font-size: 1.4rem; min-width: 48px; } }
 </style>
 </head>
 <body class="custom-cursor">
-  <a href="../index.html" aria-label="Back to Graveyard Arcade" title="Back to Graveyard Arcade" style="position:fixed;top:12px;left:12px;z-index:100000;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid #ffd76b88;border-radius:12px;background:#171321ee;color:#fff0d1;font:800 14px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 4px 16px #0009;cursor:pointer;">&#8592; Graveyard Arcade</a>
+  <a id="back-link" href="../index.html" aria-label="Back to Graveyard Arcade" title="Back to Graveyard Arcade" style="position:fixed;top:12px;left:12px;z-index:100000;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid #ffd76b88;border-radius:12px;background:#171321ee;color:#fff0d1;font:800 14px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 4px 16px #0009;cursor:pointer;">&#8592; Graveyard Arcade</a>
 
   <!-- Background graveyard atmosphere -->
   <div class="cemetery-sky">
@@ -120,18 +155,35 @@
     <line x1="38" y1="14" x2="42" y2="34" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".6"/>
   </svg>
 
+  <button id="settings-open" class="corner-btn" type="button" aria-label="Settings" title="Settings">&#9881;</button>
+  <button id="play-mode" class="corner-btn" type="button" aria-label="Maximize game" title="Maximize game">&#x26F6;</button>
+  <div id="controller-notice" role="alert">&#127918; Controller not connected. Plug in the Arduino, or click &#9881; to connect.</div>
+
   <header><h1>🪦 GRAVEYARD WHACK 🪦</h1></header>
 
   <div class="hud">
     <div class="hud-item">⭐ Score: <b id="scoreVal">0</b></div>
     <div class="hud-item">⚰️ Whacks: <b id="whacksVal">0</b></div>
     <div class="hud-item">🍬 Total Candy: <b id="totalCandy" class="candy-val">0</b></div>
-    <button id="openConfigBtn" class="config-btn" title="Points & Candy Rewards Settings">⚙️ Config</button>
     <button id="soundToggle" class="audio-btn">🔊 Sound: ON</button>
   </div>
 
   <div id="configDrawer">
-    <h3><span>⚙️ Points & Candy Settings</span><button id="closeConfigBtn" class="close-cfg-btn" title="Hide Settings">✕</button></h3>
+    <h3><span>⚙️ Settings</span><button id="closeConfigBtn" class="close-cfg-btn" title="Hide Settings">✕</button></h3>
+    <div class="cfg-group">
+      <label>Arduino 🎮</label>
+      <div class="cfg-sub">BUTTON 1 – BUTTON 6 whack graves 1 – 6. Serial speed: 115200 baud.</div>
+      <div class="cfg-arduino-row">
+        <span id="arduinoStatus" role="status" aria-live="polite">Not connected</span>
+        <button id="arduinoConnect" class="cfg-small-btn" type="button">Connect COM port</button>
+        <button id="arduinoDisconnect" class="cfg-small-btn secondary hidden" type="button">Disconnect</button>
+      </div>
+      <div id="arduinoHelp" class="cfg-sub">Choose your Arduino port.</div>
+      <pre id="arduinoLog" aria-live="polite">Arduino log: waiting to connect</pre>
+    </div>
+    <div class="cfg-group">
+      <label class="cfg-check"><input id="hideBackLink" type="checkbox"> Hide "Graveyard Arcade" back button</label>
+    </div>
     <div class="cfg-group">
       <label>🥇 Gold Tier (High Score) 🍬</label><div class="cfg-sub">Points needed & candy reward range</div>
       <div class="cfg-input-row"><input type="number" id="cfgTier3Pts" class="cfg-input" min="50" max="99900" step="50" value="2000" title="Gold Points"><span style="color:#b4ff61;font-size:.85rem;white-space:nowrap;">pts ➜</span><input type="number" id="cfgTier3Min" class="cfg-input" min="1" max="999" value="8" title="Min Candy"><span style="color:#ffd23b;">–</span><input type="number" id="cfgTier3Max" class="cfg-input" min="1" max="999" value="10" title="Max Candy"></div>
@@ -153,7 +205,7 @@
 
   <div class="timer-row"><div class="timer-wrap"><div id="timerBar"></div></div><div id="timerNumber" class="timer-number">30s</div></div>
   <div class="cemetery-field" id="field"><div class="grid" id="grid"></div></div>
-  <p class="keypad-hint">⌨️ Numpad controls: 4 · 5 · 6 (top row) &nbsp; / &nbsp; 1 · 2 · 3 (bottom row)</p>
+  <p class="keypad-hint">🎮 Press buttons 1 – 6 to whack the matching grave</p>
 
   <div id="landing">
     <div class="popup guide">
@@ -170,12 +222,12 @@
         </div><h3>3 · GOLD GHOST 👻</h3></div>
         <div class="step"><div class="visual" style="flex-direction:column;gap:4px;"><div style="font-size:1.15rem;color:#ffd23b;font-weight:bold;">POINTS ➜ CANDY</div><div id="guideTierBox" style="font-size:.85rem;line-height:1.45;color:#d6c7f0;text-align:center;">🥇 2000+ pts ➜ 8–10 🍬<br>🥈 1200+ pts ➜ 5–7 🍬<br>🥉 500+ pts ➜ 2–4 🍬</div></div><h3>4 · WIN CANDY</h3></div>
       </div>
-      <p style="color:#d6beff;margin-bottom:10px;">Use the Numpad keys shown on the graves, or click/tap a zombie.</p>
-      <button id="startGuideBtn">START GAME</button>
+      <p style="color:#d6beff;margin-bottom:10px;">Press the button with the number shown on a grave when a zombie pops up.</p>
+      <button id="startGuideBtn" class="press-any">PRESS ANY BUTTON TO START</button>
     </div>
   </div>
 
-  <div id="overlay" class="hidden"><div class="popup"><h2 id="ovTitle">⚰️ GRAVEYARD CLEARED! ⚰️</h2><div id="candyReward"></div><p id="ovSummary" style="font-size:1.2rem;margin-bottom:12px;"></p><button id="playAgainBtn">START GAME</button></div></div>
+  <div id="overlay" class="hidden"><div class="popup"><h2 id="ovTitle">⚰️ GRAVEYARD CLEARED! ⚰️</h2><div id="candyReward"></div><p id="ovSummary" style="font-size:1.2rem;margin-bottom:12px;"></p><button id="playAgainBtn" class="press-any">PRESS ANY BUTTON TO PLAY AGAIN</button></div></div>
 
 <script>
   // ---------- Spooky Sound Synthesizer ----------
@@ -273,7 +325,7 @@
   const DEFAULT_CONFIG = { tier3Pts:2000, tier3Min:8, tier3Max:10, tier2Pts:1200, tier2Min:5, tier2Max:7, tier1Pts:500, tier1Min:2, tier1Max:4, consolation:1 };
   let config = {...DEFAULT_CONFIG};
   const configDrawer = document.getElementById('configDrawer');
-  const openConfigBtn = document.getElementById('openConfigBtn');
+  const openConfigBtn = document.getElementById('settings-open');
   const closeConfigBtn = document.getElementById('closeConfigBtn');
   const saveConfigBtn = document.getElementById('saveConfigBtn');
   const resetConfigBtn = document.getElementById('resetConfigBtn');
@@ -332,17 +384,17 @@
   const startGuideBtn=document.getElementById('startGuideBtn'), playAgainBtn=document.getElementById('playAgainBtn');
 
   // Grave index mapping: 0 1 2 = top row; 3 4 5 = bottom row.
-  // Numpad 4 5 6 = top row; Numpad 1 2 3 = bottom row.
+  // Arduino BUTTON 1-6 = graves 1-6. Keyboard: Numpad 4 5 6 / 1 2 3, or W E D / A S Space.
   const NUMPAD_HOLE_MAP = { Numpad4:0, Numpad5:1, Numpad6:2, Numpad1:3, Numpad2:4, Numpad3:5, KeyW:0, KeyE:1, KeyD:2, KeyA:3, KeyS:4, Space:5 };
   const holes=[];
   gridEl.innerHTML='';
   for(let i=0;i<6;i++) {
     const graveWrap=document.createElement('div');
     graveWrap.className='grave-plot';
-    graveWrap.innerHTML=`<div class="tombstone"><div class="crack"></div></div><div class="grave-pit"></div><div class="mole-slot"><div class="mole" data-index="${i}"></div></div><div class="grave-dirt"></div><span class="hole-key" aria-label="Numpad ${['4','5','6','1','2','3'][i]}">${['4','5','6','1','2','3'][i]}</span>`;
+    graveWrap.innerHTML=`<div class="tombstone"><div class="crack"></div></div><div class="grave-pit"></div><div class="mole-slot"><div class="mole" data-index="${i}"></div></div><div class="grave-dirt"></div><span class="hole-key" aria-label="Button ${i+1}">${i+1}</span><svg class="grave-mallet" viewBox="0 0 100 100" aria-hidden="true">${mallet.innerHTML}</svg>`;
     gridEl.appendChild(graveWrap);
     const moleEl=graveWrap.querySelector('.mole');
-    holes.push({index:i,container:graveWrap,mole:moleEl,isUp:false,isGolden:false,isHit:false,hideTimeout:null});
+    holes.push({index:i,container:graveWrap,mole:moleEl,key:graveWrap.querySelector('.hole-key'),mallet:graveWrap.querySelector('.grave-mallet'),isUp:false,isGolden:false,isHit:false,hideTimeout:null});
     const handleHit=e=>{e.preventDefault();whackHole(i,e);};
     moleEl.addEventListener('mousedown',handleHit);
     moleEl.addEventListener('touchstart',handleHit,{passive:false});
@@ -351,7 +403,7 @@
   function whackHole(index,event) {
     if(!isPlaying)return;
     const h=holes[index];
-    if(!h||!h.isUp||h.isHit)return;
+    if(!h||!h.isUp||h.isHit)return false;
     h.isHit=true; whacks++; whacksValEl.textContent=whacks; clearTimeout(h.hideTimeout);
     const pts=h.isGolden?300:100;
     if(h.isGolden)sfxGold();else sfxWhack();
@@ -360,9 +412,21 @@
     const spawnX=rect.left+rect.width/2-fieldRect.left, spawnY=rect.top+rect.height/3-fieldRect.top;
     createScoreFloat(spawnX,spawnY,`+${pts}`); createBurst(spawnX,spawnY,h.isGolden);
     setTimeout(()=>{h.mole.classList.remove('up');setTimeout(()=>{h.isUp=false;h.isHit=false;},160);},280);
+    return true;
   }
-  function createScoreFloat(x,y,textValue) {
-    const el=document.createElement('div');el.className='score-float';el.style.left=x+'px';el.style.top=y+'px';el.textContent=textValue;fieldEl.appendChild(el);setTimeout(()=>el.remove(),750);
+  // Restart a CSS animation even if it is still running from the last press.
+  function replayAnim(el,cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+  // Button/keyboard press: swing a mallet over the grave so every press is visible, hit or miss.
+  function pressHole(index) {
+    const h=holes[index];
+    replayAnim(h.mallet,'swing'); replayAnim(h.key,'pressed'); replayAnim(h.container,'thud');
+    if(whackHole(index))return;
+    sfxWhack();
+    const rect=h.container.getBoundingClientRect(), fieldRect=fieldEl.getBoundingClientRect();
+    createScoreFloat(rect.left+rect.width/2-fieldRect.left,rect.top+rect.height*.55-fieldRect.top,'MISS','miss');
+  }
+  function createScoreFloat(x,y,textValue,variant='') {
+    const el=document.createElement('div');el.className=`score-float ${variant}`;el.style.left=x+'px';el.style.top=y+'px';el.textContent=textValue;fieldEl.appendChild(el);setTimeout(()=>el.remove(),750);
   }
   function createBurst(x,y,isGold) {
     for(let i=0;i<9;i++) {
@@ -414,22 +478,182 @@
     candyReward.innerHTML=`<div class="big">${earnedCandy}</div><div class="label">🍬 CANDY EARNED 🍬</div>`;
     ovSummary.innerHTML=`You whacked <b>${whacks}</b> ghouls for <b>${score}</b> points!`;
     overlay.classList.remove('hidden');
+    // Ignore input for a moment so a press from the round just played
+    // can't skip the result; then invite the player to go again.
+    readyForNextGame=false;playAgainBtn.classList.add('waiting');
+    setTimeout(()=>{readyForNextGame=true;playAgainBtn.classList.remove('waiting');},RESULT_LOCK_MS);
   }
 
-  // Numpad input: only whack the grave mapped to the pressed keypad key.
-  // Ignore typing fields and modifier shortcuts. e.code distinguishes the numpad.
+  const RESULT_LOCK_MS=1500;
+  let readyForNextGame=false;
+  // Any keyboard key or Arduino button starts a game from the
+  // how-to-play screen or (once unlocked) the result pop-up.
+  function pressAnyButton() {
+    if(configDrawer.classList.contains('open'))return false;
+    if(!landing.classList.contains('hidden')){startGame();return true;}
+    if(!overlay.classList.contains('hidden')&&readyForNextGame){readyForNextGame=false;startGame();return true;}
+    return false;
+  }
+
+  // Keyboard input: any key starts a game; in a round, only the grave
+  // mapped to the pressed key is whacked. Ignore typing fields and shortcuts.
   window.addEventListener('keydown',e=>{
-    if(e.target.matches('input, textarea, select, button') || e.ctrlKey || e.altKey || e.metaKey)return;
+    if(e.repeat || e.target.matches('input, textarea, select') || e.ctrlKey || e.altKey || e.metaKey)return;
+    if(['Escape','Shift','Tab'].includes(e.key))return;
+    if(pressAnyButton()){e.preventDefault();return;} // stop Space/Enter also clicking a focused button
     const holeIndex=NUMPAD_HOLE_MAP[e.code];
-    if(holeIndex===undefined)return;
+    if(holeIndex===undefined||e.target.matches('button'))return;
     e.preventDefault();
-    if(isPlaying){initAudio();whackHole(holeIndex,e);}
+    if(isPlaying&&!configDrawer.classList.contains('open')){initAudio();pressHole(holeIndex);}
   });
 
-  startGuideBtn.addEventListener('click',startGame);
-  playAgainBtn.addEventListener('click',startGame);
+  startGuideBtn.addEventListener('click',pressAnyButton);
+  playAgainBtn.addEventListener('click',pressAnyButton);
   loadConfig();
-  const arduinoScript = document.createElement('script'); arduinoScript.src = '../arduino-controller.js'; document.body.append(arduinoScript);
+  // Remembered per browser so the back button stays hidden after a reload.
+  const hideBackLinkEl = document.getElementById('hideBackLink');
+  function setBackLinkHidden(hidden) {
+    hideBackLinkEl.checked = hidden;
+    document.body.classList.toggle('hide-back-link', hidden);
+    try { localStorage.setItem('wackamole-hide-back-link', hidden ? '1' : ''); } catch (_) {}
+  }
+  try { setBackLinkHidden(localStorage.getItem('wackamole-hide-back-link') === '1'); } catch (_) {}
+  hideBackLinkEl.addEventListener('change', () => setBackLinkHidden(hideBackLinkEl.checked));
+
+  // Maximize: fullscreen without the corner buttons.
+  document.getElementById('play-mode').addEventListener('click', (e) => {
+    e.currentTarget.blur();
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen().catch(() => document.body.classList.toggle('play-mode'));
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !document.fullscreenElement) document.body.classList.remove('play-mode');
+  });
+  document.addEventListener('fullscreenchange', () => {
+    document.body.classList.toggle('play-mode', Boolean(document.fullscreenElement));
+  });
+
+  // Arduino Web Serial controller: accepts newline-delimited
+  // BUTTON 1 ... BUTTON 6 messages at 115200 baud.
+  const arduinoConnectBtn = document.getElementById('arduinoConnect');
+  const arduinoDisconnectBtn = document.getElementById('arduinoDisconnect');
+  const arduinoStatus = document.getElementById('arduinoStatus');
+  const arduinoHelp = document.getElementById('arduinoHelp');
+  const arduinoLog = document.getElementById('arduinoLog');
+  let arduinoPort = null;
+  let arduinoReader = null;
+  let arduinoReadTask = null;
+  let arduinoKeepReading = false;
+
+  function logArduino(msg) {
+    console.log(msg);
+    arduinoLog.textContent = `Arduino log: ${msg}`;
+  }
+
+  function setArduinoStatus(label, connected = false) {
+    arduinoStatus.textContent = label;
+    arduinoStatus.classList.toggle('connected', connected);
+    arduinoConnectBtn.classList.toggle('hidden', connected);
+    arduinoDisconnectBtn.classList.toggle('hidden', !connected);
+    document.getElementById('controller-notice').hidden = connected;
+  }
+
+  // Any button starts the game from the tutorial / result pop-up;
+  // during a round, BUTTON n whacks grave n.
+  function handleArduinoCommand(rawCommand) {
+    const match = rawCommand.trim().toUpperCase().match(/^BUTTON\s*_?([1-6])$/);
+    if (!match) return;
+    if (pressAnyButton()) return;
+    if (isPlaying && !configDrawer.classList.contains('open')) pressHole(match[1] - 1);
+  }
+
+  async function disconnectArduino() {
+    arduinoKeepReading = false;
+    try { if (arduinoReader) await arduinoReader.cancel(); } catch (_) {}
+    try { if (arduinoReadTask) await arduinoReadTask; } catch (_) {}
+    arduinoReader = null;
+    arduinoReadTask = null;
+    if (arduinoPort) {
+      try { await arduinoPort.close(); } catch (_) {}
+    }
+    arduinoPort = null;
+    setArduinoStatus('Not connected', false);
+    arduinoHelp.textContent = 'Connect your Arduino over USB, choose its port, then send BUTTON 1 – BUTTON 6 over Serial at 115200 baud.';
+  }
+
+  // With no port, asks the user to pick one. Ports picked before can be
+  // passed in directly, which is how auto-connect works.
+  async function connectArduino(port) {
+    if (arduinoPort) return;
+    logArduino('connect requested');
+    if (!('serial' in navigator)) {
+      logArduino('Web Serial unavailable. Use desktop Chrome or Edge on localhost or HTTPS.');
+      setArduinoStatus('Browser unsupported', false);
+      arduinoHelp.textContent = 'Web Serial needs desktop Chrome or Edge and a localhost or HTTPS page.';
+      return;
+    }
+    arduinoConnectBtn.disabled = true;
+    arduinoConnectBtn.textContent = 'Connecting…';
+    try {
+      if (!port) {
+        logArduino('opening browser port picker; select your Arduino COM port');
+        port = await navigator.serial.requestPort();
+      }
+      arduinoPort = port;
+      logArduino('port selected; opening at 115200 baud');
+      await arduinoPort.open({ baudRate: 115200 });
+      logArduino('CONNECTED at 115200 baud; press a controller button to check for input');
+      setArduinoStatus('Connected · 115200', true);
+      arduinoHelp.textContent = 'Connected. BUTTON 1 – 6 whack graves 1 – 6; any button starts a game.';
+      arduinoKeepReading = true;
+      const decoder = new TextDecoder();
+      let buffer = '';
+      arduinoReader = arduinoPort.readable.getReader();
+      arduinoReadTask = (async () => {
+        try {
+          while (arduinoKeepReading) {
+            const { value, done } = await arduinoReader.read();
+            if (done) break;
+            const text = decoder.decode(value, { stream: true });
+            logArduino(`received ${JSON.stringify(text)}`);
+            buffer += text;
+            const lines = buffer.split(/\n/);
+            buffer = lines.pop() || '';
+            for (const line of lines) handleArduinoCommand(line);
+            if (buffer.length > 100) buffer = buffer.slice(-100);
+          }
+        } catch (error) {
+          if (arduinoKeepReading) {
+            logArduino(`serial read failed: ${error.message}`);
+            setArduinoStatus('Read error', false);
+            arduinoHelp.textContent = `Serial read failed: ${error.message}. Check the USB connection and baud rate.`;
+          }
+        } finally {
+          try { arduinoReader?.releaseLock(); } catch (_) {}
+        }
+      })();
+    } catch (error) {
+      logArduino(`connection failed: ${error.message}`);
+      arduinoPort = null;
+      setArduinoStatus('Not connected', false);
+      arduinoHelp.textContent = error.name === 'NotFoundError'
+        ? 'No port selected. Click Connect again and select your Arduino USB port.'
+        : `Could not connect: ${error.message}. Close Arduino Serial Monitor if it is using the port, then try again.`;
+    } finally {
+      arduinoConnectBtn.disabled = false;
+      arduinoConnectBtn.textContent = 'Connect COM port';
+    }
+  }
+  arduinoConnectBtn.addEventListener('click', () => connectArduino());
+  arduinoDisconnectBtn.addEventListener('click', disconnectArduino);
+  if ('serial' in navigator) {
+    navigator.serial.addEventListener('disconnect', (e) => {
+      if (arduinoPort && e.target === arduinoPort) disconnectArduino();
+    });
+    // Auto-connect to a port that was picked before: on page load, and when it's plugged in.
+    navigator.serial.addEventListener('connect', (e) => connectArduino(e.target));
+    navigator.serial.getPorts().then(ports => { if (ports[0]) connectArduino(ports[0]); });
+  }
 </script>
 </body>
 </html>
