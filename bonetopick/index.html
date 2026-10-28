@@ -8,12 +8,27 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>BONE TO PICK</title>
+  <script src="../orientation.js" data-key="bonetopick"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#171329;color:#fff7df;font-family:Nunito,sans-serif}.mono{font-family:'DM Mono',monospace}main{position:relative;width:100%;height:100dvh;background:#354d3c}canvas{display:block;width:100%;height:100%;touch-action:none;image-rendering:auto}.panel{background:#26203bef;border:2px solid #bba7ff;box-shadow:0 8px 0 #100d1e,0 16px 50px #08071388}.btn{border:2px solid #342947;box-shadow:0 3px 0 #171329;transition:transform .12s ease}.btn:hover{transform:translateY(-2px)}.btn:active{transform:translateY(2px)}.keycap{display:inline-grid;place-items:center;width:25px;height:25px;border:1px solid #a5f3c566;border-bottom-width:3px;border-radius:6px;background:#1a1724;color:#a5f3c5;font:700 11px 'DM Mono',monospace}.rank-pop{animation:pop .65s cubic-bezier(.2,1.8,.4,1) both}@keyframes pop{from{opacity:0;transform:scale(.4) rotate(-10deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+    /* Layout orientation (set on <html> by ../orientation.js) */
+    /* The game box keeps the chosen layout's shape (up to 5:4) when it is forced against the screen shape; the canvas letterboxes anything beyond. */
+    body{display:flex;align-items:center;justify-content:center}main{flex:0 0 auto}
+    html[data-orientation="landscape"] main{max-height:80vw}
+    html[data-orientation="portrait"] main{max-width:80dvh}
+    html[data-orientation="landscape"] #guideSteps{grid-template-columns:repeat(3,minmax(0,1fr))}
+    html[data-orientation="portrait"] #timerHud{top:72px;max-width:calc(100% - 24px)}
+    html[data-orientation="portrait"] #arrowHint{top:136px}
+    html[data-orientation="portrait"] #overlay{align-items:center;padding:96px 16px 24px}
+    html[data-orientation="portrait"] #overlay>.panel{max-width:min(36rem,100%)}
+    html[data-orientation="portrait"] #guideSteps{grid-template-columns:1fr}
+    html[data-orientation="portrait"] #guideSteps>div{display:flex;align-items:center;gap:12px;text-align:left}
+    html[data-orientation="portrait"] #guideSteps>div>div{flex:0 0 112px;margin:0}
+    html[data-orientation="portrait"] #toast{bottom:40px;max-width:calc(100% - 32px)}
   </style>
 </head>
 <body>
@@ -21,7 +36,7 @@
   <main>
     <canvas id="game" width="960" height="540" aria-label="BONE TO PICK cemetery game"></canvas>
     <div id="timerHud" class="mono absolute left-1/2 top-3 flex -translate-x-1/2 items-center gap-4 rounded-xl border-2 border-[#30253e] bg-[#171329dd] px-4 py-2 text-lg font-bold shadow-lg sm:gap-6 sm:px-5"><span id="timerText" class="text-xl text-[#ffcf8e] sm:text-2xl">01:00</span><span id="goalHud" class="text-xs text-[#a5f3c5] sm:text-sm">0 / 10 BONES</span><span id="livesHud" class="text-lg tracking-widest text-[#ff79a8]" aria-label="2 lives">♥ ♥</span></div>
-        <div class="pointer-events-none absolute right-3 top-20 rounded-xl border border-white/20 bg-[#171329bb] px-3 py-2 text-center text-[10px] font-black tracking-widest text-white/70">ARROW TO NEAREST BONE</div>
+        <div id="arrowHint" class="pointer-events-none absolute right-3 top-20 rounded-xl border border-white/20 bg-[#171329bb] px-3 py-2 text-center text-[10px] font-black tracking-widest text-white/70">ARROW TO NEAREST BONE</div>
     <button id="restartBtn" class="btn absolute right-3 top-3 rounded-xl bg-[#f4e8c1] px-4 py-2 font-black text-[#292044]">↻ RESTART</button>
     <div id="overlay" class="absolute inset-0 z-10 flex items-center justify-center bg-[#171329bb] p-4 ">
       <section class="panel max-h-full w-full max-w-xl overflow-y-auto rounded-3xl p-6 text-center sm:p-8">
@@ -32,7 +47,7 @@
                                 <div id="menuGuide" class="mb-5 rounded-2xl border border-[#bba7ff55] bg-white/5 p-4">
           <div class="mb-2 flex items-center justify-center gap-3 text-2xl font-black text-[#ffcf8e]"><svg aria-hidden="true" viewBox="0 0 48 24" width="48" height="24"><path d="M8 5a4 4 0 1 0-3 7 4 4 0 0 0 7 5l24-5a4 4 0 1 0 3-7 4 4 0 0 0-7-5L8 5Z" fill="#f4e8c1" stroke="#483b55" stroke-width="2"/></svg><span>&#215; 10 BONES</span></div>
           <p class="mb-2 text-base font-black text-white">Grab all 10 bones to win!</p>
-          <div class="grid grid-cols-1 gap-2 text-left sm:grid-cols-3">
+          <div id="guideSteps" class="grid grid-cols-1 gap-2 text-left sm:grid-cols-3">
             <div class="rounded-xl bg-black/15 p-2 text-center"><div class="mb-1 flex justify-center gap-1"><kbd class="keycap">W</kbd><kbd class="keycap">A</kbd><kbd class="keycap">S</kbd><kbd class="keycap">D</kbd></div><p class="text-xs text-white/75"><b class="text-[#a5f3c5]">MOVE</b><br>WASD or arrow keys</p></div>
             <div class="rounded-xl bg-black/15 p-2 text-center"><div class="mb-1 flex h-[25px] items-center justify-center text-xl" aria-hidden="true"><svg viewBox="0 0 48 24" width="48" height="24"><path d="M8 5a4 4 0 1 0-3 7 4 4 0 0 0 7 5l24-5a4 4 0 1 0 3-7 4 4 0 0 0-7-5L8 5Z" fill="#f4e8c1" stroke="#483b55" stroke-width="2"/></svg></div><p class="text-xs text-white/75"><b class="text-[#ffcf8e]">COLLECT</b><br>Touch bones to pick them up</p></div>
             <div class="rounded-xl bg-black/15 p-2 text-center"><div class="mb-1 flex h-[25px] items-center justify-center" aria-hidden="true"><svg viewBox="0 0 48 32" width="42" height="28"><path d="M9 27 7 16q-1-8 5-11 6-4 12 0 6-4 12 0 6 3 4 11l-2 11q-1 5-8 4l-6-2-8 2q-7 1-8-4Z" fill="#9acd75" stroke="#31452f" stroke-width="2"/><circle cx="17" cy="14" r="3" fill="#fff0d1"/><circle cx="31" cy="14" r="3" fill="#fff0d1"/><circle cx="17" cy="14" r="1.5" fill="#292044"/><circle cx="31" cy="14" r="1.5" fill="#292044"/></svg></div><p class="text-xs text-white/75"><b class="text-[#ff79a8]">DODGE</b><br>Stay clear of zombies!</p></div>
@@ -42,6 +57,9 @@
           <div class="mb-2 flex items-center justify-between"><label for="durationInput" class="text-sm font-extrabold text-[#fff0d1]">Time limit (seconds)</label><span class="mono text-[10px] text-white/55">MAX 60</span></div>
           <input id="durationInput" type="number" min="1" max="60" step="1" value="60" inputmode="numeric" class="w-full rounded-lg border border-white/20 bg-[#171321] px-3 py-2 font-mono text-lg text-[#ffcf8e] outline-none focus:border-[#ff9f43]" aria-label="Round time in seconds, maximum 60">
           <p class="mt-1 text-[11px] text-white/55">Default is 60 seconds. Set any whole number from 1 to 60.</p>
+          <label for="orientationSelect" class="mb-2 mt-4 block text-sm font-extrabold text-[#fff0d1]">Layout</label>
+          <select id="orientationSelect" data-orientation-select class="w-full rounded-lg border border-white/20 bg-[#171321] px-3 py-2 text-base font-bold text-[#ffcf8e] outline-none focus:border-[#ff9f43]" aria-label="Screen layout"><option value="auto">Auto (match screen)</option><option value="landscape">Landscape</option><option value="portrait">Portrait</option></select>
+          <p class="mt-1 text-[11px] text-white/55">Auto follows the screen shape. Saved for this game.</p>
         </div>
         <div class="flex flex-wrap items-center justify-center gap-3"><button id="mainBtn" class="btn rounded-2xl bg-[#ff9f43] px-8 py-3 text-lg font-black text-[#271a32]">PLAY</button><button id="settingsBtn" type="button" class="btn rounded-2xl border-[#bba7ff] bg-[#292044] px-5 py-3 text-sm font-black text-[#e8ddff]">SETTINGS</button></div>
       </section>

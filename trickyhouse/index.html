@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
+  <script src="../orientation.js" data-key="trickyhouse"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -96,6 +97,32 @@
     body.play-mode main > :not(#game-section) { display: none; }
     body.play-mode #back-link, body.play-mode #play-mode, body.play-mode #settings-open, body.hide-back-link #back-link { display: none !important; }
     body.play-mode #game-section { width: min(100vw, calc((100vh - 60px) * 1.8)); }
+    /* Portrait layout (html[data-orientation] is set by ../orientation.js): stack screens into one column and give the canvas a taller aspect. */
+    html[data-orientation="portrait"] #start-screen { background-position: 22% center; }
+    html[data-orientation="portrait"] #start-screen > .start-card-in { justify-content: flex-end; padding: 5rem clamp(1.25rem, 5vw, 4rem) clamp(5rem, 8vh, 7rem); }
+    html[data-orientation="portrait"] #start-screen > .start-card-in > .relative.grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    html[data-orientation="portrait"] #start-screen > .start-card-in > .relative.grid > div[aria-hidden="true"] { display: none; }
+    html[data-orientation="portrait"] #start-screen > .start-card-in > .relative.grid > div[aria-label="How to play"] { max-width: 48rem; padding: clamp(1.25rem, 3.5vw, 2.5rem); border: 1px solid rgb(255 255 255 / 12%); border-radius: 2rem; background: rgb(12 10 22 / 70%); box-shadow: 0 24px 70px rgb(0 0 0 / 45%); backdrop-filter: blur(6px); }
+    html[data-orientation="portrait"] #start-screen #start-title { font-size: clamp(3rem, 10vw, 6rem); }
+    html[data-orientation="portrait"] #start-screen > .start-card-in > .relative.grid > div[aria-label="How to play"] h2 { font-size: clamp(1.5rem, 3.4vw, 2.1rem); }
+    html[data-orientation="portrait"] #start-screen > .start-card-in > .relative.grid > div[aria-label="How to play"] h3 { font-size: clamp(1.05rem, 2.6vw, 1.5rem); }
+    html[data-orientation="portrait"] #start-screen > .start-card-in > .relative.grid > div[aria-label="How to play"] .grid p,
+    html[data-orientation="portrait"] #start-screen > .start-card-in > .relative.grid > div[aria-label="How to play"] > p { font-size: clamp(1.05rem, 2.6vw, 1.45rem); }
+    html[data-orientation="portrait"] #start-screen #start-game { padding: clamp(1.2rem, 2.4vw, 1.75rem); font-size: clamp(1.2rem, 3.4vw, 1.9rem); }
+    html[data-orientation="portrait"] #character-screen > div { justify-content: flex-start; padding: 5rem clamp(1.25rem, 5vw, 4rem) clamp(5rem, 7vh, 6.5rem); }
+    html[data-orientation="portrait"] #character-screen #character-title { font-size: clamp(2.75rem, 9vw, 5.5rem); }
+    html[data-orientation="portrait"] #character-screen .character-instructions { font-size: clamp(1rem, 2.8vw, 1.5rem); }
+    html[data-orientation="portrait"] #character-screen [role="group"] { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: clamp(1.5rem, 3vh, 2.5rem); }
+    html[data-orientation="portrait"] #character-screen .character-choice .character-preview { width: clamp(4.5rem, 13vw, 9rem); height: clamp(5rem, 14.3vw, 9.9rem); }
+    html[data-orientation="portrait"] #character-screen .character-choice > span:nth-child(2) { font-size: clamp(1.5rem, 5vw, 3.25rem); }
+    html[data-orientation="portrait"] body.play-mode main { box-sizing: border-box; flex-direction: column; gap: clamp(.75rem, 1.6vh, 1.5rem); height: 100dvh; padding: clamp(.75rem, 2vh, 2rem) clamp(.75rem, 3vw, 2rem); }
+    html[data-orientation="portrait"] body.play-mode main > :is(#score-panel, #region-nav) { display: grid; width: 100%; margin: 0; }
+    html[data-orientation="portrait"] body.play-mode main > #message { display: flex; width: 100%; margin: 0; font-size: clamp(1rem, 2.6vw, 1.6rem); }
+    html[data-orientation="portrait"] body.play-mode #region-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    html[data-orientation="portrait"] body.play-mode #region-nav .region-chip { font-size: clamp(.8rem, 2vw, 1.15rem); }
+    html[data-orientation="portrait"] body.play-mode #score-panel strong { font-size: clamp(1.5rem, 4vw, 2.5rem); }
+    html[data-orientation="portrait"] body.play-mode #zone-name, html[data-orientation="portrait"] body.play-mode #zone-stage { font-size: clamp(.75rem, 1.8vw, 1.1rem); }
+    html[data-orientation="portrait"] body.play-mode #game-section { width: min(100%, calc((100dvh - 30rem) * .96)); }
     @media (prefers-reduced-motion: reduce) { .scare-pop { animation: none; } }
     @media (prefers-reduced-motion: reduce) {
       .start-card-in, .moon-float, .candy-bump, #start-game { animation: none !important; }
@@ -126,6 +153,14 @@
       <input id="hide-back-link" type="checkbox" class="h-4 w-4 accent-emerald-300">
       Hide "Graveyard Arcade" back button
     </label>
+    <label class="mt-3 flex items-center justify-center gap-2 text-sm font-bold text-lilac">
+      Layout
+      <select data-orientation-select class="rounded-lg border border-white/15 bg-black/30 px-2 py-1 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-300">
+        <option value="auto">Auto (match screen)</option>
+        <option value="landscape">Landscape</option>
+        <option value="portrait">Portrait</option>
+      </select>
+    </label>
   </dialog>
   <main class="mx-auto w-full max-w-6xl [perspective:1400px]">
     <header class="relative mb-7 overflow-hidden rounded-3xl border border-white/10 bg-[#171326]/80 px-5 py-7 text-center shadow-2xl shadow-black/30 sm:py-9">
@@ -136,7 +171,7 @@
       <p class="mx-auto max-w-xl text-sm text-lilac sm:text-base">Walk along the winding road, explore four Halloween regions, and knock on houses to collect candy.</p>
     </header>
 
-    <section class="mb-5 grid grid-cols-2 gap-3 sm:mb-6 sm:gap-4" aria-label="Game score">
+    <section id="score-panel" class="mb-5 grid grid-cols-2 gap-3 sm:mb-6 sm:gap-4" aria-label="Game score">
       <div class="group relative flex items-center gap-3 overflow-hidden rounded-2xl border border-orange-200/15 bg-gradient-to-br from-[#443047] via-[#30213c] to-[#211b35] p-3 shadow-[0_10px_25px_#08061188,inset_0_1px_0_#ffffff1a] transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_30px_#080611aa,inset_0_1px_0_#ffffff1a] sm:gap-4 sm:p-4">
         <div class="absolute -right-8 -top-10 h-24 w-24 rounded-full bg-pumpkin/10 blur-2xl transition group-hover:bg-pumpkin/20"></div>
         <span class="relative grid h-12 w-12 place-items-center rounded-xl border border-pumpkin/30 bg-gradient-to-br from-pumpkin/25 to-orange-950/40 text-2xl shadow-[inset_0_2px_5px_#ffffff22,0_4px_8px_#120b1c88] sm:h-14 sm:w-14" aria-hidden="true">&#127853;</span>
@@ -173,7 +208,7 @@
       </div>
       <canvas id="game" class="block w-full touch-none" width="900" height="500" tabindex="0" aria-label="Explore a scrolling pixel-art Halloween world. Use the joystick to move, then press the button to knock on a nearby house."></canvas>
     </section>
-    <nav class="mt-3 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-[#171326]/90 p-2 shadow-lg sm:grid-cols-4" aria-label="Adventure regions">
+    <nav id="region-nav" class="mt-3 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-[#171326]/90 p-2 shadow-lg sm:grid-cols-4" aria-label="Adventure regions">
       <div id="region-woods" class="region-chip rounded-xl border border-white/10 bg-black/15 px-2 py-2 text-center text-xs font-bold text-slate-200/70 sm:text-sm" data-region="woods" aria-current="step"><span aria-hidden="true">&#127794;</span><span class="ml-1">Woods</span><span id="region-count-woods" class="region-count mt-0.5 block text-[.62rem] font-black">0 / 8 houses</span></div>
       <div id="region-snow" class="region-chip rounded-xl border border-white/10 bg-black/15 px-2 py-2 text-center text-xs font-bold text-slate-200/70 sm:text-sm" data-region="snow" aria-current="false"><span aria-hidden="true">&#10052;</span><span class="ml-1">Snowy Village</span><span id="region-count-snow" class="region-count mt-0.5 block text-[.62rem] font-black">0 / 8 houses</span></div>
       <div id="region-city" class="region-chip rounded-xl border border-white/10 bg-black/15 px-2 py-2 text-center text-xs font-bold text-slate-200/70 sm:text-sm" data-region="city" aria-current="false"><span aria-hidden="true">&#127961;</span><span class="ml-1">Abandoned City</span><span id="region-count-city" class="region-count mt-0.5 block text-[.62rem] font-black">0 / 8 houses</span></div>
@@ -929,8 +964,9 @@
         player.direction = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : (dy > 0 ? "down" : "up");
       }
       const playerScreenX = player.x - cameraX;
-      if (playerScreenX < 330) cameraX = player.x - 330;
-      else if (playerScreenX > 570) cameraX = player.x - 570;
+      const cameraEdge = canvas.width * 11 / 30; // 330 of 900: keep the player in the middle third
+      if (playerScreenX < cameraEdge) cameraX = player.x - cameraEdge;
+      else if (playerScreenX > canvas.width - cameraEdge) cameraX = player.x - (canvas.width - cameraEdge);
       cameraX = Math.max(0, Math.min(worldWidth - canvas.width, cameraX));
       const activeBiome = biomes.find(biome => player.x >= biome.start && player.x < biome.start + biomeWidth) || biomes[biomes.length - 1];
       if (activeBiome.key !== currentBiomeKey) {
@@ -1117,6 +1153,7 @@
     }
 
     function handleArduinoCommand(rawCommand) {
+      if (settingsModal.open) return; // don't play while settings are being changed
       const command = rawCommand.trim().toUpperCase();
       if (command === "BUTTON") {
         pressKey("keydown", " ", "Space");
@@ -1246,6 +1283,8 @@
     }
 
     window.addEventListener("keydown", event => {
+      // Leave keys to the settings dialog (e.g. its Layout select) while it's in use.
+      if (settingsModal.open || event.target instanceof HTMLSelectElement) return;
       const key = getControlKey(event);
       if (!gameStarted && !characterScreenEl.classList.contains("hidden") && (key === " " || key === "Enter")) {
         event.preventDefault();
@@ -1256,7 +1295,7 @@
         event.preventDefault();
         const choices = [...document.querySelectorAll(".character-choice")];
         const currentIndex = Math.max(0, choices.findIndex(choice => choice.getAttribute("aria-pressed") === "true"));
-        const columns = window.matchMedia("(min-width: 640px)").matches ? 3 : 2;
+        const columns = getComputedStyle(choices[0].parentElement).gridTemplateColumns.split(" ").length;
         let nextIndex = currentIndex;
         if (key === "a") nextIndex = (currentIndex + choices.length - 1) % choices.length;
         if (key === "d") nextIndex = (currentIndex + 1) % choices.length;
@@ -1384,6 +1423,17 @@
       resetGame();
       messageEl.textContent = "The houses have been shuffled within each region. Explore the world and find them!";
     });
+    // Portrait shows a narrower slice of the world so the canvas is taller on screen.
+    // The world only scrolls sideways (everything is drawn within y 0-500), so only the width changes.
+    function applyCanvasLayout() {
+      const width = document.documentElement.dataset.orientation === "portrait" ? 480 : 900;
+      if (canvas.width === width) return;
+      canvas.width = width;
+      cameraX = Math.max(0, Math.min(worldWidth - canvas.width, player.x - canvas.width / 2));
+    }
+    window.addEventListener("layoutorientationchange", applyCanvasLayout);
+    applyCanvasLayout();
+
     randomizeHouseLayout();
     player.y = roadYAt(player.x);
     skateboard.y = roadYAt(skateboard.x);

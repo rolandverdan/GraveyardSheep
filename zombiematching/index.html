@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zombie Matching</title>
+<script src="../orientation.js" data-key="zombiematching"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -107,25 +108,40 @@
   body.play-mode #back-link, body.play-mode #play-mode, body.play-mode #settings-open, body.hide-back-link #back-link { display: none !important; }
   body.play-mode { justify-content: center; }
 
-  /* Landscape (normal and fullscreen): two columns that fit one screen —
-     coffin & timer on the left, cards on the right */
-  @media (orientation: landscape) {
-    body {
-      display: grid; grid-template-columns: auto auto; column-gap: 5vw;
-      justify-content: center; align-content: center; justify-items: center;
-      height: 100vh; overflow: hidden; padding: 64px 20px 20px;
-    }
-    body.play-mode { padding: 20px; }
-    body > :not(#grid) { grid-column: 1; }
-    body #grid { grid-column: 2; grid-row: 1 / span 7; align-self: center; width: min(46vw, calc((100vh - 100px) * 1.45)); max-width: none; gap: 2vh; }
-    h1 { font-size: clamp(1.4rem, 4vh, 2.6rem); white-space: nowrap; }
-    .coffin-wrap#coffin { --h: clamp(150px, calc(100vh - 380px), 520px); --w: calc(var(--h) * .6875); }
-    /* Lid fades as it slides so it never runs off the left edge */
-    #coffin .lid { transition: transform .45s ease-in-out, opacity .45s ease-in-out; }
-    #coffin.open .lid { opacity: 0; }
-    body .timer-wrap { width: min(40vw, 600px); }
-    body .key-hint { min-width: 4vh; height: 4vh; font-size: 2.4vh; }
+  /* Layout follows the Orientation setting (html[data-orientation], set by
+     ../orientation.js) and always fits one screen, normal or fullscreen. */
+  html[data-orientation] body { height: 100vh; overflow: hidden; }
+  /* Lid fades as it slides so it never runs off the screen edge */
+  #coffin .lid { transition: transform .45s ease-in-out, opacity .45s ease-in-out; }
+  #coffin.open .lid { opacity: 0; }
+
+  /* Landscape: two columns — coffin & timer on the left, cards on the right */
+  html[data-orientation="landscape"] body {
+    display: grid; grid-template-columns: auto auto; column-gap: 5vw;
+    justify-content: center; align-content: center; justify-items: center;
+    padding: 64px 20px 20px;
   }
+  html[data-orientation="landscape"] body.play-mode { padding: 20px; }
+  html[data-orientation="landscape"] body > :not(#grid) { grid-column: 1; }
+  html[data-orientation="landscape"] #grid { grid-column: 2; grid-row: 1 / span 7; align-self: center; width: min(46vw, calc((100vh - 100px) * 1.45)); max-width: none; gap: 2vh; }
+  html[data-orientation="landscape"] h1 { font-size: clamp(1.4rem, 4vh, 2.6rem); white-space: nowrap; }
+  html[data-orientation="landscape"] #coffin { --h: clamp(150px, calc(100vh - 380px), 520px); --w: calc(var(--h) * .6875); }
+  html[data-orientation="landscape"] .timer-wrap { width: min(40vw, 600px); }
+  html[data-orientation="landscape"] .key-hint { min-width: 4vh; height: 4vh; font-size: 2.4vh; }
+
+  /* Portrait: one column — coffin on top, the card grid as wide as the screen allows */
+  html[data-orientation="portrait"] body { justify-content: center; padding: 64px 16px 16px; }
+  html[data-orientation="portrait"] body.play-mode { padding: 16px; }
+  html[data-orientation="portrait"] h1 { font-size: clamp(1.5rem, min(3.6vh, 7vw), 3rem); text-align: center; }
+  html[data-orientation="portrait"] .hud { font-size: clamp(1rem, 2vh, 1.6rem); }
+  html[data-orientation="portrait"] #coffin { --h: clamp(150px, 34vh, 620px); --w: calc(var(--h) * .6875); }
+  html[data-orientation="portrait"] #screenText, html[data-orientation="portrait"] #message { font-size: clamp(1.1rem, 2vh, 1.8rem); }
+  html[data-orientation="portrait"] .timer-wrap { width: min(90vw, 760px); }
+  html[data-orientation="portrait"] #grid { width: min(94vw, calc((65vh - 300px) * 1.45)); max-width: none; gap: 1.6vh; }
+  html[data-orientation="portrait"] .key-hint { min-width: min(4vh, 7vw); height: min(4vh, 7vw); font-size: min(2.4vh, 4.2vw); }
+
+  .cfg-select { width: 100%; background: #070c06; border: 2px solid #3f682c; border-radius: 8px; color: #ffd23b; font-size: 1rem; font-weight: bold; padding: 8px 10px; font-family: inherit; }
+  .cfg-select:focus { outline: none; border-color: #8bff5a; box-shadow: 0 0 10px rgba(139,255,90,0.4); }
 
   /* ---------- Coffin (the flash screen) ---------- */
   .coffin-wrap {
@@ -319,6 +335,16 @@
 
     <div class="cfg-group">
       <label class="cfg-check"><input id="hideBackLink" type="checkbox"> Hide "Graveyard Arcade" back button</label>
+    </div>
+
+    <div class="cfg-group">
+      <label for="orientationSelect">Screen layout 🖥️</label>
+      <div class="cfg-sub">Portrait stacks the coffin above the cards for tall screens.</div>
+      <select id="orientationSelect" class="cfg-select" data-orientation-select>
+        <option value="auto">Auto (match screen)</option>
+        <option value="landscape">Landscape</option>
+        <option value="portrait">Portrait</option>
+      </select>
     </div>
 
     <div class="cfg-group">
@@ -731,7 +757,7 @@
 
   document.addEventListener('keydown', (e) => {
     if (e.repeat || ['Escape', 'Shift', 'Control', 'Alt', 'Meta', 'Tab'].includes(e.key)) return;
-    if (e.target instanceof HTMLInputElement) return;
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return;
     if (pressAnyButton()) e.preventDefault(); // stop Space/Enter also clicking a focused button
   });
 
