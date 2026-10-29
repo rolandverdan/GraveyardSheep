@@ -29,44 +29,295 @@
     html[data-orientation="portrait"] #guideSteps>div{display:flex;align-items:center;gap:12px;text-align:left}
     html[data-orientation="portrait"] #guideSteps>div>div{flex:0 0 112px;margin:0}
     html[data-orientation="portrait"] #toast{bottom:40px;max-width:calc(100% - 32px)}
+    /* Corner buttons: the in-game restart sits left of the ⚙ / ⛶ buttons, which play mode hides. */
+    #restartBtn{right:116px}
+    body.play-mode #back-link,body.play-mode #play-mode,body.play-mode #settings-open,body.hide-back-link #back-link{display:none!important}
+    body.play-mode #restartBtn{right:12px}
+    /* Time-running-out callouts and the red HUD under 10 seconds. */
+    #countdownFx{position:absolute;left:50%;top:42%;z-index:6;display:grid;justify-items:center;pointer-events:none;transform:translate(-50%,-50%);text-align:center;opacity:0}
+    #countdownFx b{font:900 clamp(96px,22vmin,220px)/.9 Nunito,sans-serif;color:#ffcf8e;-webkit-text-stroke:4px #271a32;paint-order:stroke;text-shadow:0 8px 0 #271a32,0 0 40px #ff9f43aa}
+    #countdownFx span{margin-top:6px;padding:6px 18px;border:3px solid #271a32;border-radius:14px;background:#ff9f43;color:#271a32;font:900 clamp(20px,4.5vmin,40px)/1.1 Nunito,sans-serif;letter-spacing:.06em;box-shadow:0 6px 0 #271a32}
+    #countdownFx.final b{color:#ff5d7a;text-shadow:0 8px 0 #271a32,0 0 50px #ff2d55cc}
+    #countdownFx.final span{background:#ff5d7a}
+    #countdownFx.show{animation:callout 1s ease-out both}
+    @keyframes callout{0%{opacity:0;transform:translate(-50%,-50%) scale(2.2)}18%{opacity:1;transform:translate(-50%,-50%) scale(.92)}30%{transform:translate(-50%,-50%) scale(1.04)}70%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(.85)}}
+    .hud-chip{display:grid;justify-items:center;align-content:center;gap:2px;min-width:96px;padding:4px 12px;border-radius:12px;background:#ffffff0d}
+    .hud-label{font:900 13px/1 Nunito,sans-serif;letter-spacing:.12em;color:#fff7dfb3;white-space:nowrap}
+    .hud-value{font:700 38px/1.05 'DM Mono',monospace;white-space:nowrap}
+    .hud-bar{display:block;width:100%;height:6px;overflow:hidden;border-radius:99px;background:#ffffff1f}.hud-bar i{display:block;height:100%;border-radius:inherit;transition:width .25s linear}
+    #livesHud{display:flex;gap:4px;align-items:center;min-height:42px}#livesHud svg{width:34px;height:34px}
+    #livesChip.hit{animation:hit .5s ease-out}@keyframes hit{0%,100%{transform:none;background:#ffffff0d}20%{transform:translateX(-6px);background:#ff5d7a66}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+    #timeChip.hurry{background:#ff5d7a33;animation:hurry .5s ease-in-out infinite alternate}
+    #timeChip.hurry #timerText{color:#ff5d7a}#timeChip.hurry #timeBar{background:#ff5d7a!important}
+    @keyframes hurry{from{transform:scale(1);box-shadow:0 0 0 #ff2d5500}to{transform:scale(1.08);box-shadow:0 0 24px #ff2d55aa}}
+    main:has(#timeChip.hurry)::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;box-shadow:inset 0 0 120px #ff2d5566;animation:vignette .5s ease-in-out infinite alternate}
+    .start-hint{animation:nudge 1.2s ease-in-out infinite}@keyframes nudge{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+    .title-glow{text-shadow:0 5px 0 #4a2a1a,0 0 30px #ff9f4377;animation:flicker 4s infinite}@keyframes flicker{0%,100%,8%,12%{opacity:1}10%{opacity:.55}}
+    .skull-bob{display:inline-block;animation:bob 2.2s ease-in-out infinite}@keyframes bob{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-8px) rotate(6deg)}}
+    .play-pulse{animation:playpulse 1.4s ease-in-out infinite}@keyframes playpulse{0%,100%{transform:scale(1);box-shadow:0 3px 0 #171329,0 0 0 #ff9f4300}50%{transform:scale(1.06);box-shadow:0 3px 0 #171329,0 0 30px #ff9f43aa}}
+    #overlay{background:radial-gradient(circle at 50% 40%,#17132999,#0a0814ee)}
+    #overlay>.panel{background:linear-gradient(180deg,#2a2242f2,#1b1630f2);box-shadow:0 8px 0 #100d1e,0 0 60px #bba7ff33,0 16px 50px #08071388}
+    .hud-chip[hidden]{display:none}
+    .power-chip{box-shadow:inset 0 0 0 2px var(--c);animation:powerin .35s cubic-bezier(.2,1.8,.4,1)}.power-chip.ending{animation:blink .25s steps(2) infinite}
+    @keyframes powerin{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}@keyframes blink{50%{opacity:.35}}
+    #mainBtn.waiting{opacity:.45;pointer-events:none}
+    html[data-orientation="portrait"] .hud-chip{min-width:0;padding:4px 8px}html[data-orientation="portrait"] .hud-value{font-size:30px}
+    @keyframes vignette{from{opacity:.4}to{opacity:1}}
   </style>
 </head>
 <body>
-  <a href="../index.html" aria-label="Back to Graveyard Arcade" title="Back to Graveyard Arcade" style="position:fixed;top:12px;left:12px;z-index:100000;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid #ffd76b88;border-radius:12px;background:#171321ee;color:#fff0d1;font:800 14px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 4px 16px #0009;cursor:pointer;">&#8592; Graveyard Arcade</a>
+  <a id="back-link" href="../index.html" aria-label="Back to Graveyard Arcade" title="Back to Graveyard Arcade" style="position:fixed;top:12px;left:12px;z-index:100000;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid #ffd76b88;border-radius:12px;background:#171321ee;color:#fff0d1;font:800 14px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 4px 16px #0009;cursor:pointer;">&#8592; Graveyard Arcade</a>
+  <button id="settings-open" type="button" aria-label="Arduino settings" title="Arduino settings" style="position:fixed;top:12px;right:12px;z-index:100000;display:grid;place-items:center;width:44px;height:44px;border:1px solid #ffd76b88;border-radius:12px;background:#171321ee;color:#fff0d1;font-size:22px;box-shadow:0 4px 16px #0009;cursor:pointer;">&#9881;</button>
+  <button id="play-mode" type="button" aria-label="Maximize game" title="Maximize game" style="position:fixed;top:12px;right:64px;z-index:100000;display:grid;place-items:center;width:44px;height:44px;border:1px solid #ffd76b88;border-radius:12px;background:#171321ee;color:#fff0d1;font-size:22px;box-shadow:0 4px 16px #0009;cursor:pointer;">&#x26F6;</button>
+  <div id="controller-notice" role="alert" style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:100000;padding:10px 16px;border:1px solid #f87171aa;border-radius:12px;background:#2a1218f2;color:#fecaca;font:700 14px/1.3 system-ui,sans-serif;box-shadow:0 4px 16px #0009;text-align:center;">&#127918; Controller not connected. Plug in the Arduino, or click &#9881; to connect.</div>
+  <dialog id="settings-modal" class="w-[calc(100%-2rem)] max-w-sm rounded-2xl border border-[#bba7ff55] bg-[#1d1830] p-5 text-center text-white shadow-[0_25px_90px_#000c] backdrop:bg-black/70" aria-labelledby="settings-title">
+    <div class="flex items-center justify-between">
+      <h2 id="settings-title" class="font-black uppercase tracking-wider text-[#a5f3c5]">Settings</h2>
+      <button id="settings-close" type="button" class="rounded-lg px-2 text-xl text-white/70 hover:text-white" aria-label="Close">&times;</button>
+    </div>
+    <p class="mt-3 text-left text-xs font-black uppercase tracking-widest text-white/50">Arduino controller</p>
+    <div class="mt-2 flex flex-wrap items-center justify-center gap-2">
+      <span id="arduino-status" class="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-amber-100" role="status" aria-live="polite">Not connected</span>
+      <button id="arduino-connect" class="rounded-lg bg-[#a5f3c5] px-4 py-2 text-sm font-black text-[#10201c] transition hover:brightness-110" type="button">Connect COM port</button>
+      <button id="arduino-disconnect" class="hidden rounded-lg border border-white/20 px-3 py-2 text-sm font-bold text-white" type="button">Disconnect</button>
+    </div>
+    <p id="arduino-help" class="mt-2 text-xs text-white/70">Choose your Arduino port. Serial speed: 115200 baud.</p>
+    <pre id="arduino-log" class="mt-2 max-h-16 overflow-auto whitespace-pre-wrap break-all text-left text-xs text-[#a5f3c5]" aria-live="polite">Arduino log: waiting to connect</pre>
+    <label class="mt-4 flex items-center justify-center gap-2 border-t border-white/10 pt-4 text-sm font-bold text-white/75">
+      <input id="hide-back-link" type="checkbox" class="h-4 w-4 accent-[#a5f3c5]">
+      Hide "Graveyard Arcade" back button
+    </label>
+    <label class="mt-3 flex items-center justify-center gap-2 text-sm font-bold text-white/75">
+      Time limit
+      <input id="durationInput" type="number" min="1" max="60" step="1" value="60" inputmode="numeric" class="w-20 rounded-lg border border-white/15 bg-black/30 px-2 py-1 text-center font-mono text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#a5f3c5]" aria-label="Round time in seconds, maximum 60">
+      seconds
+    </label>
+    <p class="mt-1 text-[11px] text-white/50">1 to 60 seconds. Saved for this game.</p>
+    <label class="mt-3 flex items-center justify-center gap-2 text-sm font-bold text-white/75">
+      Layout
+      <select data-orientation-select class="rounded-lg border border-white/15 bg-black/30 px-2 py-1 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#a5f3c5]">
+        <option value="auto">Auto (match screen)</option>
+        <option value="landscape">Landscape</option>
+        <option value="portrait">Portrait</option>
+      </select>
+    </label>
+  </dialog>
   <main>
     <canvas id="game" width="960" height="540" aria-label="BONE TO PICK cemetery game"></canvas>
-    <div id="timerHud" class="mono absolute left-1/2 top-3 flex -translate-x-1/2 items-center gap-4 rounded-xl border-2 border-[#30253e] bg-[#171329dd] px-4 py-2 text-lg font-bold shadow-lg sm:gap-6 sm:px-5"><span id="timerText" class="text-xl text-[#ffcf8e] sm:text-2xl">01:00</span><span id="goalHud" class="text-xs text-[#a5f3c5] sm:text-sm">0 / 10 BONES</span><span id="livesHud" class="text-lg tracking-widest text-[#ff79a8]" aria-label="2 lives">♥ ♥</span></div>
-        <div id="arrowHint" class="pointer-events-none absolute right-3 top-20 rounded-xl border border-white/20 bg-[#171329bb] px-3 py-2 text-center text-[10px] font-black tracking-widest text-white/70">ARROW TO NEAREST BONE</div>
+    <div id="timerHud" class="absolute left-1/2 top-3 z-[5] flex -translate-x-1/2 items-stretch gap-2 rounded-2xl border-2 border-[#30253e] bg-[#171329e6] p-2 shadow-lg">
+      <div id="timeChip" class="hud-chip"><span class="hud-label">&#9201; TIME LEFT</span><span id="timerText" class="hud-value text-[#ffcf8e]">1:00</span><span class="hud-bar"><i id="timeBar" style="background:#ffcf8e"></i></span></div>
+      <div class="hud-chip"><span class="hud-label">&#129460; BONES</span><span id="goalHud" class="hud-value text-[#a5f3c5]">0 / 10</span><span class="hud-bar"><i id="boneBar" style="background:#a5f3c5;width:0"></i></span></div>
+      <div id="livesChip" class="hud-chip"><span class="hud-label">&#10084; LIVES</span><span id="livesHud" class="hud-value" aria-label="2 lives"></span></div>
+      <div id="shieldChip" class="hud-chip power-chip" style="--c:#7fe7ff" hidden><span class="hud-label">&#128737;&#65039; SHIELD</span><span class="hud-value" style="color:#7fe7ff">7s</span><span class="hud-bar"><i style="background:#7fe7ff"></i></span></div>
+      <div id="speedChip" class="hud-chip power-chip" style="--c:#ffe066" hidden><span class="hud-label">&#9889; SPEED</span><span class="hud-value" style="color:#ffe066">7s</span><span class="hud-bar"><i style="background:#ffe066"></i></span></div>
+    </div>
+        <div id="arrowHint" class="pointer-events-none absolute right-3 top-20 rounded-xl border border-white/20 bg-[#171329bb] px-3 py-2 text-center text-xs font-black tracking-widest text-white/80">ARROW TO NEAREST BONE</div>
     <button id="restartBtn" class="btn absolute right-3 top-3 rounded-xl bg-[#f4e8c1] px-4 py-2 font-black text-[#292044]">↻ RESTART</button>
     <div id="overlay" class="absolute inset-0 z-10 flex items-center justify-center bg-[#171329bb] p-4 ">
-      <section class="panel max-h-full w-full max-w-xl overflow-y-auto rounded-3xl p-6 text-center sm:p-8">
-        <div class="mb-1 text-5xl">💀</div><p class="mono text-[10px] tracking-[.2em] text-[#bba7ff]">A GRAVEYARD SPEEDRUN</p>
-        <h1 id="overlayTitle" class="mt-1 text-4xl font-black text-[#ff9f43] sm:text-5xl">BONE TO PICK</h1>
-        <p id="overlayText" class="mx-auto mb-4 mt-2 max-w-md text-sm leading-6 text-white/75">Grab 10 bones in 1 minute. Dodge the zombies and keep your bones!</p>
-        <div id="victoryPanel" class="mb-4 hidden rounded-2xl border-2 border-[#ff9f43] bg-[#ff9f43]/10 p-4"><div id="rankBadge" class="rank-pop text-3xl font-black text-[#ffcf8e]">10 BONES COLLECTED!</div><div id="finishTime" class="mono mt-1 text-sm text-white/80">FINISHED IN 00:00</div><div class="mt-3 rounded-xl bg-black/20 p-3 text-sm"><span class="mono text-[10px] tracking-widest text-white/60">YOUR CANDY</span><br><b id="runReward" class="text-xl text-[#ffcf8e]">🍬 × 10</b></div></div>
+      <section class="panel max-h-full w-full max-w-2xl overflow-y-auto rounded-3xl p-5 text-center sm:px-8 sm:py-6">
+        <div class="skull-bob text-5xl">💀</div><p class="mono text-sm tracking-[.25em] text-[#bba7ff]">A GRAVEYARD SPEEDRUN</p>
+        <h1 id="overlayTitle" class="title-glow mt-1 whitespace-nowrap text-5xl font-black text-[#ff9f43] sm:text-6xl">BONE TO PICK</h1>
+        <p id="overlayText" class="mx-auto mb-4 mt-2 max-w-lg text-lg leading-7 text-white/85 sm:text-xl">Grab 10 bones in 1 minute. Dodge the zombies and keep your bones!</p>
+        <div id="victoryPanel" class="mb-4 hidden rounded-2xl border-2 border-[#ff9f43] bg-[#ff9f43]/10 p-4"><div id="rankBadge" class="rank-pop text-4xl font-black text-[#ffcf8e] sm:text-5xl">10 BONES COLLECTED!</div><div id="finishTime" class="mono mt-1 text-lg text-white/85">FINISHED IN 00:00</div><div class="mt-3 rounded-xl bg-black/20 p-3 text-sm"><span class="mono text-sm tracking-widest text-white/70">YOUR CANDY</span><br><b id="runReward" class="text-3xl text-[#ffcf8e]">🍬 × 10</b></div></div>
                                 <div id="menuGuide" class="mb-5 rounded-2xl border border-[#bba7ff55] bg-white/5 p-4">
-          <div class="mb-2 flex items-center justify-center gap-3 text-2xl font-black text-[#ffcf8e]"><svg aria-hidden="true" viewBox="0 0 48 24" width="48" height="24"><path d="M8 5a4 4 0 1 0-3 7 4 4 0 0 0 7 5l24-5a4 4 0 1 0 3-7 4 4 0 0 0-7-5L8 5Z" fill="#f4e8c1" stroke="#483b55" stroke-width="2"/></svg><span>&#215; 10 BONES</span></div>
-          <p class="mb-2 text-base font-black text-white">Grab all 10 bones to win!</p>
+          <div class="mb-2 flex items-center justify-center gap-3 text-3xl font-black text-[#ffcf8e]"><svg aria-hidden="true" viewBox="0 0 48 24" width="48" height="24"><path d="M8 5a4 4 0 1 0-3 7 4 4 0 0 0 7 5l24-5a4 4 0 1 0 3-7 4 4 0 0 0-7-5L8 5Z" fill="#f4e8c1" stroke="#483b55" stroke-width="2"/></svg><span>&#215; 10 BONES</span></div>
+          <p class="mb-3 text-xl font-black text-white sm:text-2xl">Grab all 10 bones to win!</p>
           <div id="guideSteps" class="grid grid-cols-1 gap-2 text-left sm:grid-cols-3">
-            <div class="rounded-xl bg-black/15 p-2 text-center"><div class="mb-1 flex justify-center gap-1"><kbd class="keycap">W</kbd><kbd class="keycap">A</kbd><kbd class="keycap">S</kbd><kbd class="keycap">D</kbd></div><p class="text-xs text-white/75"><b class="text-[#a5f3c5]">MOVE</b><br>WASD or arrow keys</p></div>
-            <div class="rounded-xl bg-black/15 p-2 text-center"><div class="mb-1 flex h-[25px] items-center justify-center text-xl" aria-hidden="true"><svg viewBox="0 0 48 24" width="48" height="24"><path d="M8 5a4 4 0 1 0-3 7 4 4 0 0 0 7 5l24-5a4 4 0 1 0 3-7 4 4 0 0 0-7-5L8 5Z" fill="#f4e8c1" stroke="#483b55" stroke-width="2"/></svg></div><p class="text-xs text-white/75"><b class="text-[#ffcf8e]">COLLECT</b><br>Touch bones to pick them up</p></div>
-            <div class="rounded-xl bg-black/15 p-2 text-center"><div class="mb-1 flex h-[25px] items-center justify-center" aria-hidden="true"><svg viewBox="0 0 48 32" width="42" height="28"><path d="M9 27 7 16q-1-8 5-11 6-4 12 0 6-4 12 0 6 3 4 11l-2 11q-1 5-8 4l-6-2-8 2q-7 1-8-4Z" fill="#9acd75" stroke="#31452f" stroke-width="2"/><circle cx="17" cy="14" r="3" fill="#fff0d1"/><circle cx="31" cy="14" r="3" fill="#fff0d1"/><circle cx="17" cy="14" r="1.5" fill="#292044"/><circle cx="31" cy="14" r="1.5" fill="#292044"/></svg></div><p class="text-xs text-white/75"><b class="text-[#ff79a8]">DODGE</b><br>Stay clear of zombies!</p></div>
+            <div class="rounded-xl bg-black/15 p-2 text-center"><div class="mb-1 flex h-[25px] items-center justify-center text-2xl" aria-hidden="true">&#128377;&#65039;</div><p class="text-base leading-snug text-white/80 sm:text-lg"><b class="text-[#a5f3c5]">MOVE</b><br>Push the joystick to walk</p></div>
+            <div class="rounded-xl bg-black/15 p-2 text-center"><div class="mb-1 flex h-[25px] items-center justify-center text-xl" aria-hidden="true"><svg viewBox="0 0 48 24" width="48" height="24"><path d="M8 5a4 4 0 1 0-3 7 4 4 0 0 0 7 5l24-5a4 4 0 1 0 3-7 4 4 0 0 0-7-5L8 5Z" fill="#f4e8c1" stroke="#483b55" stroke-width="2"/></svg></div><p class="text-base leading-snug text-white/80 sm:text-lg"><b class="text-[#ffcf8e]">COLLECT</b><br>Touch bones to pick them up</p></div>
+            <div class="rounded-xl bg-black/15 p-2 text-center"><div class="mb-1 flex h-[25px] items-center justify-center" aria-hidden="true"><svg viewBox="0 0 48 32" width="42" height="28"><path d="M9 27 7 16q-1-8 5-11 6-4 12 0 6-4 12 0 6 3 4 11l-2 11q-1 5-8 4l-6-2-8 2q-7 1-8-4Z" fill="#9acd75" stroke="#31452f" stroke-width="2"/><circle cx="17" cy="14" r="3" fill="#fff0d1"/><circle cx="31" cy="14" r="3" fill="#fff0d1"/><circle cx="17" cy="14" r="1.5" fill="#292044"/><circle cx="31" cy="14" r="1.5" fill="#292044"/></svg></div><p class="text-base leading-snug text-white/80 sm:text-lg"><b class="text-[#ff79a8]">DODGE</b><br>Stay clear of zombies!</p></div>
           </div>
+          <p class="mt-3 text-base font-black text-white/90 sm:text-lg">Power-ups: <span class="text-[#7fe7ff]">&#128737;&#65039; Shield</span> = zombie-proof &nbsp;·&nbsp; <span class="text-[#ffe066]">&#9889; Speed</span> = run faster</p>
         </div>
-        <div id="configPanel" class="mx-auto mb-5 hidden max-w-sm rounded-xl border border-[#bba7ff55] bg-[#17132988] px-4 py-3 text-left">
-          <div class="mb-2 flex items-center justify-between"><label for="durationInput" class="text-sm font-extrabold text-[#fff0d1]">Time limit (seconds)</label><span class="mono text-[10px] text-white/55">MAX 60</span></div>
-          <input id="durationInput" type="number" min="1" max="60" step="1" value="60" inputmode="numeric" class="w-full rounded-lg border border-white/20 bg-[#171321] px-3 py-2 font-mono text-lg text-[#ffcf8e] outline-none focus:border-[#ff9f43]" aria-label="Round time in seconds, maximum 60">
-          <p class="mt-1 text-[11px] text-white/55">Default is 60 seconds. Set any whole number from 1 to 60.</p>
-          <label for="orientationSelect" class="mb-2 mt-4 block text-sm font-extrabold text-[#fff0d1]">Layout</label>
-          <select id="orientationSelect" data-orientation-select class="w-full rounded-lg border border-white/20 bg-[#171321] px-3 py-2 text-base font-bold text-[#ffcf8e] outline-none focus:border-[#ff9f43]" aria-label="Screen layout"><option value="auto">Auto (match screen)</option><option value="landscape">Landscape</option><option value="portrait">Portrait</option></select>
-          <p class="mt-1 text-[11px] text-white/55">Auto follows the screen shape. Saved for this game.</p>
-        </div>
-        <div class="flex flex-wrap items-center justify-center gap-3"><button id="mainBtn" class="btn rounded-2xl bg-[#ff9f43] px-8 py-3 text-lg font-black text-[#271a32]">PLAY</button><button id="settingsBtn" type="button" class="btn rounded-2xl border-[#bba7ff] bg-[#292044] px-5 py-3 text-sm font-black text-[#e8ddff]">SETTINGS</button></div>
+        <button id="mainBtn" class="btn play-pulse rounded-2xl bg-[#ff9f43] px-12 py-4 text-3xl font-black text-[#271a32]">PLAY</button>
+        <p id="startHint" class="start-hint mt-3 text-2xl font-black text-[#a5f3c5] sm:text-3xl">&#128377;&#65039; Move the joystick to play</p>
       </section>
     </div>
-    <div id="toast" class="pointer-events-none absolute bottom-5 left-1/2 z-[5] hidden -translate-x-1/2 rounded-xl border-2 border-[#332947] bg-[#f4e8c1] px-4 py-2 text-center text-sm font-black text-[#292044] shadow-lg"></div>
+    <div id="countdownFx" class="hidden" aria-live="assertive"><b></b><span></span></div>
+    <div id="toast" class="pointer-events-none absolute bottom-5 left-1/2 z-[5] hidden -translate-x-1/2 rounded-xl border-2 border-[#332947] bg-[#f4e8c1] px-6 py-3 text-center text-xl font-black text-[#292044] shadow-lg sm:text-2xl"></div>
   </main>
-  <script src="game.js?v=20261021-1"></script>
-  <script src="../arduino-controller.js"></script>
+  <script src="game.js?v=20261029-6"></script>
+  <script>
+    const settingsModal = document.querySelector("#settings-modal");
+    document.querySelector("#settings-open").addEventListener("click", () => settingsModal.showModal());
+    document.querySelector("#settings-close").addEventListener("click", () => settingsModal.close());
+
+    // Remembered per browser so the back button stays hidden after a reload.
+    const hideBackLinkEl = document.querySelector("#hide-back-link");
+    function setBackLinkHidden(hidden) {
+      hideBackLinkEl.checked = hidden;
+      document.body.classList.toggle("hide-back-link", hidden);
+      try { localStorage.setItem("bonetopick-hide-back-link", hidden ? "1" : ""); } catch (_) {}
+    }
+    try { setBackLinkHidden(localStorage.getItem("bonetopick-hide-back-link") === "1"); } catch (_) {}
+    hideBackLinkEl.addEventListener("change", () => setBackLinkHidden(hideBackLinkEl.checked));
+
+    // Maximize: fullscreen with only the game shown.
+    document.querySelector("#play-mode").addEventListener("click", event => {
+      event.currentTarget.blur(); // so Space keeps going to the game
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen().catch(() => document.body.classList.toggle("play-mode"));
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && !document.fullscreenElement) document.body.classList.remove("play-mode");
+    });
+    document.addEventListener("fullscreenchange", () => {
+      document.body.classList.toggle("play-mode", Boolean(document.fullscreenElement));
+    });
+
+    // Arduino Web Serial controller: accepts newline-delimited BUTTON / UP /
+    // DOWN / LEFT / RIGHT messages at 115200 baud.
+    const arduinoConnectButton = document.querySelector("#arduino-connect");
+    const arduinoDisconnectButton = document.querySelector("#arduino-disconnect");
+    const arduinoStatus = document.querySelector("#arduino-status");
+    const arduinoHelp = document.querySelector("#arduino-help");
+    const arduinoLog = document.querySelector("#arduino-log");
+    const overlayEl = document.querySelector("#overlay");
+    let arduinoPort = null;
+    let arduinoReader = null;
+    let arduinoReadTask = null;
+    let arduinoKeepReading = false;
+    const arduinoHoldTimers = new Map();
+
+    function logArduino(message) {
+      console.log(message);
+      arduinoLog.textContent = `Arduino log: ${message}`;
+    }
+
+    function setArduinoStatus(label, connected = false) {
+      arduinoStatus.textContent = label;
+      arduinoStatus.className = `rounded-full px-3 py-1 text-xs font-bold ${connected ? "bg-emerald-300/15 text-emerald-200" : "bg-white/10 text-amber-100"}`;
+      arduinoConnectButton.classList.toggle("hidden", connected);
+      arduinoDisconnectButton.classList.toggle("hidden", !connected);
+      document.querySelector("#controller-notice").hidden = connected;
+    }
+
+    function pressKey(type, key, code) {
+      document.body.dispatchEvent(new KeyboardEvent(type, { key, code, bubbles: true }));
+    }
+
+    // Holds a key down until no repeat of it has arrived for `ms`. The game reads
+    // held keys once per frame, so even a single press must last a few frames.
+    function holdKey(key, code, ms) {
+      if (!arduinoHoldTimers.has(key)) pressKey("keydown", key, code);
+      clearTimeout(arduinoHoldTimers.get(key));
+      arduinoHoldTimers.set(key, setTimeout(() => {
+        pressKey("keyup", key, code);
+        arduinoHoldTimers.delete(key);
+      }, ms));
+    }
+
+    // Arduino sends BUTTON once per press and UP/DOWN/LEFT/RIGHT every 100 ms
+    // while held. On the menu / result screen BUTTON presses Space (PLAY /
+    // CONFIRM); in a run it presses E to interact with graves.
+    function handleArduinoCommand(rawCommand) {
+      if (settingsModal.open) return; // don't play while settings are being changed
+      const command = rawCommand.trim().toUpperCase();
+      if (command === "BUTTON") {
+        if (!overlayEl.classList.contains("hidden")) {
+          pressKey("keydown", " ", "Space");
+          pressKey("keyup", " ", "Space");
+        } else {
+          holdKey("e", "KeyE", 120);
+        }
+        return;
+      }
+      const key = { UP: "w", LEFT: "a", DOWN: "s", RIGHT: "d" }[command];
+      if (key) holdKey(key, `Key${key.toUpperCase()}`, 250);
+    }
+
+    async function disconnectArduino() {
+      arduinoKeepReading = false;
+      try { if (arduinoReader) await arduinoReader.cancel(); } catch (_) {}
+      try { if (arduinoReadTask) await arduinoReadTask; } catch (_) {}
+      arduinoReader = null;
+      arduinoReadTask = null;
+      if (arduinoPort) {
+        try { await arduinoPort.close(); } catch (_) {}
+      }
+      arduinoPort = null;
+      for (const [key, timer] of arduinoHoldTimers) {
+        clearTimeout(timer);
+        pressKey("keyup", key, `Key${key.toUpperCase()}`);
+      }
+      arduinoHoldTimers.clear();
+      setArduinoStatus("Not connected", false);
+      arduinoHelp.textContent = "Connect your Arduino over USB, choose its port, then send BUTTON / UP / DOWN / LEFT / RIGHT over Serial at 115200 baud.";
+    }
+
+    // With no port, asks the user to pick one. Ports picked before can be
+    // passed in directly, which is how auto-connect works.
+    async function connectArduino(port) {
+      if (arduinoPort) return;
+      logArduino("connect requested");
+      if (!("serial" in navigator)) {
+        logArduino("Web Serial unavailable. Use desktop Chrome or Edge on localhost or HTTPS.");
+        setArduinoStatus("Browser unsupported", false);
+        arduinoHelp.textContent = "Web Serial needs desktop Chrome or Edge and a localhost or HTTPS page.";
+        return;
+      }
+      arduinoConnectButton.disabled = true;
+      arduinoConnectButton.textContent = "Connecting…";
+      try {
+        if (!port) {
+          logArduino("opening browser port picker; select your Arduino COM port");
+          port = await navigator.serial.requestPort();
+        }
+        arduinoPort = port;
+        logArduino("port selected; opening at 115200 baud");
+        await arduinoPort.open({ baudRate: 115200 });
+        logArduino("CONNECTED at 115200 baud; press a controller button to check for input");
+        setArduinoStatus("Connected · 115200", true);
+        arduinoHelp.textContent = "Connected. Move the joystick to start and walk; the button continues past results and interacts in a run.";
+        arduinoKeepReading = true;
+        const decoder = new TextDecoder();
+        let buffer = "";
+        arduinoReader = arduinoPort.readable.getReader();
+        arduinoReadTask = (async () => {
+          try {
+            while (arduinoKeepReading) {
+              const { value, done } = await arduinoReader.read();
+              if (done) break;
+              const receivedText = decoder.decode(value, { stream: true });
+              logArduino(`received ${JSON.stringify(receivedText)}`);
+              buffer += receivedText;
+              const lines = buffer.split(/\n/);
+              buffer = lines.pop() || "";
+              for (const line of lines) handleArduinoCommand(line);
+              if (buffer.length > 100) buffer = buffer.slice(-100);
+            }
+          } catch (error) {
+            if (arduinoKeepReading) {
+              logArduino(`serial read failed: ${error.message}`);
+              setArduinoStatus("Read error", false);
+              arduinoHelp.textContent = `Serial read failed: ${error.message}. Check the USB connection and baud rate.`;
+            }
+          } finally {
+            try { arduinoReader?.releaseLock(); } catch (_) {}
+          }
+        })();
+      } catch (error) {
+        logArduino(`connection failed: ${error.message}`);
+        arduinoPort = null;
+        setArduinoStatus("Not connected", false);
+        arduinoHelp.textContent = error.name === "NotFoundError"
+          ? "No port selected. Click Connect again and select your Arduino USB port."
+          : `Could not connect: ${error.message}. Close Arduino Serial Monitor/Plotter if it is using the port, then try again.`;
+      } finally {
+        arduinoConnectButton.disabled = false;
+        arduinoConnectButton.textContent = "Connect COM port";
+      }
+    }
+    arduinoConnectButton.addEventListener("click", () => connectArduino());
+    arduinoDisconnectButton.addEventListener("click", disconnectArduino);
+    if ("serial" in navigator) {
+      navigator.serial.addEventListener("disconnect", event => {
+        if (arduinoPort && event.target === arduinoPort) disconnectArduino();
+      });
+      // Auto-connect to a port that was picked before: on page load, and when it's plugged in.
+      navigator.serial.addEventListener("connect", event => connectArduino(event.target));
+      navigator.serial.getPorts().then(ports => { if (ports[0]) connectArduino(ports[0]); });
+    }
+  </script>
 </body>
 </html>
